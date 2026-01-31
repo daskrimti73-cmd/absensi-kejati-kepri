@@ -53,42 +53,74 @@
         }
         
         .filter-section {
-            display: flex;
-            gap: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px 30px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            flex-wrap: wrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #dee2e6;
+        }
+        
+        .filter-title {
+            text-align: center;
+            color: #1a5f2a;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+            gap: 10px;
+        }
+        
+        .filter-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
         }
         
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
         }
         
         .filter-group label {
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
         .filter-group select {
-            padding: 12px 20px;
-            font-size: 16px;
-            border: 2px solid #1a5f2a;
+            padding: 12px 16px;
+            font-size: 15px;
+            border: 2px solid #ced4da;
             border-radius: 8px;
             background: white;
             cursor: pointer;
-            min-width: 150px;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #495057;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
         .filter-group select:hover {
-            border-color: #2d8f4e;
-            box-shadow: 0 2px 8px rgba(26,95,42,0.2);
+            border-color: #1a5f2a;
+            box-shadow: 0 4px 12px rgba(26,95,42,0.15);
+            transform: translateY(-1px);
+        }
+        
+        .filter-group select:focus {
+            outline: none;
+            border-color: #1a5f2a;
+            box-shadow: 0 0 0 3px rgba(26,95,42,0.1);
         }
         
         .stats-cards {
@@ -250,8 +282,17 @@
             }
             
             .filter-section {
-                flex-direction: column;
-                align-items: center;
+                padding: 20px 15px;
+            }
+            
+            .filter-title {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+            
+            .filter-controls {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
             
             .stats-cards {
@@ -271,44 +312,50 @@
             <p>Kejaksaan Tinggi Kepulauan Riau</p>
         </div>
         
-        <!-- Filter Section - TERPISAH BULAN DAN TAHUN -->
+        <!-- Filter Section -->
         <div class="filter-section">
-            <div class="filter-group">
-                <label for="bulanFilter">📅 Pilih Bulan:</label>
-                <select id="bulanFilter" onchange="updateChart()">
-                    <option value="januari">Januari</option>
-                    <option value="februari">Februari</option>
-                    <option value="maret">Maret</option>
-                    <option value="april">April</option>
-                    <option value="mei">Mei</option>
-                    <option value="juni">Juni</option>
-                    <option value="juli">Juli</option>
-                    <option value="agustus">Agustus</option>
-                    <option value="september">September</option>
-                    <option value="oktober">Oktober</option>
-                    <option value="november">November</option>
-                    <option value="desember" selected>Desember</option>
-                </select>
+            <div class="filter-title">
+                <span>�</span>
+                <span>FILTER DATA ABSENSI</span>
             </div>
-            <div class="filter-group">
-                <label for="tahunFilter">📆 Pilih Tahun:</label>
-                <select id="tahunFilter" onchange="updateChart()">
-                    <option value="2025" selected>2025</option>
-                    <option value="2026">2026</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="kategoriFilter">📋 Tampilkan Kategori:</label>
-                <select id="kategoriFilter" onchange="updateChart()">
-                    <option value="semua">Semua Kategori</option>
-                    <option value="wfo">WFO (Hadir)</option>
-                    <option value="dinasLuar">Dinas Luar</option>
-                    <option value="undangan">Undangan</option>
-                    <option value="sakit">Sakit</option>
-                    <option value="ijin">Ijin</option>
-                    <option value="cuti">Cuti</option>
-                    <option value="tidakAbsen">Tidak Absen</option>
-                </select>
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="bulanFilter">📅 Pilih Bulan</label>
+                    <select id="bulanFilter" onchange="updateChart()">
+                        <option value="januari">Januari</option>
+                        <option value="februari">Februari</option>
+                        <option value="maret">Maret</option>
+                        <option value="april">April</option>
+                        <option value="mei">Mei</option>
+                        <option value="juni">Juni</option>
+                        <option value="juli">Juli</option>
+                        <option value="agustus">Agustus</option>
+                        <option value="september">September</option>
+                        <option value="oktober">Oktober</option>
+                        <option value="november">November</option>
+                        <option value="desember" selected>Desember</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="tahunFilter">� Pilih Tahun</label>
+                    <select id="tahunFilter" onchange="updateChart()">
+                        <option value="2025" selected>2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="kategoriFilter">📋 Kategori Data</label>
+                    <select id="kategoriFilter" onchange="updateChart()">
+                        <option value="semua">Semua Kategori</option>
+                        <option value="wfo">WFO (Hadir)</option>
+                        <option value="dinasLuar">Dinas Luar</option>
+                        <option value="undangan">Undangan</option>
+                        <option value="sakit">Sakit</option>
+                        <option value="ijin">Ijin</option>
+                        <option value="cuti">Cuti</option>
+                        <option value="tidakAbsen">Tidak Absen</option>
+                    </select>
+                </div>
             </div>
         </div>
         
