@@ -579,7 +579,9 @@
                         data: data[key],
                         backgroundColor: datasetConfig[key].color,
                         borderColor: datasetConfig[key].border,
-                        borderWidth: 1
+                        borderWidth: 1,
+                        barPercentage: 0.9,
+                        categoryPercentage: 1.0
                     }))
                 },
                 options: {
@@ -604,7 +606,7 @@
                                 autoSkip: false,
                                 maxRotation: 0,
                                 minRotation: 0,
-                                font: { size: 11 }
+                                font: { size: 10 }
                             }
                         },
                         y: {
@@ -644,7 +646,9 @@
                     data: data[key],
                     backgroundColor: datasetConfig[key].color,
                     borderColor: datasetConfig[key].border,
-                    borderWidth: 1
+                    borderWidth: 1,
+                    barPercentage: 0.9,
+                    categoryPercentage: 1.0
                 }));
                 chartInstance.options.scales.x.stacked = true;
                 chartInstance.options.scales.y.stacked = true;
@@ -656,7 +660,9 @@
                     data: data[kategori],
                     backgroundColor: config.color,
                     borderColor: config.border,
-                    borderWidth: 1
+                    borderWidth: 1,
+                    barPercentage: 0.9,
+                    categoryPercentage: 1.0
                 }];
                 chartInstance.options.scales.x.stacked = false;
                 chartInstance.options.scales.y.stacked = false;
