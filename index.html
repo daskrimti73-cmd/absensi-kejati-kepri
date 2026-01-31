@@ -53,74 +53,96 @@
         }
         
         .filter-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 25px 30px;
-            border-radius: 12px;
+            background: white;
+            padding: 0;
+            border-radius: 16px;
             margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border: 1px solid #dee2e6;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            border: none;
+            overflow: hidden;
         }
         
         .filter-title {
-            text-align: center;
-            color: #1a5f2a;
+            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            color: white;
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 20px;
+            padding: 20px 30px;
+            margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            letter-spacing: 1px;
         }
         
         .filter-controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            padding: 30px;
+            background: #fafbfc;
         }
         
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
+            padding: 0 15px;
+            position: relative;
+        }
+        
+        .filter-group:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 10%;
+            height: 80%;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, #dee2e6, transparent);
         }
         
         .filter-group label {
-            font-weight: 600;
-            color: #495057;
-            font-size: 13px;
+            font-weight: 700;
+            color: #1a5f2a;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            margin-bottom: 4px;
         }
         
         .filter-group select {
-            padding: 12px 16px;
+            padding: 14px 18px;
             font-size: 15px;
-            border: 2px solid #ced4da;
-            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
             background: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: 500;
-            color: #495057;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-weight: 600;
+            color: #2c3e50;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a5f2a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 40px;
         }
         
         .filter-group select:hover {
             border-color: #1a5f2a;
-            box-shadow: 0 4px 12px rgba(26,95,42,0.15);
-            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(26,95,42,0.15);
+            transform: translateY(-2px);
+            background-color: #f8fdf9;
         }
         
         .filter-group select:focus {
             outline: none;
             border-color: #1a5f2a;
-            box-shadow: 0 0 0 3px rgba(26,95,42,0.1);
+            box-shadow: 0 0 0 4px rgba(26,95,42,0.1);
+            background-color: white;
         }
         
         .stats-cards {
@@ -282,17 +304,31 @@
             }
             
             .filter-section {
-                padding: 20px 15px;
+                border-radius: 12px;
             }
             
             .filter-title {
                 font-size: 16px;
-                margin-bottom: 15px;
+                padding: 16px 20px;
             }
             
             .filter-controls {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .filter-group {
+                padding: 0;
+            }
+            
+            .filter-group:not(:last-child)::after {
+                display: none;
+            }
+            
+            .filter-group select {
+                padding: 12px 16px;
+                font-size: 14px;
             }
             
             .stats-cards {
