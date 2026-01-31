@@ -195,17 +195,175 @@
 
         function getSelectedData() { const bulan = document.getElementById('bulanFilter').value; const tahun = document.getElementById('tahunFilter').value; if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) { return dataAbsensi[tahun][bulan]; } return null; }
 
-        function initChart() { const ctx = document.getElementById('absensiChart').getContext('2d'); const data = getSelectedData() || dataAbsensi[2025].desember; chartInstance = new Chart(ctx, { type: 'bar', data: { labels: data.labels, datasets: Object.keys(datasetConfig).map(key => ({ label: datasetConfig[key].label, data: data[key], backgroundColor: datasetConfig[key].color, borderColor: datasetConfig[key].border, borderWidth: 1 })) }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, title: { display: true, text: 'GRAFIK BATANG ABSENSI HARIAN - DESEMBER 2025', font: { size: 18, weight: 'bold' }, color: '#1a5f2a', padding: { bottom: 20 } } }, scales: { x: { stacked: true, title: { display: true, text: 'TANGGAL', font: { weight: 'bold', size: 14 } }, grid: { display: false } }, y: { stacked: true, beginAtZero: true, max: 160, title: { display: true, text: 'JUMLAH PEGAWAI', font: { weight: 'bold', size: 14 } } } } } ); updateStats(); updateTable(); }
+        function initChart() { 
+            const ctx = document.getElementById('absensiChart').getContext('2d'); 
+            const data = getSelectedData() || dataAbsensi[2025].desember; 
+            chartInstance = new Chart(ctx, { 
+                type: 'bar', 
+                data: { 
+                    labels: data.labels, 
+                    datasets: Object.keys(datasetConfig).map(key => ({ 
+                        label: datasetConfig[key].label, 
+                        data: data[key], 
+                        backgroundColor: datasetConfig[key].color, 
+                        borderColor: datasetConfig[key].border, 
+                        borderWidth: 1 
+                    })) 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { 
+                        legend: { display: false }, 
+                        title: { 
+                            display: true, 
+                            text: 'GRAFIK BATANG ABSENSI HARIAN - DESEMBER 2025', 
+                            font: { size: 18, weight: 'bold' }, 
+                            color: '#1a5f2a', 
+                            padding: { bottom: 20 } 
+                        } 
+                    }, 
+                    scales: { 
+                        x: { 
+                            stacked: true, 
+                            title: { 
+                                display: true, 
+                                text: 'TANGGAL', 
+                                font: { weight: 'bold', size: 14 } 
+                            }, 
+                            grid: { display: false } 
+                        }, 
+                        y: { 
+                            stacked: true, 
+                            beginAtZero: true, 
+                            max: 160, 
+                            title: { 
+                                display: true, 
+                                text: 'JUMLAH PEGAWAI', 
+                                font: { weight: 'bold', size: 14 } 
+                            } 
+                        } 
+                    } 
+                } 
+            }); 
+            updateStats(); 
+            updateTable(); 
+        }
 
-        function updateChart() { const bulan = document.getElementById('bulanFilter').value; const tahun = document.getElementById('tahunFilter').value; const kategori = document.getElementById('kategoriFilter').value; const data = getSelectedData(); if (!data) { chartInstance.data.labels = []; chartInstance.data.datasets = []; chartInstance.options.plugins.title.text = 'DATA TIDAK TERSEDIA - ' + bulanNama[bulan] + ' ' + tahun; chartInstance.update(); updateStatsEmpty(); updateTableEmpty(bulan, tahun); return; } if (kategori === 'semua') { chartInstance.data.datasets = Object.keys(datasetConfig).map(key => ({ label: datasetConfig[key].label, data: data[key], backgroundColor: datasetConfig[key].color, borderColor: datasetConfig[key].border, borderWidth: 1 })); chartInstance.options.scales.x.stacked = true; chartInstance.options.scales.y.stacked = true; chartInstance.options.scales.y.max = 160; } else { const config = datasetConfig[kategori]; chartInstance.data.datasets = [{ label: config.label, data: data[kategori], backgroundColor: config.color, borderColor: config.border, borderWidth: 1 }]; chartInstance.options.scales.x.stacked = false; chartInstance.options.scales.y.stacked = false; chartInstance.options.scales.y.max = kategori === 'wfo' ? 150 : 80; } chartInstance.data.labels = data.labels; chartInstance.options.plugins.title.text = 'GRAFIK BATANG ABSENSI HARIAN - ' + bulanNama[bulan] + ' ' + tahun; chartInstance.update(); updateStats(); updateTable(); }
+        function updateChart() { 
+            const bulan = document.getElementById('bulanFilter').value; 
+            const tahun = document.getElementById('tahunFilter').value; 
+            const kategori = document.getElementById('kategoriFilter').value; 
+            const data = getSelectedData(); 
+            
+            if (!data) { 
+                chartInstance.data.labels = []; 
+                chartInstance.data.datasets = []; 
+                chartInstance.options.plugins.title.text = 'DATA TIDAK TERSEDIA - ' + bulanNama[bulan] + ' ' + tahun; 
+                chartInstance.update(); 
+                updateStatsEmpty(); 
+                updateTableEmpty(bulan, tahun); 
+                return; 
+            } 
+            
+            if (kategori === 'semua') { 
+                chartInstance.data.datasets = Object.keys(datasetConfig).map(key => ({ 
+                    label: datasetConfig[key].label, 
+                    data: data[key], 
+                    backgroundColor: datasetConfig[key].color, 
+                    borderColor: datasetConfig[key].border, 
+                    borderWidth: 1 
+                })); 
+                chartInstance.options.scales.x.stacked = true; 
+                chartInstance.options.scales.y.stacked = true; 
+                chartInstance.options.scales.y.max = 160; 
+            } else { 
+                const config = datasetConfig[kategori]; 
+                chartInstance.data.datasets = [{ 
+                    label: config.label, 
+                    data: data[kategori], 
+                    backgroundColor: config.color, 
+                    borderColor: config.border, 
+                    borderWidth: 1 
+                }]; 
+                chartInstance.options.scales.x.stacked = false; 
+                chartInstance.options.scales.y.stacked = false; 
+                chartInstance.options.scales.y.max = kategori === 'wfo' ? 150 : 80; 
+            } 
+            
+            chartInstance.data.labels = data.labels; 
+            chartInstance.options.plugins.title.text = 'GRAFIK BATANG ABSENSI HARIAN - ' + bulanNama[bulan] + ' ' + tahun; 
+            chartInstance.update(); 
+            updateStats(); 
+            updateTable(); 
+        }
 
-        function updateStats() { const data = getSelectedData(); if (!data) { updateStatsEmpty(); return; } const sum = arr => arr.reduce((a, b) => a + b, 0); document.getElementById('statPegawai').textContent = data.totalPegawai; document.getElementById('statWfo').textContent = sum(data.wfo).toLocaleString(); document.getElementById('statDinas').textContent = sum(data.dinasLuar).toLocaleString(); document.getElementById('statUndangan').textContent = sum(data.undangan).toLocaleString(); document.getElementById('statSakit').textContent = sum(data.sakit).toLocaleString(); document.getElementById('statIjin').textContent = sum(data.ijin).toLocaleString(); document.getElementById('statCuti').textContent = sum(data.cuti).toLocaleString(); document.getElementById('statAlpha').textContent = sum(data.tidakAbsen).toLocaleString(); }
+        function updateStats() { 
+            const data = getSelectedData(); 
+            if (!data) { 
+                updateStatsEmpty(); 
+                return; 
+            } 
+            const sum = arr => arr.reduce((a, b) => a + b, 0); 
+            document.getElementById('statPegawai').textContent = data.totalPegawai; 
+            document.getElementById('statWfo').textContent = sum(data.wfo).toLocaleString(); 
+            document.getElementById('statDinas').textContent = sum(data.dinasLuar).toLocaleString(); 
+            document.getElementById('statUndangan').textContent = sum(data.undangan).toLocaleString(); 
+            document.getElementById('statSakit').textContent = sum(data.sakit).toLocaleString(); 
+            document.getElementById('statIjin').textContent = sum(data.ijin).toLocaleString(); 
+            document.getElementById('statCuti').textContent = sum(data.cuti).toLocaleString(); 
+            document.getElementById('statAlpha').textContent = sum(data.tidakAbsen).toLocaleString(); 
+        }
 
-        function updateStatsEmpty() { document.getElementById('statPegawai').textContent = '-'; document.getElementById('statWfo').textContent = '-'; document.getElementById('statDinas').textContent = '-'; document.getElementById('statUndangan').textContent = '-'; document.getElementById('statSakit').textContent = '-'; document.getElementById('statIjin').textContent = '-'; document.getElementById('statCuti').textContent = '-'; document.getElementById('statAlpha').textContent = '-'; }
+        function updateStatsEmpty() { 
+            document.getElementById('statPegawai').textContent = '-'; 
+            document.getElementById('statWfo').textContent = '-'; 
+            document.getElementById('statDinas').textContent = '-'; 
+            document.getElementById('statUndangan').textContent = '-'; 
+            document.getElementById('statSakit').textContent = '-'; 
+            document.getElementById('statIjin').textContent = '-'; 
+            document.getElementById('statCuti').textContent = '-'; 
+            document.getElementById('statAlpha').textContent = '-'; 
+        }
 
-        function updateTableEmpty(bulan, tahun) { const tableBody = document.getElementById('tableBody'); document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun; tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>'; }
+        function updateTableEmpty(bulan, tahun) { 
+            const tableBody = document.getElementById('tableBody'); 
+            document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun; 
+            tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>'; 
+        }
 
-        function updateTable() { const bulan = document.getElementById('bulanFilter').value; const tahun = document.getElementById('tahunFilter').value; const data = getSelectedData(); const tableBody = document.getElementById('tableBody'); document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun; if (!data) { tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>'; return; } let html = ''; for (let i = 0; i < data.labels.length; i++) { const isWeekend = data.isWeekend[i]; const rowClass = isWeekend ? 'weekend-row' : ''; const totalAktif = data.wfo[i] + data.dinasLuar[i] + data.undangan[i]; html += `<tr class="${rowClass}">\n                    <td><strong>${data.labels[i]}</strong></td>\n                    <td>${data.hari[i]}</td>\n                    <td>${data.wfo[i]}</td>\n                    <td>${data.dinasLuar[i]}</td>\n                    <td>${data.undangan[i]}</td>\n                    <td>${data.sakit[i]}</td>\n                    <td>${data.ijin[i]}</td>\n                    <td>${data.cuti[i]}</td>\n                    <td>${data.tidakAbsen[i]}</td>\n                    <td><strong>${totalAktif}</strong></td>\n                </tr>`; } tableBody.innerHTML = html; }
+        function updateTable() { 
+            const bulan = document.getElementById('bulanFilter').value; 
+            const tahun = document.getElementById('tahunFilter').value; 
+            const data = getSelectedData(); 
+            const tableBody = document.getElementById('tableBody'); 
+            document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun; 
+            
+            if (!data) { 
+                tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>'; 
+                return; 
+            } 
+            
+            let html = ''; 
+            for (let i = 0; i < data.labels.length; i++) { 
+                const isWeekend = data.isWeekend[i]; 
+                const rowClass = isWeekend ? 'weekend-row' : ''; 
+                const totalAktif = data.wfo[i] + data.dinasLuar[i] + data.undangan[i]; 
+                html += `<tr class="${rowClass}">
+                    <td><strong>${data.labels[i]}</strong></td>
+                    <td>${data.hari[i]}</td>
+                    <td>${data.wfo[i]}</td>
+                    <td>${data.dinasLuar[i]}</td>
+                    <td>${data.undangan[i]}</td>
+                    <td>${data.sakit[i]}</td>
+                    <td>${data.ijin[i]}</td>
+                    <td>${data.cuti[i]}</td>
+                    <td>${data.tidakAbsen[i]}</td>
+                    <td><strong>${totalAktif}</strong></td>
+                </tr>`; 
+            } 
+            tableBody.innerHTML = html; 
+        }
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', initChart);
