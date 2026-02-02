@@ -218,50 +218,6 @@
             border-radius: 4px;
         }
         
-        .table-container {
-            overflow-x: auto;
-            margin-top: 30px;
-        }
-        
-        .table-container h3 {
-            margin-bottom: 15px;
-            color: #1a5f2a;
-            font-size: 20px;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-        
-        th, td {
-            padding: 12px 8px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-        
-        th {
-            background: #1a5f2a;
-            color: white;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
-        }
-        
-        tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-        
-        tr:hover {
-            background: #e9ecef;
-        }
-        
-        .weekend-row {
-            background: #ffe6e6 !important;
-            color: #999;
-        }
-        
         .footer {
             text-align: center;
             margin-top: 30px;
@@ -467,29 +423,6 @@
                 <div class="legend-color" style="background: #dc3545;"></div>
                 <span>Tidak Absen</span>
             </div>
-        </div>
-        
-        <!-- Table -->
-        <div class="table-container">
-            <h3 id="tableTitle">📋 Detail Data Harian - Desember 2025</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tgl</th>
-                        <th>Hari</th>
-                        <th>WFO</th>
-                        <th>Dinas Luar</th>
-                        <th>Undangan</th>
-                        <th>Sakit</th>
-                        <th>Ijin</th>
-                        <th>Cuti</th>
-                        <th>Tidak Absen</th>
-                        <th>Total Aktif</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                </tbody>
-            </table>
         </div>
         
         <div class="footer">
@@ -757,7 +690,6 @@
             });
             
             updateStats();
-            updateTable();
         }
 
         function updateChart() {
@@ -773,7 +705,6 @@
                 chartInstance.options.plugins.title.text = 'DATA TIDAK TERSEDIA - ' + bulanNama[bulan] + ' ' + tahun;
                 chartInstance.update();
                 updateStatsEmpty();
-                updateTableEmpty(bulan, tahun);
                 return;
             }
 
@@ -811,7 +742,6 @@
             chartInstance.update();
             
             updateStats();
-            updateTable();
         }
 
         function updateStats() {
@@ -841,70 +771,6 @@
             document.getElementById('statIjin').textContent = '-';
             document.getElementById('statCuti').textContent = '-';
             document.getElementById('statAlpha').textContent = '-';
-        }
-
-        function updateTableEmpty(bulan, tahun) {
-            const tableBody = document.getElementById('tableBody');
-            document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun;
-            tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>';
-        }
-
-        function updateTable() {
-            const bulan = document.getElementById('bulanFilter').value;
-            const tahun = document.getElementById('tahunFilter').value;
-            const data = getSelectedData();
-            const tableBody = document.getElementById('tableBody');
-            
-            // Update judul tabel
-            if (bulan === 'semua') {
-                document.getElementById('tableTitle').innerHTML = '📋 Detail Data Per Bulan - ' + bulanNama[bulan] + ' ' + tahun;
-            } else {
-                document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun;
-            }
-
-            if (!data) {
-                tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>';
-                return;
-            }
-            
-            let html = '';
-            for (let i = 0; i < data.labels.length; i++) {
-                const isWeekend = data.isWeekend[i];
-                const rowClass = isWeekend ? 'weekend-row' : '';
-                const totalAktif = data.wfo[i] + data.dinasLuar[i] + data.undangan[i];
-                
-                // Untuk tampilan semua bulan, gunakan nama bulan sebagai label
-                const labelText = bulan === 'semua' ? data.hari[i] : data.labels[i];
-                const hariText = bulan === 'semua' ? '' : data.hari[i];
-                
-                if (bulan === 'semua') {
-                    html += `<tr class="${rowClass}">
-                        <td colspan="2"><strong>${labelText}</strong></td>
-                        <td>${data.wfo[i].toLocaleString()}</td>
-                        <td>${data.dinasLuar[i].toLocaleString()}</td>
-                        <td>${data.undangan[i].toLocaleString()}</td>
-                        <td>${data.sakit[i].toLocaleString()}</td>
-                        <td>${data.ijin[i].toLocaleString()}</td>
-                        <td>${data.cuti[i].toLocaleString()}</td>
-                        <td>${data.tidakAbsen[i].toLocaleString()}</td>
-                        <td><strong>${totalAktif.toLocaleString()}</strong></td>
-                    </tr>`;
-                } else {
-                    html += `<tr class="${rowClass}">
-                        <td><strong>${labelText}</strong></td>
-                        <td>${hariText}</td>
-                        <td>${data.wfo[i]}</td>
-                        <td>${data.dinasLuar[i]}</td>
-                        <td>${data.undangan[i]}</td>
-                        <td>${data.sakit[i]}</td>
-                        <td>${data.ijin[i]}</td>
-                        <td>${data.cuti[i]}</td>
-                        <td>${data.tidakAbsen[i]}</td>
-                        <td><strong>${totalAktif}</strong></td>
-                    </tr>`;
-                }
-            }
-            tableBody.innerHTML = html;
         }
 
         // Initialize when DOM is ready
