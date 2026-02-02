@@ -358,6 +358,7 @@
                 <div class="filter-group">
                     <label for="bulanFilter">📅 Pilih Bulan</label>
                     <select id="bulanFilter" onchange="updateChart()">
+                        <option value="semua">Semua Bulan</option>
                         <option value="januari">Januari</option>
                         <option value="februari">Februari</option>
                         <option value="maret">Maret</option>
@@ -612,6 +613,7 @@
         };
 
         const bulanNama = {
+            semua: 'SEMUA BULAN',
             januari: 'JANUARI',
             februari: 'FEBRUARI',
             maret: 'MARET',
@@ -626,10 +628,63 @@
             desember: 'DESEMBER'
         };
 
+        // Fungsi untuk menggabungkan data semua bulan
+        function getAllMonthsData(tahun) {
+            if (!dataAbsensi[tahun]) return null;
+            
+            const bulanList = ['mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
+            const availableMonths = bulanList.filter(b => dataAbsensi[tahun][b]);
+            
+            if (availableMonths.length === 0) return null;
+            
+            // Hitung total pegawai (ambil yang terbesar)
+            let maxPegawai = 0;
+            availableMonths.forEach(bulan => {
+                if (dataAbsensi[tahun][bulan].totalPegawai > maxPegawai) {
+                    maxPegawai = dataAbsensi[tahun][bulan].totalPegawai;
+                }
+            });
+            
+            // Gabungkan semua data
+            const combinedData = {
+                totalPegawai: maxPegawai,
+                labels: availableMonths,
+                hari: availableMonths.map(b => bulanNama[b]),
+                isWeekend: availableMonths.map(() => false),
+                wfo: [],
+                dinasLuar: [],
+                undangan: [],
+                sakit: [],
+                ijin: [],
+                cuti: [],
+                tidakAbsen: []
+            };
+            
+            // Jumlahkan data per bulan
+            availableMonths.forEach(bulan => {
+                const monthData = dataAbsensi[tahun][bulan];
+                const sum = arr => arr.reduce((a, b) => a + b, 0);
+                
+                combinedData.wfo.push(sum(monthData.wfo));
+                combinedData.dinasLuar.push(sum(monthData.dinasLuar));
+                combinedData.undangan.push(sum(monthData.undangan));
+                combinedData.sakit.push(sum(monthData.sakit));
+                combinedData.ijin.push(sum(monthData.ijin));
+                combinedData.cuti.push(sum(monthData.cuti));
+                combinedData.tidakAbsen.push(sum(monthData.tidakAbsen));
+            });
+            
+            return combinedData;
+        }
+
         // Fungsi helper untuk mengambil data berdasarkan tahun dan bulan
         function getSelectedData() {
             const bulan = document.getElementById('bulanFilter').value;
             const tahun = document.getElementById('tahunFilter').value;
+            
+            if (bulan === 'semua') {
+                return getAllMonthsData(tahun);
+            }
             
             if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) {
                 return dataAbsensi[tahun][bulan];
@@ -800,7 +855,13 @@
             const tahun = document.getElementById('tahunFilter').value;
             const data = getSelectedData();
             const tableBody = document.getElementById('tableBody');
-            document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun;
+            
+            // Update judul tabel
+            if (bulan === 'semua') {
+                document.getElementById('tableTitle').innerHTML = '📋 Detail Data Per Bulan - ' + bulanNama[bulan] + ' ' + tahun;
+            } else {
+                document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun;
+            }
 
             if (!data) {
                 tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>';
@@ -813,18 +874,36 @@
                 const rowClass = isWeekend ? 'weekend-row' : '';
                 const totalAktif = data.wfo[i] + data.dinasLuar[i] + data.undangan[i];
                 
-                html += `<tr class="${rowClass}">
-                    <td><strong>${data.labels[i]}</strong></td>
-                    <td>${data.hari[i]}</td>
-                    <td>${data.wfo[i]}</td>
-                    <td>${data.dinasLuar[i]}</td>
-                    <td>${data.undangan[i]}</td>
-                    <td>${data.sakit[i]}</td>
-                    <td>${data.ijin[i]}</td>
-                    <td>${data.cuti[i]}</td>
-                    <td>${data.tidakAbsen[i]}</td>
-                    <td><strong>${totalAktif}</strong></td>
-                </tr>`;
+                // Untuk tampilan semua bulan, gunakan nama bulan sebagai label
+                const labelText = bulan === 'semua' ? data.hari[i] : data.labels[i];
+                const hariText = bulan === 'semua' ? '' : data.hari[i];
+                
+                if (bulan === 'semua') {
+                    html += `<tr class="${rowClass}">
+                        <td colspan="2"><strong>${labelText}</strong></td>
+                        <td>${data.wfo[i].toLocaleString()}</td>
+                        <td>${data.dinasLuar[i].toLocaleString()}</td>
+                        <td>${data.undangan[i].toLocaleString()}</td>
+                        <td>${data.sakit[i].toLocaleString()}</td>
+                        <td>${data.ijin[i].toLocaleString()}</td>
+                        <td>${data.cuti[i].toLocaleString()}</td>
+                        <td>${data.tidakAbsen[i].toLocaleString()}</td>
+                        <td><strong>${totalAktif.toLocaleString()}</strong></td>
+                    </tr>`;
+                } else {
+                    html += `<tr class="${rowClass}">
+                        <td><strong>${labelText}</strong></td>
+                        <td>${hariText}</td>
+                        <td>${data.wfo[i]}</td>
+                        <td>${data.dinasLuar[i]}</td>
+                        <td>${data.undangan[i]}</td>
+                        <td>${data.sakit[i]}</td>
+                        <td>${data.ijin[i]}</td>
+                        <td>${data.cuti[i]}</td>
+                        <td>${data.tidakAbsen[i]}</td>
+                        <td><strong>${totalAktif}</strong></td>
+                    </tr>`;
+                }
             }
             tableBody.innerHTML = html;
         }
