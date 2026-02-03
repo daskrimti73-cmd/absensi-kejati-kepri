@@ -624,10 +624,10 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
         const USE_SUPABASE = false; // SEMENTARA DISABLE untuk testing grafik
         
-        let supabase;
+        let supabaseClient = null;
         try {
             if (window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             }
         } catch (error) {
             console.error('Supabase initialization error:', error);
@@ -813,13 +813,13 @@
 
         // Fungsi untuk fetch data dari Supabase
         async function fetchDataFromSupabase(tahun, bulan) {
-            if (!supabase) {
+            if (!supabaseClient) {
                 console.log('Supabase not initialized, using hardcoded data');
                 return null;
             }
             
             try {
-                const { data, error } = await supabase
+                const { data, error } = await supabaseClient
                     .from('absensi')
                     .select('*')
                     .eq('tahun', tahun)
@@ -871,7 +871,7 @@
             }
             
             // Coba fetch dari Supabase jika enabled
-            if (USE_SUPABASE && supabase) {
+            if (USE_SUPABASE && supabaseClient) {
                 try {
                     const supabaseData = await fetchDataFromSupabase(parseInt(tahun), bulan);
                     if (supabaseData) {
