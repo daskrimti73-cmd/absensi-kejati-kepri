@@ -300,14 +300,23 @@
                     const dataRows = jsonData.filter(row => {
                         const firstCol = String(Object.values(row)[0] || '').toUpperCase().trim();
                         // Cek apakah baris ini adalah baris ringkasan
-                        return firstCol.includes('JUMLAH WFO') || 
+                        // Support both "WFO" and "JUMLAH WFO" format
+                        return firstCol === 'WFO' ||
+                               firstCol.includes('JUMLAH WFO') || 
                                firstCol.includes('JUMLAH DINAS') || 
+                               firstCol.includes('DINAS LUAR') ||
                                firstCol.includes('JUMLAH UNDANGAN') || 
+                               firstCol.includes('UNDANGAN') ||
                                firstCol.includes('JUMLAH SAKIT') || 
+                               firstCol.includes('SAKIT') ||
                                firstCol.includes('JUMLAH IJIN') || 
+                               firstCol.includes('IJIN') ||
                                firstCol.includes('JUMLAH CUTI') || 
+                               firstCol.includes('CUTI') ||
                                firstCol.includes('JUMLAH ISOMAN') || 
+                               firstCol.includes('ISOMAN') ||
                                firstCol.includes('JUMLAH TIDAK ABSEN') ||
+                               firstCol.includes('TIDAK ABSEN') ||
                                firstCol === 'TOTAL';
                     });
                     
@@ -337,20 +346,20 @@
                             const label = String(Object.values(row)[0] || '').toUpperCase().trim();
                             const value = parseInt(row[key]) || 0;
                             
-                            // Match label dengan kategori
-                            if (label.includes('JUMLAH WFO')) {
+                            // Match label dengan kategori (support both "WFO" and "JUMLAH WFO" format)
+                            if (label === 'WFO' || label.includes('JUMLAH WFO')) {
                                 wfo = value;
-                            } else if (label.includes('JUMLAH DINAS')) {
+                            } else if (label.includes('DINAS')) {
                                 dinasLuar = value;
-                            } else if (label.includes('JUMLAH UNDANGAN')) {
+                            } else if (label.includes('UNDANGAN')) {
                                 undangan = value;
-                            } else if (label.includes('JUMLAH SAKIT')) {
+                            } else if (label.includes('SAKIT')) {
                                 sakit = value;
-                            } else if (label.includes('JUMLAH IJIN')) {
+                            } else if (label.includes('IJIN')) {
                                 ijin = value;
-                            } else if (label.includes('JUMLAH CUTI')) {
+                            } else if (label.includes('CUTI')) {
                                 cuti = value;
-                            } else if (label.includes('JUMLAH TIDAK ABSEN') || label.includes('JUMLAH ISOMAN')) {
+                            } else if (label.includes('TIDAK ABSEN') || label.includes('ISOMAN')) {
                                 tidakAbsen = value;
                             }
                         });
