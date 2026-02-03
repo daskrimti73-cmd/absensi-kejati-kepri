@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Upload Data Absensi</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #1a5f2a;
+        }
+        
+        .header h1 {
+            color: #1a5f2a;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group select,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group select:focus,
+        .form-group input[type="file"]:focus {
+            outline: none;
+            border-color: #1a5f2a;
+            box-shadow: 0 0 0 3px rgba(26,95,42,0.1);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        
+        .radio-group input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .btn-upload {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-upload:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(26,95,42,0.3);
+        }
+        
+        .btn-upload:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📤 UPLOAD DATA ABSENSI</h1>
+            <p>Kejaksaan Tinggi Kepulauan Riau</p>
+        </div>
+        
+        <form id="uploadForm">
+            <div class="form-group">
+                <label for="bulan">📅 Pilih Bulan</label>
+                <select id="bulan" required>
+                    <option value="januari">Januari</option>
+                    <option value="februari">Februari</option>
+                    <option value="maret">Maret</option>
+                    <option value="april">April</option>
+                    <option value="mei">Mei</option>
+                    <option value="juni">Juni</option>
+                    <option value="juli">Juli</option>
+                    <option value="agustus">Agustus</option>
+                    <option value="september">September</option>
+                    <option value="oktober">Oktober</option>
+                    <option value="november">November</option>
+                    <option value="desember">Desember</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="tahun">📆 Pilih Tahun</label>
+                <select id="tahun" required>
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="excelFile">📁 Pilih File Excel</label>
+                <input type="file" id="excelFile" accept=".xlsx,.xls" required>
+                <p class="help-text">Format: .xlsx atau .xls</p>
+            </div>
+            
+            <div class="form-group">
+                <label>🔄 Mode Upload</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="uploadMode" value="replace" checked>
+                        Replace (Hapus data lama)
+                    </label>
+                    <label>
+                        <input type="radio" name="uploadMode" value="append">
+                        Append (Tambah data baru)
+                    </label>
+                </div>
+                <p class="help-text">Replace: Hapus semua data bulan ini lalu upload baru | Append: Tambah data tanpa hapus yang lama</p>
+            </div>
+            
+            <button type="submit" class="btn-upload" id="btnUpload">
+                📤 Upload Data
+            </button>
+        </form>
+        
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        // Supabase Config
+        const SUPABASE_URL = 'https://iudtxznbakaqzygpkaxf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
+        
+        // Initialize Supabase client
+        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // Form submit handler
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const bulan = document.getElementById('bulan').value;
+            const tahun = parseInt(document.getElementById('tahun').value);
+            const fileInput = document.getElementById('excelFile');
+            const uploadMode = document.querySelector('input[name="uploadMode"]:checked').value;
+            const btnUpload = document.getElementById('btnUpload');
+            
+            if (!fileInput.files[0]) {
+                showStatus('error', '❌ Mohon pilih file Excel!');
+                return;
+            }
+            
+            btnUpload.disabled = true;
+            btnUpload.textContent = '⏳ Sedang upload...';
+            showStatus('info', '⏳ Sedang memproses file Excel...');
+            
+            try {
+                // Read Excel file
+                const file = fileInput.files[0];
+                const data = await file.arrayBuffer();
+                const workbook = XLSX.read(data);
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                
+                if (jsonData.length === 0) {
+                    throw new Error('File Excel kosong!');
+                }
+                
+                // Detect format: Vertical atau Horizontal
+                let transformedData = [];
+                
+                // Try VERTICAL format first (Tanggal di baris)
+                const hasVerticalFormat = jsonData.some(row => {
+                    const tanggal = parseInt(row['Tanggal'] || row['tanggal'] || row['Tgl'] || row['tgl']);
+                    return !isNaN(tanggal) && tanggal >= 1 && tanggal <= 31;
+                });
+                
+                if (hasVerticalFormat) {
+                    // VERTICAL FORMAT
+                    showStatus('info', '⏳ Format Vertical terdeteksi...');
+                    for (let row of jsonData) {
+                        const tanggal = parseInt(row['Tanggal'] || row['tanggal'] || row['Tgl'] || row['tgl']);
+                        
+                        if (isNaN(tanggal) || tanggal < 1 || tanggal > 31) continue;
+                        
+                        transformedData.push({
+                            tahun: tahun,
+                            bulan: bulan,
+                            tanggal: tanggal,
+                            hari: row['Hari'] || row['hari'] || '',
+                            wfo: parseInt(row['WFO'] || row['wfo'] || 0),
+                            dinas_luar: parseInt(row['Dinas Luar'] || row['dinas_luar'] || row['Dinas'] || 0),
+                            undangan: parseInt(row['Undangan'] || row['undangan'] || 0),
+                            sakit: parseInt(row['Sakit'] || row['sakit'] || 0),
+                            ijin: parseInt(row['Ijin'] || row['ijin'] || 0),
+                            cuti: parseInt(row['Cuti'] || row['cuti'] || 0),
+                            tidak_absen: parseInt(row['Tidak Absen'] || row['tidak_absen'] || row['Alpha'] || 0)
+                        });
+                    }
+                } else {
+                    // HORIZONTAL FORMAT (tanggal di kolom)
+                    showStatus('info', '⏳ Format Horizontal terdeteksi...');
+                    
+                    // Cari baris yang berisi data ringkasan
+                    // Filter data: ambil hanya baris yang kolom pertamanya berisi kata kunci ringkasan
+                    const dataRows = jsonData.filter(row => {
+                        const firstCol = String(Object.values(row)[0] || '').toUpperCase().trim();
+                        // Cek apakah baris ini adalah baris ringkasan
+                        return firstCol.includes('JUMLAH WFO') || 
+                               firstCol.includes('JUMLAH DINAS') || 
+                               firstCol.includes('JUMLAH UNDANGAN') || 
+                               firstCol.includes('JUMLAH SAKIT') || 
+                               firstCol.includes('JUMLAH IJIN') || 
+                               firstCol.includes('JUMLAH CUTI') || 
+                               firstCol.includes('JUMLAH ISOMAN') || 
+                               firstCol.includes('JUMLAH TIDAK ABSEN') ||
+                               firstCol === 'TOTAL';
+                    });
+                    
+                    if (dataRows.length === 0) {
+                        throw new Error('Format horizontal tidak valid! Tidak ditemukan baris ringkasan (JUMLAH WFO, JUMLAH DINAS LUAR, dll).');
+                    }
+                    
+                    // Extract data per tanggal (dari kolom)
+                    // Ambil semua keys dari baris pertama
+                    const keys = Object.keys(dataRows[0]);
+                    
+                    // Loop setiap kolom untuk cari tanggal
+                    for (let i = 0; i < keys.length; i++) {
+                        const key = keys[i];
+                        
+                        // Coba parse sebagai tanggal (1-31)
+                        // Key bisa berupa "01", "02", "1", "2", dll
+                        const tanggal = parseInt(key);
+                        
+                        // Skip kolom yang bukan tanggal (1-31)
+                        if (isNaN(tanggal) || tanggal < 1 || tanggal > 31) continue;
+                        
+                        // Extract data untuk tanggal ini dari setiap baris ringkasan
+                        let wfo = 0, dinasLuar = 0, undangan = 0, sakit = 0, ijin = 0, cuti = 0, tidakAbsen = 0;
+                        
+                        dataRows.forEach(row => {
+                            const label = String(Object.values(row)[0] || '').toUpperCase().trim();
+                            const value = parseInt(row[key]) || 0;
+                            
+                            // Match label dengan kategori
+                            if (label.includes('JUMLAH WFO')) {
+                                wfo = value;
+                            } else if (label.includes('JUMLAH DINAS')) {
+                                dinasLuar = value;
+                            } else if (label.includes('JUMLAH UNDANGAN')) {
+                                undangan = value;
+                            } else if (label.includes('JUMLAH SAKIT')) {
+                                sakit = value;
+                            } else if (label.includes('JUMLAH IJIN')) {
+                                ijin = value;
+                            } else if (label.includes('JUMLAH CUTI')) {
+                                cuti = value;
+                            } else if (label.includes('JUMLAH TIDAK ABSEN') || label.includes('JUMLAH ISOMAN')) {
+                                tidakAbsen = value;
+                            }
+                        });
+                        
+                        // Push data untuk tanggal ini
+                        transformedData.push({
+                            tahun: tahun,
+                            bulan: bulan,
+                            tanggal: tanggal,
+                            hari: '', // Tidak ada info hari di format horizontal
+                            wfo: wfo,
+                            dinas_luar: dinasLuar,
+                            undangan: undangan,
+                            sakit: sakit,
+                            ijin: ijin,
+                            cuti: cuti,
+                            tidak_absen: tidakAbsen
+                        });
+                    }
+                }
+                
+                if (transformedData.length === 0) {
+                    throw new Error('Tidak ada data valid! Pastikan format Excel sesuai (Vertical atau Horizontal).');
+                }
+                
+                // Delete old data if replace mode
+                if (uploadMode === 'replace') {
+                    showStatus('info', '⏳ Menghapus data lama...');
+                    const { error: deleteError } = await sbClient
+                        .from('absensi')
+                        .delete()
+                        .eq('tahun', tahun)
+                        .eq('bulan', bulan);
+                    
+                    if (deleteError) throw deleteError;
+                }
+                
+                // Insert new data
+                showStatus('info', '⏳ Mengupload data baru...');
+                const { data: insertedData, error: insertError } = await sbClient
+                    .from('absensi')
+                    .insert(transformedData);
+                
+                if (insertError) throw insertError;
+                
+                showStatus('success', `✅ Berhasil upload ${transformedData.length} data untuk ${bulan} ${tahun}!`);
+                fileInput.value = '';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('error', `❌ Error: ${error.message}`);
+            } finally {
+                btnUpload.disabled = false;
+                btnUpload.textContent = '📤 Upload Data';
+            }
+        });
+        
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>
