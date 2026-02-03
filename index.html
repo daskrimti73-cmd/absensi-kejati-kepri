@@ -624,7 +624,14 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
         const USE_SUPABASE = true; // Set false untuk pakai data hardcoded
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let supabase;
+        try {
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch (error) {
+            console.error('Supabase initialization error:', error);
+        }
         
         // DATA ABSENSI - Diorganisir per TAHUN dan BULAN (Fallback jika Supabase gagal)
         const dataAbsensi = {
@@ -806,6 +813,11 @@
 
         // Fungsi untuk fetch data dari Supabase
         async function fetchDataFromSupabase(tahun, bulan) {
+            if (!supabase) {
+                console.log('Supabase not initialized, using hardcoded data');
+                return null;
+            }
+            
             try {
                 const { data, error } = await supabase
                     .from('absensi')
@@ -817,6 +829,7 @@
                 if (error) throw error;
                 
                 if (!data || data.length === 0) {
+                    console.log('No data found in Supabase for', bulan, tahun);
                     return null;
                 }
                 
