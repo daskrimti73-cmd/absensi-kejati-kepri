@@ -865,30 +865,30 @@
             const bulan = document.getElementById('bulanFilter').value;
             const tahun = document.getElementById('tahunFilter').value;
             
-            if (USE_SUPABASE) {
-                if (bulan === 'semua') {
-                    // Untuk "semua bulan", fetch dari hardcoded atau implementasi khusus
-                    return getAllMonthsData(tahun);
-                }
-                
-                // Fetch dari Supabase
-                const supabaseData = await fetchDataFromSupabase(parseInt(tahun), bulan);
-                if (supabaseData) {
-                    return supabaseData;
-                }
-                
-                // Fallback ke hardcoded jika Supabase gagal
-                console.log('Supabase data not found, using hardcoded data');
-            }
-            
-            // Gunakan data hardcoded
+            // Jika "semua bulan", gunakan data hardcoded
             if (bulan === 'semua') {
                 return getAllMonthsData(tahun);
             }
             
+            // Coba fetch dari Supabase jika enabled
+            if (USE_SUPABASE && supabase) {
+                try {
+                    const supabaseData = await fetchDataFromSupabase(parseInt(tahun), bulan);
+                    if (supabaseData) {
+                        console.log('Using Supabase data for', bulan, tahun);
+                        return supabaseData;
+                    }
+                } catch (error) {
+                    console.error('Supabase fetch error:', error);
+                }
+            }
+            
+            // Fallback ke hardcoded data
+            console.log('Using hardcoded data for', bulan, tahun);
             if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) {
                 return dataAbsensi[tahun][bulan];
             }
+            
             return null;
         }
 
@@ -906,7 +906,19 @@
 
         async function initChart() {
             const ctx = document.getElementById('absensiChart').getContext('2d');
-            const data = await getSelectedData() || dataAbsensi[2025].desember;
+            
+            // Ambil data, jika gagal gunakan default
+            let data;
+            try {
+                data = await getSelectedData();
+                if (!data) {
+                    console.log('Using default data: Desember 2025');
+                    data = dataAbsensi[2025].desember;
+                }
+            } catch (error) {
+                console.error('Error getting data:', error);
+                data = dataAbsensi[2025].desember;
+            }
             
             chartInstance = new Chart(ctx, {
                 type: 'bar',
