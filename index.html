@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -731,6 +732,74 @@
             }
         };
 
+        // ============================================
+        // SUPABASE CONFIGURATION
+        // ============================================
+        const SUPABASE_URL = 'https://iudtxznbakaqzygpkaxf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
+        const USE_SUPABASE = true; // Set false untuk disable Supabase
+        
+        let supabaseClient = null;
+        
+        // Initialize Supabase client
+        if (USE_SUPABASE && typeof window.supabase !== 'undefined') {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase initialized successfully');
+            } catch (error) {
+                console.error('❌ Supabase initialization failed:', error);
+            }
+        } else {
+            console.log('ℹ️ Supabase disabled or library not loaded');
+        }
+        
+        // Fetch data from Supabase
+        async function fetchFromSupabase(tahun, bulan) {
+            if (!supabaseClient) return null;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('absensi')
+                    .select('*')
+                    .eq('tahun', parseInt(tahun))
+                    .eq('bulan', bulan)
+                    .order('tanggal', { ascending: true });
+                
+                if (error) {
+                    console.error('Supabase query error:', error);
+                    return null;
+                }
+                
+                if (!data || data.length === 0) {
+                    console.log(`No Supabase data for ${bulan} ${tahun}`);
+                    return null;
+                }
+                
+                console.log(`✅ Loaded ${data.length} rows from Supabase for ${bulan} ${tahun}`);
+                
+                // Transform to expected format
+                return {
+                    totalPegawai: 142,
+                    labels: data.map(d => d.tanggal),
+                    hari: data.map(d => d.hari || ''),
+                    isWeekend: data.map(d => {
+                        const h = (d.hari || '').toLowerCase();
+                        return h.includes('sabtu') || h.includes('minggu') || h.includes('libur');
+                    }),
+                    wfo: data.map(d => d.wfo || 0),
+                    dinasLuar: data.map(d => d.dinas_luar || 0),
+                    undangan: data.map(d => d.undangan || 0),
+                    sakit: data.map(d => d.sakit || 0),
+                    ijin: data.map(d => d.ijin || 0),
+                    cuti: data.map(d => d.cuti || 0),
+                    tidakAbsen: data.map(d => d.tidak_absen || 0)
+                };
+            } catch (error) {
+                console.error('Supabase fetch error:', error);
+                return null;
+            }
+        }
+
         const bulanNama = {
             semua: 'SEMUA BULAN',
             januari: 'JANUARI',
@@ -746,6 +815,37 @@
             november: 'NOVEMBER',
             desember: 'DESEMBER'
         };
+
+        // Get selected data with Supabase fallback
+        async function getSelectedData() {
+            const bulan = document.getElementById('bulanFilter').value;
+            const tahun = document.getElementById('tahunFilter').value;
+            
+            // Special case: "semua bulan" always uses hardcoded
+            if (bulan === 'semua') {
+                return getAllMonthsData(tahun);
+            }
+            
+            // Try Supabase first if enabled
+            if (USE_SUPABASE && supabaseClient) {
+                try {
+                    const supabaseData = await fetchFromSupabase(tahun, bulan);
+                    if (supabaseData) {
+                        return supabaseData;
+                    }
+                } catch (error) {
+                    console.error('Error fetching from Supabase:', error);
+                }
+            }
+            
+            // Fallback to hardcoded data
+            console.log(`Using hardcoded data for ${bulan} ${tahun}`);
+            if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) {
+                return dataAbsensi[tahun][bulan];
+            }
+            
+            return null;
+        }
 
         // Fungsi untuk menggabungkan data semua bulan
         function getAllMonthsData(tahun) {
@@ -823,9 +923,9 @@
             tidakAbsen: { label: 'Tidak Absen', color: '#dc3545', border: '#c82333' }
         };
 
-        function initChart() {
+        async function initChart() {
             const ctx = document.getElementById('absensiChart').getContext('2d');
-            const data = getSelectedData() || dataAbsensi[2025].desember;
+            const data = await getSelectedData() || dataAbsensi[2025].desember;
             
             chartInstance = new Chart(ctx, {
                 type: 'bar',
@@ -879,11 +979,11 @@
             updateStats();
         }
 
-        function updateChart() {
+        async function updateChart() {
             const bulan = document.getElementById('bulanFilter').value;
             const tahun = document.getElementById('tahunFilter').value;
             const kategori = document.getElementById('kategoriFilter').value;
-            const data = getSelectedData();
+            const data = await getSelectedData();
 
             // Jika data tidak tersedia untuk kombinasi tahun/bulan yang dipilih
             if (!data) {
@@ -931,8 +1031,8 @@
             updateStats();
         }
 
-        function updateStats() {
-            const data = getSelectedData();
+        async function updateStats() {
+            const data = await getSelectedData();
             if (!data) {
                 updateStatsEmpty();
                 return;
@@ -1003,14 +1103,24 @@
             updateComparison();
         }
 
-        function updateComparison() {
+        async function updateComparison() {
             const bulan1 = document.getElementById('compare1Bulan').value;
             const tahun1 = document.getElementById('compare1Tahun').value;
             const bulan2 = document.getElementById('compare2Bulan').value;
             const tahun2 = document.getElementById('compare2Tahun').value;
             
-            const data1 = dataAbsensi[tahun1] && dataAbsensi[tahun1][bulan1] ? dataAbsensi[tahun1][bulan1] : null;
-            const data2 = dataAbsensi[tahun2] && dataAbsensi[tahun2][bulan2] ? dataAbsensi[tahun2][bulan2] : null;
+            // Try Supabase first, fallback to hardcoded
+            let data1 = null;
+            let data2 = null;
+            
+            if (USE_SUPABASE && supabaseClient) {
+                data1 = await fetchFromSupabase(tahun1, bulan1);
+                data2 = await fetchFromSupabase(tahun2, bulan2);
+            }
+            
+            // Fallback to hardcoded
+            if (!data1) data1 = dataAbsensi[tahun1] && dataAbsensi[tahun1][bulan1] ? dataAbsensi[tahun1][bulan1] : null;
+            if (!data2) data2 = dataAbsensi[tahun2] && dataAbsensi[tahun2][bulan2] ? dataAbsensi[tahun2][bulan2] : null;
             
             const sum = arr => arr.reduce((a, b) => a + b, 0);
             
