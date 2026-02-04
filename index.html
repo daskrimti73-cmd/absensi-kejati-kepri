@@ -569,7 +569,12 @@
         
         // Fetch data from Supabase
         async function fetchFromSupabase(tahun, bulan) {
-            if (!supabaseClient) return null;
+            if (!supabaseClient) {
+                console.log('❌ Supabase client not initialized');
+                return null;
+            }
+            
+            console.log(`🔍 Fetching from Supabase: tahun=${tahun}, bulan=${bulan}`);
             
             try {
                 const { data, error } = await supabaseClient
@@ -580,16 +585,17 @@
                     .order('tanggal', { ascending: true });
                 
                 if (error) {
-                    console.error('Supabase query error:', error);
+                    console.error('❌ Supabase query error:', error);
                     return null;
                 }
                 
                 if (!data || data.length === 0) {
-                    console.log(`No Supabase data for ${bulan} ${tahun}`);
+                    console.log(`⚠️ No Supabase data for ${bulan} ${tahun}`);
                     return null;
                 }
                 
                 console.log(`✅ Loaded ${data.length} rows from Supabase for ${bulan} ${tahun}`);
+                console.log('First 3 rows:', data.slice(0, 3));
                 
                 // Transform to expected format
                 return {
@@ -609,7 +615,7 @@
                     tidakAbsen: data.map(d => d.tidak_absen || 0)
                 };
             } catch (error) {
-                console.error('Supabase fetch error:', error);
+                console.error('❌ Supabase fetch error:', error);
                 return null;
             }
         }
