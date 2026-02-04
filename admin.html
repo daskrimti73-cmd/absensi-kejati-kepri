@@ -252,137 +252,156 @@
                 const file = fileInput.files[0];
                 const data = await file.arrayBuffer();
                 const workbook = XLSX.read(data);
-                const sheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[sheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                
+                console.log('📊 Total sheets found:', workbook.SheetNames.length);
+                console.log('📋 Sheet names:', workbook.SheetNames);
+                
+                // Process all sheets (each sheet = 1 bidang)
+                let allTransformedData = [];
+                
+                for (const sheetName of workbook.SheetNames) {
+                    console.log(`\n🔍 Processing sheet: ${sheetName}`);
+                    const worksheet = workbook.Sheets[sheetName];
+                    
+                    // Debug: Check raw data
+                    console.log('Worksheet range:', worksheet['!ref']);
+                
+                // Read as array (header: 1) to include all rows including those with empty first column
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                
+                console.log(`Sheet "${sheetName}" - Total rows:`, jsonData.length);
                 
                 if (jsonData.length === 0) {
-                    throw new Error('File Excel kosong!');
+                    console.log(`⚠️ Sheet "${sheetName}" is empty, skipping...`);
+                    continue;
                 }
+                
+                // Detect bidang from sheet name
+                const bidang = sheetName.trim().toUpperCase();
+                console.log(`📌 Bidang detected: ${bidang}`);
+                
+                // Debug: Log first 10 rows to see structure
+                console.log('First 5 rows:', jsonData.slice(0, 5));
                 
                 // Detect format: Vertical atau Horizontal
                 let transformedData = [];
                 
-                // Try VERTICAL format first (Tanggal di baris)
-                const hasVerticalFormat = jsonData.some(row => {
-                    const tanggal = parseInt(row['Tanggal'] || row['tanggal'] || row['Tgl'] || row['tgl']);
-                    return !isNaN(tanggal) && tanggal >= 1 && tanggal <= 31;
-                });
+                // Since we're reading as array, we need to find summary rows by checking first column
+                // Summary rows have labels like "JUMLAH WFO", "JUMLAH DINAS LUAR", etc in column D (index 3) or later
                 
-                if (hasVerticalFormat) {
-                    // VERTICAL FORMAT
-                    showStatus('info', '⏳ Format Vertical terdeteksi...');
-                    for (let row of jsonData) {
-                        const tanggal = parseInt(row['Tanggal'] || row['tanggal'] || row['Tgl'] || row['tgl']);
-                        
-                        if (isNaN(tanggal) || tanggal < 1 || tanggal > 31) continue;
-                        
-                        transformedData.push({
-                            tahun: tahun,
-                            bulan: bulan,
-                            tanggal: tanggal,
-                            hari: row['Hari'] || row['hari'] || '',
-                            wfo: parseInt(row['WFO'] || row['wfo'] || 0),
-                            dinas_luar: parseInt(row['Dinas Luar'] || row['dinas_luar'] || row['Dinas'] || 0),
-                            undangan: parseInt(row['Undangan'] || row['undangan'] || 0),
-                            sakit: parseInt(row['Sakit'] || row['sakit'] || 0),
-                            ijin: parseInt(row['Ijin'] || row['ijin'] || 0),
-                            cuti: parseInt(row['Cuti'] || row['cuti'] || 0),
-                            tidak_absen: parseInt(row['Tidak Absen'] || row['tidak_absen'] || row['Alpha'] || 0)
-                        });
-                    }
-                } else {
-                    // HORIZONTAL FORMAT (tanggal di kolom)
-                    showStatus('info', '⏳ Format Horizontal terdeteksi...');
-                    
-                    // Cari baris yang berisi data ringkasan
-                    // Filter data: ambil hanya baris yang kolom pertamanya berisi kata kunci ringkasan
-                    const dataRows = jsonData.filter(row => {
-                        const firstCol = String(Object.values(row)[0] || '').toUpperCase().trim();
-                        // Cek apakah baris ini adalah baris ringkasan
-                        // Support both "WFO" and "JUMLAH WFO" format
-                        return firstCol === 'WFO' ||
-                               firstCol.includes('JUMLAH WFO') || 
-                               firstCol.includes('JUMLAH DINAS') || 
-                               firstCol.includes('DINAS LUAR') ||
-                               firstCol.includes('JUMLAH UNDANGAN') || 
-                               firstCol.includes('UNDANGAN') ||
-                               firstCol.includes('JUMLAH SAKIT') || 
-                               firstCol.includes('SAKIT') ||
-                               firstCol.includes('JUMLAH IJIN') || 
-                               firstCol.includes('IJIN') ||
-                               firstCol.includes('JUMLAH CUTI') || 
-                               firstCol.includes('CUTI') ||
-                               firstCol.includes('JUMLAH ISOMAN') || 
-                               firstCol.includes('ISOMAN') ||
-                               firstCol.includes('JUMLAH TIDAK ABSEN') ||
-                               firstCol.includes('TIDAK ABSEN') ||
-                               firstCol === 'TOTAL';
-                    });
-                    
-                    if (dataRows.length === 0) {
-                        throw new Error('Format horizontal tidak valid! Tidak ditemukan baris ringkasan (JUMLAH WFO, JUMLAH DINAS LUAR, dll).');
-                    }
-                    
-                    // Extract data per tanggal (dari kolom)
-                    // Ambil semua keys dari baris pertama
-                    const keys = Object.keys(dataRows[0]);
-                    
-                    // Loop setiap kolom untuk cari tanggal
-                    for (let i = 0; i < keys.length; i++) {
-                        const key = keys[i];
-                        
-                        // Coba parse sebagai tanggal (1-31)
-                        // Key bisa berupa "01", "02", "1", "2", dll
-                        const tanggal = parseInt(key);
-                        
-                        // Skip kolom yang bukan tanggal (1-31)
-                        if (isNaN(tanggal) || tanggal < 1 || tanggal > 31) continue;
-                        
-                        // Extract data untuk tanggal ini dari setiap baris ringkasan
-                        let wfo = 0, dinasLuar = 0, undangan = 0, sakit = 0, ijin = 0, cuti = 0, tidakAbsen = 0;
-                        
-                        dataRows.forEach(row => {
-                            const label = String(Object.values(row)[0] || '').toUpperCase().trim();
-                            const value = parseInt(row[key]) || 0;
-                            
-                            // Match label dengan kategori (support both "WFO" and "JUMLAH WFO" format)
-                            if (label === 'WFO' || label.includes('JUMLAH WFO')) {
-                                wfo = value;
-                            } else if (label.includes('DINAS')) {
-                                dinasLuar = value;
-                            } else if (label.includes('UNDANGAN')) {
-                                undangan = value;
-                            } else if (label.includes('SAKIT')) {
-                                sakit = value;
-                            } else if (label.includes('IJIN')) {
-                                ijin = value;
-                            } else if (label.includes('CUTI')) {
-                                cuti = value;
-                            } else if (label.includes('TIDAK ABSEN') || label.includes('ISOMAN')) {
-                                tidakAbsen = value;
-                            }
-                        });
-                        
-                        // Push data untuk tanggal ini
-                        transformedData.push({
-                            tahun: tahun,
-                            bulan: bulan,
-                            tanggal: tanggal,
-                            hari: '', // Tidak ada info hari di format horizontal
-                            wfo: wfo,
-                            dinas_luar: dinasLuar,
-                            undangan: undangan,
-                            sakit: sakit,
-                            ijin: ijin,
-                            cuti: cuti,
-                            tidak_absen: tidakAbsen
-                        });
+                // Find rows that contain summary labels
+                const summaryRowIndices = [];
+                const summaryLabels = {
+                    'JUMLAH WFO': 'wfo',
+                    'WFO': 'wfo',
+                    'JUMLAH DINAS LUAR': 'dinas_luar',
+                    'DINAS LUAR': 'dinas_luar',
+                    'JUMLAH UNDANGAN': 'undangan',
+                    'UNDANGAN': 'undangan',
+                    'JUMLAH SAKIT': 'sakit',
+                    'SAKIT': 'sakit',
+                    'JUMLAH IJIN': 'ijin',
+                    'IJIN': 'ijin',
+                    'JUMLAH CUTI': 'cuti',
+                    'CUTI': 'cuti',
+                    'JUMLAH ISOMAN': 'tidak_absen',
+                    'ISOMAN': 'tidak_absen',
+                    'JUMLAH TIDAK ABSEN': 'tidak_absen',
+                    'TIDAK ABSEN': 'tidak_absen'
+                };
+                
+                // Find summary rows and map them
+                const summaryData = {};
+                for (let i = 0; i < jsonData.length; i++) {
+                    const row = jsonData[i];
+                    // Check all columns for summary labels
+                    for (let j = 0; j < row.length; j++) {
+                        const cellValue = String(row[j] || '').toUpperCase().trim();
+                        if (summaryLabels[cellValue]) {
+                            summaryRowIndices.push(i);
+                            summaryData[summaryLabels[cellValue]] = row;
+                            console.log(`  Found summary row at index ${i}: ${cellValue}`);
+                            break;
+                        }
                     }
                 }
                 
-                if (transformedData.length === 0) {
-                    throw new Error('Tidak ada data valid! Pastikan format Excel sesuai (Vertical atau Horizontal).');
+                if (summaryRowIndices.length === 0) {
+                    console.log(`⚠️ Sheet "${sheetName}" - No summary rows found, skipping...`);
+                    continue;
+                }
+                
+                console.log(`  Summary rows found: ${summaryRowIndices.length}`);
+                
+                // Now extract data per tanggal (from columns)
+                // Based on CSV analysis: columns 0-5 are headers (No, Nama, NIP, Satker, Golongan, Eselon)
+                // Columns 6-36 are dates (01-31)
+                const firstSummaryRow = jsonData[summaryRowIndices[0]];
+                
+                console.log(`  First summary row length: ${firstSummaryRow.length}`);
+                
+                // Data tanggal dimulai dari kolom index 6 (kolom G)
+                const DATE_START_COLUMN = 6;
+                
+                // Extract data for each date (tanggal 1-31)
+                let sheetDataCount = 0;
+                for (let tanggal = 1; tanggal <= 31; tanggal++) {
+                    const colIndex = DATE_START_COLUMN + (tanggal - 1); // Column 6 = tanggal 1, column 7 = tanggal 2, etc.
+                    
+                    if (colIndex >= firstSummaryRow.length) {
+                        break;
+                    }
+                    
+                    // Check if this column has any data
+                    let hasData = false;
+                    for (const key in summaryData) {
+                        const value = summaryData[key][colIndex];
+                        if (value !== '' && value !== undefined && !isNaN(value) && parseInt(value) > 0) {
+                            hasData = true;
+                            break;
+                        }
+                    }
+                    
+                    // Skip dates with no data (weekends, holidays)
+                    if (!hasData) {
+                        continue;
+                    }
+                    
+                    // Extract data for this tanggal
+                    const wfo = parseInt(summaryData['wfo']?.[colIndex]) || 0;
+                    const dinasLuar = parseInt(summaryData['dinas_luar']?.[colIndex]) || 0;
+                    const undangan = parseInt(summaryData['undangan']?.[colIndex]) || 0;
+                    const sakit = parseInt(summaryData['sakit']?.[colIndex]) || 0;
+                    const ijin = parseInt(summaryData['ijin']?.[colIndex]) || 0;
+                    const cuti = parseInt(summaryData['cuti']?.[colIndex]) || 0;
+                    const tidakAbsen = parseInt(summaryData['tidak_absen']?.[colIndex]) || 0;
+                    
+                    transformedData.push({
+                        tahun: tahun,
+                        bulan: bulan,
+                        tanggal: tanggal,
+                        hari: '',
+                        bidang: bidang,  // Add bidang field
+                        wfo: wfo,
+                        dinas_luar: dinasLuar,
+                        undangan: undangan,
+                        sakit: sakit,
+                        ijin: ijin,
+                        cuti: cuti,
+                        tidak_absen: tidakAbsen
+                    });
+                    sheetDataCount++;
+                }
+                
+                console.log(`  ✅ Sheet "${sheetName}" - Extracted ${sheetDataCount} rows`);
+                allTransformedData = allTransformedData.concat(transformedData);
+                
+                } // End of sheet loop
+                
+                console.log(`\n📊 Total data from all sheets: ${allTransformedData.length} rows`);
+                
+                if (allTransformedData.length === 0) {
+                    throw new Error('Tidak ada data valid! Pastikan format Excel sesuai dengan baris ringkasan (JUMLAH WFO, dll).');
                 }
                 
                 // Delete old data if replace mode
@@ -401,11 +420,11 @@
                 showStatus('info', '⏳ Mengupload data baru...');
                 const { data: insertedData, error: insertError } = await sbClient
                     .from('absensi')
-                    .insert(transformedData);
+                    .insert(allTransformedData);
                 
                 if (insertError) throw insertError;
                 
-                showStatus('success', `✅ Berhasil upload ${transformedData.length} data untuk ${bulan} ${tahun}!`);
+                showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!`);
                 fileInput.value = '';
                 
             } catch (error) {
