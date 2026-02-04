@@ -724,20 +724,7 @@
             return combinedData;
         }
 
-        // Fungsi helper untuk mengambil data berdasarkan tahun dan bulan
-        function getSelectedData() {
-            const bulan = document.getElementById('bulanFilter').value;
-            const tahun = document.getElementById('tahunFilter').value;
-            
-            if (bulan === 'semua') {
-                return getAllMonthsData(tahun);
-            }
-            
-            if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) {
-                return dataAbsensi[tahun][bulan];
-            }
-            return null;
-        }
+
 
         let chartInstance;
 
