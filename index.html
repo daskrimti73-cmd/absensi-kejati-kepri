@@ -641,29 +641,37 @@
             const bulan = document.getElementById('bulanFilter').value;
             const tahun = document.getElementById('tahunFilter').value;
             
+            console.log(`📊 getSelectedData called: bulan=${bulan}, tahun=${tahun}`);
+            
             // Special case: "semua bulan" always uses hardcoded
             if (bulan === 'semua') {
+                console.log('Using getAllMonthsData for "semua bulan"');
                 return getAllMonthsData(tahun);
             }
             
             // Try Supabase first if enabled
             if (USE_SUPABASE && supabaseClient) {
+                console.log('Trying Supabase...');
                 try {
                     const supabaseData = await fetchFromSupabase(tahun, bulan);
                     if (supabaseData) {
+                        console.log('✅ Using Supabase data');
                         return supabaseData;
                     }
                 } catch (error) {
-                    console.error('Error fetching from Supabase:', error);
+                    console.error('❌ Error fetching from Supabase:', error);
                 }
+            } else {
+                console.log('⚠️ Supabase disabled or not initialized');
             }
             
             // Fallback to hardcoded data
-            console.log(`Using hardcoded data for ${bulan} ${tahun}`);
+            console.log(`📁 Using hardcoded data for ${bulan} ${tahun}`);
             if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) {
                 return dataAbsensi[tahun][bulan];
             }
             
+            console.log(`❌ No data found for ${bulan} ${tahun}`);
             return null;
         }
 
