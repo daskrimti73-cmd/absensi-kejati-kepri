@@ -301,26 +301,6 @@
             margin-bottom: 15px;
         }
         
-        .bidang-table {
-            width: 100%;
-            font-size: 11px;
-            border-collapse: collapse;
-        }
-        
-        .bidang-table th {
-            background: #f8f9fa;
-            padding: 6px 4px;
-            text-align: center;
-            font-weight: bold;
-            border: 1px solid #dee2e6;
-        }
-        
-        .bidang-table td {
-            padding: 4px;
-            text-align: center;
-            border: 1px solid #dee2e6;
-        }
-        
         .bidang-no-data {
             text-align: center;
             padding: 40px;
@@ -1127,34 +1107,6 @@
                             <div class="bidang-chart-container">
                                 <canvas id="${canvasId}"></canvas>
                             </div>
-                            <table class="bidang-table">
-                                <thead>
-                                    <tr>
-                                        <th>Tgl</th>
-                                        <th>WFO</th>
-                                        <th>Dinas</th>
-                                        <th>Undangan</th>
-                                        <th>Sakit</th>
-                                        <th>Ijin</th>
-                                        <th>Cuti</th>
-                                        <th>Alpha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${bidangData.labels.map((tgl, idx) => `
-                                        <tr>
-                                            <td>${tgl}</td>
-                                            <td>${bidangData.wfo[idx]}</td>
-                                            <td>${bidangData.dinasLuar[idx]}</td>
-                                            <td>${bidangData.undangan[idx]}</td>
-                                            <td>${bidangData.sakit[idx]}</td>
-                                            <td>${bidangData.ijin[idx]}</td>
-                                            <td>${bidangData.cuti[idx]}</td>
-                                            <td>${bidangData.tidakAbsen[idx]}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
                         </div>
                     `;
                     
