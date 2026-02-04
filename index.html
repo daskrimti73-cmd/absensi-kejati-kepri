@@ -228,6 +228,106 @@
             color: #666;
         }
         
+        /* Dashboard Per Bidang */
+        .bidang-dashboard {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 3px solid #1a5f2a;
+        }
+        
+        .bidang-dashboard-title {
+            text-align: center;
+            color: #1a5f2a;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        
+        .bidang-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .bidang-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .bidang-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .bidang-card-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a5f2a;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a5f2a;
+        }
+        
+        .bidang-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        
+        .bidang-stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        
+        .bidang-stat-label {
+            color: #666;
+        }
+        
+        .bidang-stat-value {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .bidang-chart-container {
+            height: 200px;
+            margin-bottom: 15px;
+        }
+        
+        .bidang-table {
+            width: 100%;
+            font-size: 11px;
+            border-collapse: collapse;
+        }
+        
+        .bidang-table th {
+            background: #f8f9fa;
+            padding: 6px 4px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #dee2e6;
+        }
+        
+        .bidang-table td {
+            padding: 4px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        
+        .bidang-no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+        
         .footer p {
             margin: 5px 0;
         }
@@ -438,6 +538,14 @@
             <div class="legend-item">
                 <div class="legend-color" style="background: #dc3545;"></div>
                 <span>Tidak Absen</span>
+            </div>
+        </div>
+        
+        <!-- Dashboard Per Bidang -->
+        <div class="bidang-dashboard" id="bidangDashboard">
+            <h2 class="bidang-dashboard-title">📊 DASHBOARD PER BIDANG</h2>
+            <div class="bidang-grid" id="bidangGrid">
+                <!-- Cards will be generated dynamically -->
             </div>
         </div>
         
@@ -842,6 +950,7 @@
             });
             
             updateStats();
+            updateBidangDashboard(); // Init dashboard per bidang
         }
 
         async function updateChart() {
@@ -894,6 +1003,7 @@
             chartInstance.update();
             
             updateStats();
+            updateBidangDashboard(); // Update dashboard per bidang
         }
 
         async function updateStats() {
@@ -923,6 +1033,182 @@
             document.getElementById('statIjin').textContent = '-';
             document.getElementById('statCuti').textContent = '-';
             document.getElementById('statAlpha').textContent = '-';
+        }
+
+        // Update Dashboard Per Bidang
+        async function updateBidangDashboard() {
+            const bulan = document.getElementById('bulanFilter').value;
+            const tahun = document.getElementById('tahunFilter').value;
+            const bidangGrid = document.getElementById('bidangGrid');
+            
+            // Skip if "semua bulan" selected
+            if (bulan === 'semua') {
+                bidangGrid.innerHTML = '<div class="bidang-no-data">📊 Dashboard per bidang hanya tersedia untuk bulan tertentu. Silahkan pilih bulan spesifik.</div>';
+                return;
+            }
+            
+            // List of bidang
+            const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR'];
+            
+            bidangGrid.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">⏳ Memuat data per bidang...</div>';
+            
+            try {
+                const cards = [];
+                
+                for (const bidang of bidangList) {
+                    // Fetch data for this bidang
+                    const bidangData = await fetchFromSupabase(tahun, bulan, bidang);
+                    
+                    if (!bidangData || bidangData.labels.length === 0) {
+                        continue; // Skip if no data
+                    }
+                    
+                    // Calculate totals
+                    const sum = arr => arr.reduce((a, b) => a + b, 0);
+                    const totalWfo = sum(bidangData.wfo);
+                    const totalDinas = sum(bidangData.dinasLuar);
+                    const totalUndangan = sum(bidangData.undangan);
+                    const totalSakit = sum(bidangData.sakit);
+                    const totalIjin = sum(bidangData.ijin);
+                    const totalCuti = sum(bidangData.cuti);
+                    const totalAlpha = sum(bidangData.tidakAbsen);
+                    const grandTotal = totalWfo + totalDinas + totalUndangan + totalSakit + totalIjin + totalCuti + totalAlpha;
+                    
+                    // Calculate percentages
+                    const pctWfo = grandTotal > 0 ? ((totalWfo / grandTotal) * 100).toFixed(1) : 0;
+                    const pctDinas = grandTotal > 0 ? ((totalDinas / grandTotal) * 100).toFixed(1) : 0;
+                    const pctUndangan = grandTotal > 0 ? ((totalUndangan / grandTotal) * 100).toFixed(1) : 0;
+                    const pctSakit = grandTotal > 0 ? ((totalSakit / grandTotal) * 100).toFixed(1) : 0;
+                    const pctIjin = grandTotal > 0 ? ((totalIjin / grandTotal) * 100).toFixed(1) : 0;
+                    const pctCuti = grandTotal > 0 ? ((totalCuti / grandTotal) * 100).toFixed(1) : 0;
+                    const pctAlpha = grandTotal > 0 ? ((totalAlpha / grandTotal) * 100).toFixed(1) : 0;
+                    
+                    // Create card HTML
+                    const cardId = `bidang-${bidang.toLowerCase().replace(/\s+/g, '-')}`;
+                    const canvasId = `canvas-${bidang.toLowerCase().replace(/\s+/g, '-')}`;
+                    
+                    const cardHTML = `
+                        <div class="bidang-card" id="${cardId}">
+                            <div class="bidang-card-header">${bidang}</div>
+                            <div class="bidang-stats">
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">TOTAL ABSEN:</span>
+                                    <span class="bidang-stat-value">${grandTotal}</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">WFO:</span>
+                                    <span class="bidang-stat-value">${pctWfo}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">DINAS LUAR:</span>
+                                    <span class="bidang-stat-value">${pctDinas}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">UNDANGAN:</span>
+                                    <span class="bidang-stat-value">${pctUndangan}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">SAKIT:</span>
+                                    <span class="bidang-stat-value">${pctSakit}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">IJIN:</span>
+                                    <span class="bidang-stat-value">${pctIjin}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">CUTI:</span>
+                                    <span class="bidang-stat-value">${pctCuti}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">TIDAK ABSEN:</span>
+                                    <span class="bidang-stat-value">${pctAlpha}%</span>
+                                </div>
+                            </div>
+                            <div class="bidang-chart-container">
+                                <canvas id="${canvasId}"></canvas>
+                            </div>
+                            <table class="bidang-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tgl</th>
+                                        <th>WFO</th>
+                                        <th>Dinas</th>
+                                        <th>Undangan</th>
+                                        <th>Sakit</th>
+                                        <th>Ijin</th>
+                                        <th>Cuti</th>
+                                        <th>Alpha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${bidangData.labels.map((tgl, idx) => `
+                                        <tr>
+                                            <td>${tgl}</td>
+                                            <td>${bidangData.wfo[idx]}</td>
+                                            <td>${bidangData.dinasLuar[idx]}</td>
+                                            <td>${bidangData.undangan[idx]}</td>
+                                            <td>${bidangData.sakit[idx]}</td>
+                                            <td>${bidangData.ijin[idx]}</td>
+                                            <td>${bidangData.cuti[idx]}</td>
+                                            <td>${bidangData.tidakAbsen[idx]}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    
+                    cards.push({ html: cardHTML, data: bidangData, canvasId: canvasId });
+                }
+                
+                if (cards.length === 0) {
+                    bidangGrid.innerHTML = '<div class="bidang-no-data">📊 Tidak ada data per bidang untuk bulan ini. Silahkan upload data dengan format multi-sheet.</div>';
+                    return;
+                }
+                
+                // Render all cards
+                bidangGrid.innerHTML = cards.map(c => c.html).join('');
+                
+                // Create charts for each card
+                cards.forEach(card => {
+                    const ctx = document.getElementById(card.canvasId).getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: card.data.labels,
+                            datasets: Object.keys(datasetConfig).map(key => ({
+                                label: datasetConfig[key].label,
+                                data: card.data[key],
+                                backgroundColor: datasetConfig[key].color,
+                                borderColor: datasetConfig[key].border,
+                                borderWidth: 1
+                            }))
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                    ticks: { font: { size: 9 } }
+                                },
+                                y: {
+                                    stacked: true,
+                                    beginAtZero: true,
+                                    ticks: { font: { size: 9 } }
+                                }
+                            }
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error updating bidang dashboard:', error);
+                bidangGrid.innerHTML = '<div class="bidang-no-data">❌ Error memuat data per bidang. Silahkan coba lagi.</div>';
+            }
         }
 
         // Initialize when DOM is ready
