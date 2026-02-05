@@ -259,8 +259,27 @@
                 // Process all sheets (each sheet = 1 bidang)
                 let allTransformedData = [];
                 
-                for (const sheetName of workbook.SheetNames) {
-                    console.log(`\n🔍 Processing sheet: ${sheetName}`);
+                // Valid bidang names (case-insensitive)
+                const validBidang = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR'];
+                
+                for (let i = 0; i < workbook.SheetNames.length; i++) {
+                    const sheetName = workbook.SheetNames[i];
+                    const sheetNameUpper = sheetName.trim().toUpperCase();
+                    
+                    // First sheet is always processed as "GABUNGAN" (combined data for main chart)
+                    // Other sheets are only processed if they match valid bidang names
+                    let bidangName;
+                    if (i === 0) {
+                        console.log(`\n🔍 Processing sheet: ${sheetName} (FIRST SHEET - will be saved as "GABUNGAN")`);
+                        bidangName = 'GABUNGAN';
+                    } else if (!validBidang.includes(sheetNameUpper)) {
+                        console.log(`⏭️ Skipping sheet: ${sheetName} (not a valid bidang)`);
+                        continue;
+                    } else {
+                        console.log(`\n🔍 Processing sheet: ${sheetName}`);
+                        bidangName = sheetNameUpper;
+                    }
+                    
                     const worksheet = workbook.Sheets[sheetName];
                     
                     // Debug: Check raw data
@@ -276,8 +295,8 @@
                     continue;
                 }
                 
-                // Detect bidang from sheet name
-                const bidang = sheetName.trim().toUpperCase();
+                // Use bidangName instead of detecting from sheet name
+                const bidang = bidangName;
                 console.log(`📌 Bidang detected: ${bidang}`);
                 
                 // Debug: Log first 10 rows to see structure
