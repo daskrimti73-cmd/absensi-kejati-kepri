@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -793,6 +796,19 @@
                                 font: { size: 18, weight: 'bold' },
                                 color: '#6c757d',
                                 padding: { bottom: 20 }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: { display: true, text: 'TANGGAL', font: { weight: 'bold', size: 14 } },
+                                grid: { display: false }
+                            },
+                            y: {
+                                stacked: true,
+                                beginAtZero: true,
+                                max: 160,
+                                title: { display: true, text: 'JUMLAH PEGAWAI', font: { weight: 'bold', size: 14 } }
                             }
                         }
                     }
