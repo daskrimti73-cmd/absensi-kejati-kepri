@@ -785,9 +785,9 @@
                             legend: { display: false },
                             title: {
                                 display: true,
-                                text: 'TIDAK ADA DATA - Silahkan upload data via Admin Panel',
+                                text: 'DATA BELUM TERSEDIA',
                                 font: { size: 18, weight: 'bold' },
-                                color: '#dc3545',
+                                color: '#6c757d',
                                 padding: { bottom: 20 }
                             }
                         }
@@ -860,7 +860,7 @@
             if (!data) {
                 chartInstance.data.labels = [];
                 chartInstance.data.datasets = [];
-                chartInstance.options.plugins.title.text = 'DATA TIDAK TERSEDIA - ' + bulanNama[bulan] + ' ' + tahun;
+                chartInstance.options.plugins.title.text = 'DATA BELUM TERSEDIA - ' + bulanNama[bulan] + ' ' + tahun;
                 chartInstance.update();
                 updateStatsEmpty();
                 return;
@@ -940,7 +940,7 @@
             
             // Skip if "semua bulan" selected
             if (bulan === 'semua') {
-                bidangGrid.innerHTML = '<div class="bidang-no-data">📊 Dashboard per bidang hanya tersedia untuk bulan tertentu. Silahkan pilih bulan spesifik.</div>';
+                bidangGrid.innerHTML = '<div class="bidang-no-data">📊 Dashboard per bidang tersedia untuk bulan tertentu. Silahkan pilih bulan spesifik.</div>';
                 return;
             }
             
@@ -1031,7 +1031,7 @@
                 }
                 
                 if (cards.length === 0) {
-                    bidangGrid.innerHTML = '<div class="bidang-no-data">📊 Tidak ada data per bidang untuk bulan ini. Silahkan upload data dengan format multi-sheet.</div>';
+                    bidangGrid.innerHTML = '<div class="bidang-no-data">📊 Data per bidang belum tersedia untuk bulan ini.</div>';
                     return;
                 }
                 
@@ -1076,7 +1076,7 @@
                 
             } catch (error) {
                 console.error('Error updating bidang dashboard:', error);
-                bidangGrid.innerHTML = '<div class="bidang-no-data">❌ Error memuat data per bidang. Silahkan coba lagi.</div>';
+                bidangGrid.innerHTML = '<div class="bidang-no-data">⚠️ Terjadi kesalahan saat memuat data. Silahkan refresh halaman.</div>';
             }
         }
 
