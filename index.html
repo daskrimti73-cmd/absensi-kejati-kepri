@@ -687,11 +687,19 @@
                 return getAllMonthsData(tahun);
             }
             
+            // For main chart: if bidang = "semua", use "GABUNGAN" instead
+            // This prevents double-counting data from all bidang
+            let bidangToFetch = bidang;
+            if (bidang === 'semua') {
+                bidangToFetch = 'GABUNGAN';
+                console.log('📊 Main chart: Using GABUNGAN bidang for "Semua Bidang" filter');
+            }
+            
             // Try Supabase first if enabled
             if (USE_SUPABASE && supabaseClient) {
                 console.log('Trying Supabase...');
                 try {
-                    const supabaseData = await fetchFromSupabase(tahun, bulan, bidang);
+                    const supabaseData = await fetchFromSupabase(tahun, bulan, bidangToFetch);
                     if (supabaseData) {
                         console.log('✅ Using Supabase data');
                         return supabaseData;
