@@ -569,7 +569,7 @@
                 return null;
             }
             
-            console.log(`🔍 Fetching from Supabase: tahun=${tahun}, bulan=${bulan}, bidang=${bidang || 'semua'}`);
+            console.log(`🔍 Fetching from Supabase: tahun=${tahun} (type: ${typeof tahun}), bulan="${bulan}" (type: ${typeof bulan}), bidang=${bidang || 'semua'}`);
             
             try {
                 let query = supabaseClient
@@ -583,6 +583,8 @@
                     query = query.eq('bidang', bidang);
                 }
                 
+                console.log(`📋 Query: tahun=${parseInt(tahun)}, bulan="${bulan}"${bidang && bidang !== 'semua' ? `, bidang="${bidang}"` : ''}`);
+                
                 const { data, error } = await query.order('tanggal', { ascending: true });
                 
                 if (error) {
@@ -592,6 +594,8 @@
                 
                 if (!data || data.length === 0) {
                     console.log(`⚠️ No Supabase data for ${bulan} ${tahun}${bidang && bidang !== 'semua' ? ` - ${bidang}` : ''}`);
+                    console.log('💡 TIP: Cek data di Supabase Table Editor dengan query:');
+                    console.log(`   SELECT tahun, bulan, bidang, COUNT(*) FROM absensi WHERE bulan LIKE '%${bulan.substring(0, 3)}%' GROUP BY tahun, bulan, bidang;`);
                     return null;
                 }
                 
