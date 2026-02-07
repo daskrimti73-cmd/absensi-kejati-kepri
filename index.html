@@ -309,35 +309,6 @@
             border-radius: 50%;
         }
         
-        /* Table Section */
-        .table-section { 
-            background: white; 
-            border-radius: 10px; 
-            padding: 20px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            margin-top: 15px; 
-        }
-        .table-title { 
-            margin-bottom: 15px; 
-            color: #333; 
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        .table-container { overflow-x: auto; max-height: 500px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { padding: 10px 8px; text-align: center; border: 1px solid #e0e0e0; }
-        th { 
-            background: #3d3d3d; 
-            color: white; 
-            font-weight: 600; 
-            position: sticky; 
-            top: 0; 
-            z-index: 10;
-        }
-        tr:nth-child(even) { background: #f8f9fa; }
-        tr:hover { background: #e9ecef; }
-        .weekend-row { background: #ffe6e6 !important; color: #999; }
-        
         /* Footer */
         .footer { 
             text-align: center; 
@@ -656,30 +627,6 @@
             </div>
         </div>
 
-        <!-- Table Section -->
-        <div class="table-section">
-            <h3 class="table-title" id="tableTitle">📋 Detail Data Harian - DESEMBER 2025</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Tgl</th>
-                            <th>Hari</th>
-                            <th>WFO</th>
-                            <th>Dinas Luar</th>
-                            <th>Undangan</th>
-                            <th>Sakit</th>
-                            <th>Ijin</th>
-                            <th>Cuti</th>
-                            <th>Tidak Absen</th>
-                            <th>Total Aktif</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody"></tbody>
-                </table>
-            </div>
-        </div>
-
         <div class="footer">
             <p>© 2025 Kejaksaan Tinggi Kepulauan Riau - Sistem Absensi Mobile</p>
             <p>Data: 122-151 Pegawai | Periode: Mei - Desember 2025</p>
@@ -731,7 +678,6 @@
             initRingkasanChart();
             initBidangSmallCharts();
             updateStats();
-            updateTable();
         }
         
         function initBidangChart() {
@@ -967,7 +913,6 @@
             
             if (!data) {
                 updateStatsEmpty();
-                updateTableEmpty(bulan, tahun);
                 return;
             }
             
@@ -1005,7 +950,6 @@
             }
             
             updateStats();
-            updateTable();
         }
 
         function updateStats() {
@@ -1034,45 +978,6 @@
             document.getElementById('statHariKerja').textContent = '-';
             document.getElementById('statCheckIn').textContent = '-';
             document.getElementById('statTotalCheckIn').textContent = '-';
-        }
-
-        function updateTableEmpty(bulan, tahun) {
-            const tableBody = document.getElementById('tableBody');
-            document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun;
-            tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>';
-        }
-
-        function updateTable() {
-            const bulan = document.getElementById('bulanFilter').value;
-            const tahun = document.getElementById('tahunFilter').value;
-            const data = getSelectedData();
-            const tableBody = document.getElementById('tableBody');
-            document.getElementById('tableTitle').innerHTML = '📋 Detail Data Harian - ' + bulanNama[bulan] + ' ' + tahun;
-            
-            if (!data) {
-                tableBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:30px;color:#999;">Data tidak tersedia untuk periode ini</td></tr>';
-                return;
-            }
-            
-            let html = '';
-            for (let i = 0; i < data.labels.length; i++) {
-                const isWeekend = data.isWeekend[i];
-                const rowClass = isWeekend ? 'weekend-row' : '';
-                const totalAktif = data.wfo[i] + data.dinasLuar[i] + data.undangan[i];
-                html += `<tr class="${rowClass}">
-                    <td><strong>${data.labels[i]}</strong></td>
-                    <td>${data.hari[i]}</td>
-                    <td>${data.wfo[i]}</td>
-                    <td>${data.dinasLuar[i]}</td>
-                    <td>${data.undangan[i]}</td>
-                    <td>${data.sakit[i]}</td>
-                    <td>${data.ijin[i]}</td>
-                    <td>${data.cuti[i]}</td>
-                    <td>${data.tidakAbsen[i]}</td>
-                    <td><strong>${totalAktif}</strong></td>
-                </tr>`;
-            }
-            tableBody.innerHTML = html;
         }
 
         // Initialize when DOM is ready
