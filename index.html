@@ -16,7 +16,7 @@
             font-family: 'Poppins', sans-serif; 
             background: linear-gradient(135deg, #3d3d3d 0%, #2c2c2c 100%); 
             min-height: 100vh; 
-            padding: 10px; 
+            padding: 15px; 
             color: #333; 
         }
         
@@ -29,11 +29,11 @@
         
         /* Main Title */
         .dashboard-title {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             font-weight: 700;
             color: #5a4a78;
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
@@ -50,14 +50,14 @@
         .summary-card { 
             display: flex; 
             align-items: center; 
-            gap: 8px; 
-            padding: 8px 15px; 
-            border-radius: 6px; 
+            gap: 12px; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
             background: linear-gradient(135deg, #8B4513 0%, #6B3410 100%);
             box-shadow: 0 3px 10px rgba(0,0,0,0.3);
             flex: 1;
-            min-width: 180px;
-            max-width: 250px;
+            min-width: 200px;
+            max-width: 280px;
         }
         .summary-card.hari-kerja { background: linear-gradient(135deg, #6B8E23 0%, #556B2F 100%); }
         .summary-card.check-in { background: linear-gradient(135deg, #2E8B57 0%, #228B46 100%); }
@@ -66,23 +66,23 @@
         .summary-card .card-label { 
             background: rgba(0,0,0,0.35); 
             color: white; 
-            padding: 5px 8px; 
+            padding: 6px 10px; 
             border-radius: 4px; 
-            font-size: 0.55rem; 
+            font-size: 0.7rem; 
             font-weight: 600; 
             text-transform: uppercase; 
             line-height: 1.2;
             text-align: center;
-            min-width: 45px;
+            min-width: 50px;
         }
         .summary-card .card-value { 
-            font-size: 1.4rem; 
+            font-size: 1.8rem; 
             font-weight: 700; 
             color: white; 
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
         .summary-card .card-icon { 
-            font-size: 1.3rem; 
+            font-size: 1.6rem; 
             margin-left: auto;
             filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
         }
@@ -100,15 +100,15 @@
             flex-wrap: wrap;
         }
         .filter-group { display: flex; align-items: center; gap: 6px; }
-        .filter-group label { font-weight: 500; color: #fff; font-size: 0.75rem; }
+        .filter-group label { font-weight: 500; color: #fff; font-size: 0.9rem; }
         .filter-group select { 
-            padding: 5px 10px; 
-            font-size: 0.8rem; 
+            padding: 8px 15px; 
+            font-size: 0.9rem; 
             border: none; 
             border-radius: 5px; 
             background: white; 
             cursor: pointer; 
-            min-width: 100px;
+            min-width: 120px;
             font-family: 'Poppins', sans-serif;
         }
         
@@ -123,20 +123,20 @@
         /* Cards */
         .card { 
             background: white; 
-            border-radius: 8px; 
-            padding: 10px; 
+            border-radius: 10px; 
+            padding: 15px; 
             box-shadow: 0 3px 15px rgba(0,0,0,0.12); 
         }
         .card-header { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            margin-bottom: 8px; 
-            padding-bottom: 5px; 
+            margin-bottom: 10px; 
+            padding-bottom: 8px; 
             border-bottom: 2px solid #e0e0e0; 
         }
         .card-title { 
-            font-size: 0.75rem; 
+            font-size: 0.95rem; 
             font-weight: 700; 
             color: #333; 
             text-transform: uppercase; 
@@ -144,13 +144,13 @@
         }
         
         /* Bidang Pegawai Chart */
-        .bidang-chart-container { height: 200px; }
+        .bidang-chart-container { height: 280px; }
         
         /* Persentase Section - Center Card */
-        .persentase-card { padding: 10px; }
+        .persentase-card { padding: 15px; }
         .persentase-container { 
             display: flex; 
-            gap: 15px; 
+            gap: 20px; 
             justify-content: center; 
             align-items: flex-start; 
         }
@@ -161,8 +161,8 @@
         }
         .donut-wrapper { 
             position: relative; 
-            width: 120px; 
-            height: 120px;
+            width: 160px; 
+            height: 160px;
         }
         .donut-chart { width: 100% !important; height: 100% !important; }
         .donut-center-text { 
@@ -173,42 +173,42 @@
             text-align: center; 
             pointer-events: none;
         }
-        .donut-center-text .percentage { font-size: 1rem; font-weight: 700; color: #28a745; }
-        .donut-center-text .label { font-size: 0.55rem; color: #666; display: block; }
+        .donut-center-text .percentage { font-size: 1.3rem; font-weight: 700; color: #28a745; }
+        .donut-center-text .label { font-size: 0.7rem; color: #666; display: block; }
         
         /* Donut Legend */
         .donut-legend { 
             display: flex; 
             flex-wrap: wrap; 
-            gap: 3px 8px; 
-            margin-top: 5px; 
+            gap: 5px 12px; 
+            margin-top: 8px; 
             justify-content: center;
-            max-width: 200px;
+            max-width: 280px;
         }
-        .legend-item { display: flex; align-items: center; gap: 3px; font-size: 0.55rem; }
-        .legend-color { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+        .legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; }
+        .legend-color { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
         .legend-value { font-weight: 600; color: #333; }
         
         /* Keterangan Box */
         .keterangan-box { 
             background: #f8f9fa; 
-            border-radius: 6px; 
-            padding: 8px 10px; 
+            border-radius: 8px; 
+            padding: 12px 15px; 
             text-align: center;
-            min-width: 70px;
+            min-width: 90px;
         }
-        .keterangan-title { font-size: 0.55rem; font-weight: 600; color: #666; margin-bottom: 5px; }
-        .keterangan-value { font-size: 1.1rem; font-weight: 700; color: #dc3545; }
-        .keterangan-percent { font-size: 0.6rem; color: #999; }
+        .keterangan-title { font-size: 0.7rem; font-weight: 600; color: #666; margin-bottom: 6px; }
+        .keterangan-value { font-size: 1.4rem; font-weight: 700; color: #dc3545; }
+        .keterangan-percent { font-size: 0.75rem; color: #999; }
         
         /* Pembinaan Section */
-        .pembinaan-chart-container { height: 200px; }
+        .pembinaan-chart-container { height: 280px; }
         .pembinaan-legend { 
             display: flex; 
             flex-direction: column; 
-            gap: 4px; 
-            margin-bottom: 10px;
-            font-size: 0.65rem;
+            gap: 5px; 
+            margin-bottom: 12px;
+            font-size: 0.8rem;
         }
         .pembinaan-legend-item { 
             display: flex; 
@@ -219,93 +219,93 @@
         .pembinaan-legend-item .label { color: #666; }
         .pembinaan-legend-item .value { 
             font-weight: 600; 
-            padding: 2px 8px; 
-            border-radius: 3px; 
-            font-size: 0.6rem;
+            padding: 3px 10px; 
+            border-radius: 4px; 
+            font-size: 0.75rem;
         }
         
         /* Bidang Cards Grid - 4 columns */
         .bidang-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            gap: 8px; 
-            margin-bottom: 10px; 
+            gap: 12px; 
+            margin-bottom: 15px; 
         }
         
         .bidang-card { 
             background: white; 
-            border-radius: 6px; 
-            padding: 8px; 
+            border-radius: 8px; 
+            padding: 12px; 
             box-shadow: 0 3px 10px rgba(0,0,0,0.1); 
         }
         .bidang-card-header { 
-            font-size: 0.65rem; 
+            font-size: 0.85rem; 
             font-weight: 700; 
             color: #333; 
-            margin-bottom: 5px; 
+            margin-bottom: 8px; 
             text-align: center; 
-            border-bottom: 2px solid #B8860B; 
-            padding-bottom: 4px; 
+            border-bottom: 3px solid #B8860B; 
+            padding-bottom: 6px; 
         }
         
         /* Bidang Stats - Horizontal Layout */
         .bidang-stats-row {
             display: flex;
-            gap: 2px;
-            margin-bottom: 2px;
+            gap: 4px;
+            margin-bottom: 4px;
         }
         .bidang-stat-item {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            font-size: 0.45rem;
+            font-size: 0.65rem;
             flex: 1;
         }
         .bidang-stat-item .stat-label { 
             color: #888; 
             font-weight: 500;
             white-space: nowrap;
-            margin-bottom: 1px;
+            margin-bottom: 2px;
         }
         .bidang-stat-item .stat-bar {
             width: 100%;
-            height: 10px;
+            height: 14px;
             background: #e9ecef;
-            border-radius: 2px;
+            border-radius: 3px;
             overflow: hidden;
             display: flex;
             align-items: center;
         }
         .bidang-stat-item .stat-bar-fill {
             height: 100%;
-            border-radius: 2px;
+            border-radius: 3px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            padding-right: 3px;
-            font-size: 0.5rem;
+            padding-right: 4px;
+            font-size: 0.6rem;
             font-weight: 600;
             color: white;
             min-width: fit-content;
         }
         
-        .bidang-chart { height: 70px; margin-top: 3px; }
+        .bidang-chart { height: 100px; margin-top: 6px; }
         .bidang-chart-legend { 
             display: flex; 
             flex-wrap: wrap; 
-            gap: 3px; 
-            margin-top: 5px; 
+            gap: 5px; 
+            margin-top: 6px; 
             justify-content: center; 
-            font-size: 0.5rem;
+            font-size: 0.65rem;
         }
         .bidang-chart-legend span { 
             display: flex;
             align-items: center;
-            gap: 2px;
+            gap: 3px;
         }
         .bidang-chart-legend .dot {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
         }
         
@@ -313,19 +313,19 @@
         .table-section { 
             background: white; 
             border-radius: 10px; 
-            padding: 15px; 
+            padding: 20px; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
             margin-top: 15px; 
         }
         .table-title { 
-            margin-bottom: 12px; 
+            margin-bottom: 15px; 
             color: #333; 
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
         }
-        .table-container { overflow-x: auto; max-height: 400px; overflow-y: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
-        th, td { padding: 8px 6px; text-align: center; border: 1px solid #e0e0e0; }
+        .table-container { overflow-x: auto; max-height: 500px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 10px 8px; text-align: center; border: 1px solid #e0e0e0; }
         th { 
             background: #3d3d3d; 
             color: white; 
