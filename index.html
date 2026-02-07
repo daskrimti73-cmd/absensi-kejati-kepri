@@ -2,111 +2,379 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #2c2c2c; min-height: 100vh; padding: 15px; color: #333; }
         
-        .dashboard-container { max-width: 1400px; margin: 0 auto; }
+        html { font-size: 16px; }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #3d3d3d 0%, #2c2c2c 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+            color: #333; 
+        }
+        
+        .dashboard-container { 
+            max-width: 1600px; 
+            margin: 0 auto; 
+            width: 100%;
+        }
+        
+        /* Main Title */
+        .dashboard-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #5a4a78;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
         
         /* Top Summary Cards */
-        .top-summary { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .summary-card { display: flex; align-items: center; gap: 15px; padding: 15px 25px; border-radius: 8px; min-width: 180px; }
-        .summary-card.pegawai { background: #8B4513; }
-        .summary-card.hari-kerja { background: #6B8E23; }
-        .summary-card.check-in { background: #2E8B57; }
-        .summary-card.bidang { background: #B8860B; }
-        .summary-card .card-label { background: rgba(0,0,0,0.3); color: white; padding: 8px 12px; border-radius: 5px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
-        .summary-card .card-value { font-size: 32px; font-weight: 700; color: white; }
-        .summary-card .card-icon { font-size: 28px; opacity: 0.8; }
+        .top-summary { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
+        
+        .summary-card { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 12px 18px; 
+            border-radius: 8px; 
+            background: linear-gradient(135deg, #8B4513 0%, #6B3410 100%);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .summary-card.hari-kerja { background: linear-gradient(135deg, #6B8E23 0%, #556B2F 100%); }
+        .summary-card.check-in { background: linear-gradient(135deg, #2E8B57 0%, #228B46 100%); }
+        .summary-card.bidang { background: linear-gradient(135deg, #B8860B 0%, #8B6508 100%); }
+        
+        .summary-card .card-label { 
+            background: rgba(0,0,0,0.35); 
+            color: white; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            font-size: 0.7rem; 
+            font-weight: 600; 
+            text-transform: uppercase; 
+            line-height: 1.3;
+            text-align: center;
+            min-width: 60px;
+        }
+        .summary-card .card-value { 
+            font-size: 2rem; 
+            font-weight: 700; 
+            color: white; 
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+        .summary-card .card-icon { 
+            font-size: 2rem; 
+            margin-left: auto;
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
+        }
         
         /* Filter Section */
-        .filter-section { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; background: rgba(255,255,255,0.1); padding: 15px 20px; border-radius: 10px; }
-        .filter-group { display: flex; flex-direction: column; gap: 5px; }
-        .filter-group label { font-weight: 500; color: #fff; font-size: 12px; }
-        .filter-group select { padding: 10px 15px; font-size: 14px; border: none; border-radius: 6px; background: white; cursor: pointer; min-width: 140px; }
+        .filter-section { 
+            display: flex; 
+            gap: 20px; 
+            margin-bottom: 20px; 
+            justify-content: flex-start; 
+            background: rgba(255,255,255,0.08); 
+            padding: 12px 20px; 
+            border-radius: 10px; 
+            align-items: center;
+        }
+        .filter-group { display: flex; align-items: center; gap: 10px; }
+        .filter-group label { font-weight: 500; color: #fff; font-size: 0.85rem; }
+        .filter-group select { 
+            padding: 8px 15px; 
+            font-size: 0.9rem; 
+            border: none; 
+            border-radius: 6px; 
+            background: white; 
+            cursor: pointer; 
+            min-width: 130px;
+            font-family: 'Poppins', sans-serif;
+        }
         
-        /* Main Content Grid */
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        /* Main Content - 3 Column Grid */
+        .main-grid { 
+            display: grid; 
+            grid-template-columns: 1.2fr 2fr 1fr; 
+            gap: 15px; 
+            margin-bottom: 20px; 
+        }
         
         /* Cards */
-        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #f0f0f0; }
-        .card-title { font-size: 14px; font-weight: 600; color: #333; text-transform: uppercase; }
+        .card { 
+            background: white; 
+            border-radius: 10px; 
+            padding: 15px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+        }
+        .card-header { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            margin-bottom: 12px; 
+            padding-bottom: 8px; 
+            border-bottom: 2px solid #e0e0e0; 
+        }
+        .card-title { 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            color: #333; 
+            text-transform: uppercase; 
+            text-align: center;
+        }
         
-        /* Bidang Pegawai Section */
-        .bidang-section { display: flex; gap: 20px; }
-        .bidang-chart-container { flex: 1; height: 250px; }
+        /* Bidang Pegawai Chart */
+        .bidang-chart-container { height: 280px; }
         
-        /* Persentase Section */
-        .persentase-container { display: flex; gap: 30px; justify-content: center; align-items: center; }
-        .donut-wrapper { text-align: center; position: relative; }
-        .donut-chart { width: 180px; height: 180px; }
-        .donut-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-        .donut-center-text .percentage { font-size: 24px; font-weight: 700; color: #333; }
-        .donut-center-text .label { font-size: 10px; color: #666; }
+        /* Persentase Section - Center Card */
+        .persentase-card { padding: 15px; }
+        .persentase-container { 
+            display: flex; 
+            gap: 20px; 
+            justify-content: center; 
+            align-items: flex-start; 
+        }
+        .donut-section { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .donut-wrapper { 
+            position: relative; 
+            width: 160px; 
+            height: 160px;
+        }
+        .donut-chart { width: 100% !important; height: 100% !important; }
+        .donut-center-text { 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
+            pointer-events: none;
+        }
+        .donut-center-text .percentage { font-size: 1.4rem; font-weight: 700; color: #28a745; }
+        .donut-center-text .label { font-size: 0.7rem; color: #666; display: block; }
         
-        /* Legend Items */
-        .legend-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 15px; }
-        .legend-item { display: flex; align-items: center; gap: 8px; font-size: 11px; }
-        .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+        /* Donut Legend */
+        .donut-legend { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 6px 15px; 
+            margin-top: 10px; 
+            justify-content: center;
+            max-width: 250px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; }
+        .legend-color { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+        .legend-value { font-weight: 600; color: #333; }
         
-        /* Keterangan Section */
-        .keterangan-box { background: #f8f9fa; border-radius: 8px; padding: 15px; margin-left: 20px; }
-        .keterangan-title { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 10px; }
-        .keterangan-item { display: flex; justify-content: space-between; font-size: 11px; padding: 3px 0; }
+        /* Keterangan Box */
+        .keterangan-box { 
+            background: #f8f9fa; 
+            border-radius: 8px; 
+            padding: 12px 15px; 
+            text-align: center;
+            min-width: 100px;
+        }
+        .keterangan-title { font-size: 0.7rem; font-weight: 600; color: #666; margin-bottom: 8px; }
+        .keterangan-value { font-size: 1.5rem; font-weight: 700; color: #dc3545; }
+        .keterangan-percent { font-size: 0.8rem; color: #999; }
         
-        /* Bidang Cards Grid */
-        .bidang-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .bidang-card { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .bidang-card-header { font-size: 13px; font-weight: 600; color: #333; margin-bottom: 10px; text-align: center; border-bottom: 2px solid #B8860B; padding-bottom: 8px; }
-        .bidang-stats { display: flex; flex-direction: column; gap: 4px; font-size: 10px; margin-bottom: 10px; }
-        .bidang-stat-row { display: flex; justify-content: space-between; align-items: center; }
-        .bidang-stat-row .stat-label { color: #666; }
-        .bidang-stat-row .stat-value { font-weight: 600; padding: 2px 8px; border-radius: 3px; font-size: 9px; }
-        .bidang-stat-row .stat-value.tidak-absen { background: #dc3545; color: white; }
-        .bidang-stat-row .stat-value.cuti { background: #ffc107; color: #333; }
-        .bidang-stat-row .stat-value.ijin { background: #20c997; color: white; }
-        .bidang-stat-row .stat-value.sakit { background: #fd7e14; color: white; }
-        .bidang-stat-row .stat-value.undangan { background: #6f42c1; color: white; }
-        .bidang-stat-row .stat-value.dinas { background: #17a2b8; color: white; }
-        .bidang-stat-row .stat-value.wfo { background: #28a745; color: white; }
-        .bidang-chart { height: 120px; margin-top: 10px; }
-        .bidang-chart-legend { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; justify-content: center; }
-        .bidang-chart-legend span { font-size: 8px; color: #666; }
+        /* Pembinaan Section */
+        .pembinaan-chart-container { height: 280px; }
+        .pembinaan-legend { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px; 
+            margin-bottom: 10px;
+            font-size: 0.65rem;
+        }
+        .pembinaan-legend-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 2px 0;
+        }
+        .pembinaan-legend-item .label { color: #666; }
+        .pembinaan-legend-item .value { 
+            font-weight: 600; 
+            padding: 2px 8px; 
+            border-radius: 3px; 
+            font-size: 0.6rem;
+        }
+        
+        /* Bidang Cards Grid - 4 columns */
+        .bidang-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 12px; 
+            margin-bottom: 20px; 
+        }
+        
+        .bidang-card { 
+            background: white; 
+            border-radius: 8px; 
+            padding: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        .bidang-card-header { 
+            font-size: 0.8rem; 
+            font-weight: 700; 
+            color: #333; 
+            margin-bottom: 8px; 
+            text-align: center; 
+            border-bottom: 3px solid #B8860B; 
+            padding-bottom: 6px; 
+        }
+        
+        /* Bidang Stats - Horizontal Layout */
+        .bidang-stats-row {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 4px;
+        }
+        .bidang-stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            font-size: 0.55rem;
+            flex: 1;
+        }
+        .bidang-stat-item .stat-label { 
+            color: #888; 
+            font-weight: 500;
+            white-space: nowrap;
+            margin-bottom: 2px;
+        }
+        .bidang-stat-item .stat-bar {
+            width: 100%;
+            height: 12px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        .bidang-stat-item .stat-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 3px;
+            font-size: 0.5rem;
+            font-weight: 600;
+            color: white;
+            min-width: fit-content;
+        }
+        
+        .bidang-chart { height: 100px; margin-top: 5px; }
+        .bidang-chart-legend { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 3px; 
+            margin-top: 5px; 
+            justify-content: center; 
+            font-size: 0.5rem;
+        }
+        .bidang-chart-legend span { 
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .bidang-chart-legend .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
         
         /* Table Section */
-        .table-section { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 20px; }
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th, td { padding: 10px 8px; text-align: center; border: 1px solid #e0e0e0; }
-        th { background: #3d3d3d; color: white; font-weight: 600; position: sticky; top: 0; }
+        .table-section { 
+            background: white; 
+            border-radius: 10px; 
+            padding: 15px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            margin-top: 15px; 
+        }
+        .table-title { 
+            margin-bottom: 12px; 
+            color: #333; 
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .table-container { overflow-x: auto; max-height: 400px; overflow-y: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+        th, td { padding: 8px 6px; text-align: center; border: 1px solid #e0e0e0; }
+        th { 
+            background: #3d3d3d; 
+            color: white; 
+            font-weight: 600; 
+            position: sticky; 
+            top: 0; 
+            z-index: 10;
+        }
         tr:nth-child(even) { background: #f8f9fa; }
         tr:hover { background: #e9ecef; }
         .weekend-row { background: #ffe6e6 !important; color: #999; }
         
         /* Footer */
-        .footer { text-align: center; margin-top: 20px; padding: 15px; color: #999; font-size: 12px; }
+        .footer { 
+            text-align: center; 
+            margin-top: 20px; 
+            padding: 15px; 
+            color: #888; 
+            font-size: 0.75rem; 
+        }
         
         /* Responsive */
+        @media (max-width: 1400px) { 
+            .main-grid { grid-template-columns: 1fr 1.5fr 1fr; }
+        }
         @media (max-width: 1200px) { 
             .bidang-grid { grid-template-columns: repeat(2, 1fr); } 
             .main-grid { grid-template-columns: 1fr; }
+            .top-summary { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 768px) { 
-            .top-summary { flex-direction: column; align-items: center; }
-            .summary-card { width: 100%; justify-content: center; }
+            body { padding: 10px; }
+            .dashboard-title { font-size: 1.5rem; }
+            .top-summary { grid-template-columns: 1fr; }
+            .summary-card { justify-content: flex-start; }
             .bidang-grid { grid-template-columns: 1fr; }
-            .persentase-container { flex-direction: column; }
-            .filter-section { flex-direction: column; align-items: center; }
+            .persentase-container { flex-direction: column; align-items: center; }
+            .filter-section { flex-direction: column; align-items: stretch; }
         }
+        
+        /* Color utilities */
+        .bg-wfo { background: #28a745; }
+        .bg-dinas { background: #17a2b8; }
+        .bg-undangan { background: #6f42c1; }
+        .bg-sakit { background: #fd7e14; }
+        .bg-ijin { background: #20c997; }
+        .bg-cuti { background: #ffc107; color: #333 !important; }
+        .bg-tidak-absen { background: #dc3545; }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Dashboard Title -->
+        <h1 class="dashboard-title" id="dashboardTitle">DASHBOARD ABSENSI DESEMBER 2025</h1>
+        
         <!-- Top Summary Cards -->
         <div class="top-summary">
             <div class="summary-card pegawai">
@@ -121,7 +389,7 @@
             </div>
             <div class="summary-card check-in">
                 <span class="card-label">Check<br>In</span>
-                <span class="card-value"><span id="statCheckIn">2965</span>/<span id="statTotalCheckIn">2982</span></span>
+                <span class="card-value"><span id="statCheckIn">2,965</span>/<span id="statTotalCheckIn">2,982</span></span>
                 <span class="card-icon">✅</span>
             </div>
             <div class="summary-card bidang">
@@ -159,7 +427,7 @@
             </div>
         </div>
 
-        <!-- Main Content - Bidang Pegawai & Persentase -->
+        <!-- Main Content - 3 Column Grid -->
         <div class="main-grid">
             <!-- Bidang Pegawai Card -->
             <div class="card">
@@ -171,44 +439,72 @@
                 </div>
             </div>
             
-            <!-- Persentase Kehadiran Card -->
-            <div class="card">
+            <!-- Persentase Kehadiran Card (Center) -->
+            <div class="card persentase-card">
                 <div class="card-header">
                     <span class="card-title">Persentase Kehadiran Keseluruhan</span>
                 </div>
                 <div class="persentase-container">
-                    <div class="donut-wrapper">
-                        <canvas id="kehadiranDonutChart" class="donut-chart"></canvas>
-                    </div>
-                    <div class="donut-wrapper">
-                        <canvas id="absenDonutChart" class="donut-chart"></canvas>
-                    </div>
-                    <div class="keterangan-box">
-                        <div class="keterangan-title">Tanpa Keterangan</div>
-                        <div class="keterangan-item">
-                            <span id="tanpaKeteranganPersen">0.57%</span>
+                    <!-- Left Donut - Categories -->
+                    <div class="donut-section">
+                        <div class="donut-wrapper">
+                            <canvas id="kehadiranDonutChart" class="donut-chart"></canvas>
+                        </div>
+                        <div class="donut-legend" id="kehadiranLegend">
+                            <div class="legend-item"><div class="legend-color bg-wfo"></div><span>WFO</span><span class="legend-value" id="leg-wfo">78.0%</span></div>
+                            <div class="legend-item"><div class="legend-color bg-dinas"></div><span>DINAS LUAR</span><span class="legend-value" id="leg-dinas">14.8%</span></div>
+                            <div class="legend-item"><div class="legend-color bg-undangan"></div><span>UNDANGAN</span><span class="legend-value" id="leg-undangan">2.5%</span></div>
+                            <div class="legend-item"><div class="legend-color bg-sakit"></div><span>SAKIT</span><span class="legend-value" id="leg-sakit">0.6%</span></div>
+                            <div class="legend-item"><div class="legend-color bg-ijin"></div><span>IJIN</span><span class="legend-value" id="leg-ijin">0.0%</span></div>
+                            <div class="legend-item"><div class="legend-color bg-cuti"></div><span>CUTI</span><span class="legend-value" id="leg-cuti">3.6%</span></div>
+                            <div class="legend-item"><div class="legend-color bg-tidak-absen"></div><span>TIDAK ABSEN</span><span class="legend-value" id="leg-tidakabsen">0.0%</span></div>
                         </div>
                     </div>
+                    
+                    <!-- Right Donut - Absen Percentage -->
+                    <div class="donut-section">
+                        <div class="donut-wrapper">
+                            <canvas id="absenDonutChart" class="donut-chart"></canvas>
+                            <div class="donut-center-text">
+                                <span class="percentage" id="absenPercent">99.43%</span>
+                                <span class="label">Absen</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Keterangan Box -->
+                    <div class="keterangan-box">
+                        <div class="keterangan-title">Tanpa<br>Keterangan</div>
+                        <div class="keterangan-value" id="tanpaKeteranganValue">0</div>
+                        <div class="keterangan-percent" id="tanpaKeteranganPersen">0.57%</div>
+                    </div>
                 </div>
-                <div class="legend-grid">
-                    <div class="legend-item"><div class="legend-color" style="background: #28a745;"></div><span>WFO</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #17a2b8;"></div><span>DINAS LUAR</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #6f42c1;"></div><span>UNDANGAN</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #fd7e14;"></div><span>SAKIT</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #20c997;"></div><span>IJIN</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #ffc107;"></div><span>CUTI</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #dc3545;"></div><span>TIDAK ABSEN</span></div>
+            </div>
+            
+            <!-- Pembinaan Card (Right) -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Pembinaan</span>
+                </div>
+                <div class="pembinaan-legend" id="pembinaanLegend">
+                    <div class="pembinaan-legend-item"><span class="label">TIDAK ABSEN</span><span class="value bg-tidak-absen">0.00%</span></div>
+                    <div class="pembinaan-legend-item"><span class="label">SAKIT</span><span class="value bg-sakit">0.19%</span></div>
+                    <div class="pembinaan-legend-item"><span class="label">UNDANGAN</span><span class="value bg-undangan">0.58%</span></div>
+                    <div class="pembinaan-legend-item"><span class="label">DINAS LUAR</span><span class="value bg-dinas">5.77%</span></div>
+                </div>
+                <div class="pembinaan-chart-container">
+                    <canvas id="pembinaanChart"></canvas>
                 </div>
             </div>
         </div>
         
-        <!-- Pembinaan Summary Card -->
+        <!-- Ringkasan Kehadiran Per Kategori -->
         <div class="card" style="margin-bottom: 20px;">
             <div class="card-header">
                 <span class="card-title">Ringkasan Kehadiran Per Kategori</span>
             </div>
-            <div style="height: 200px;">
-                <canvas id="pembinaanChart"></canvas>
+            <div style="height: 180px;">
+                <canvas id="ringkasanChart"></canvas>
             </div>
         </div>
 
@@ -217,14 +513,47 @@
             <!-- Tata Usaha -->
             <div class="bidang-card">
                 <div class="bidang-card-header">Tata Usaha</div>
-                <div class="bidang-stats">
-                    <div class="bidang-stat-row"><span class="stat-label">TIDAK ABSEN</span><span class="stat-value tidak-absen" id="tu-tidakAbsen">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">CUTI</span><span class="stat-value cuti" id="tu-cuti">6.94%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">IJIN</span><span class="stat-value ijin" id="tu-ijin">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">SAKIT</span><span class="stat-value sakit" id="tu-sakit">0.46%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">UNDANGAN</span><span class="stat-value undangan" id="tu-undangan">1.32%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">DINAS LUAR</span><span class="stat-value dinas" id="tu-dinas">5.79%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">WFO</span><span class="stat-value wfo" id="tu-wfo">83.33%</span></div>
+                <div class="bidang-stats-row">
+                    <div class="bidang-stat-item">
+                        <span class="stat-label">TIDAK ABSEN</span>
+                        <div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="tu-tidakabsen-bar" style="width: 0%">0.00%</div></div>
+                    </div>
+                </div>
+                <div class="bidang-stats-row">
+                    <div class="bidang-stat-item">
+                        <span class="stat-label">CUTI</span>
+                        <div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="tu-cuti-bar" style="width: 6.94%">6.94%</div></div>
+                    </div>
+                </div>
+                <div class="bidang-stats-row">
+                    <div class="bidang-stat-item">
+                        <span class="stat-label">IJIN</span>
+                        <div class="stat-bar"><div class="stat-bar-fill bg-ijin" id="tu-ijin-bar" style="width: 0%">0.00%</div></div>
+                    </div>
+                </div>
+                <div class="bidang-stats-row">
+                    <div class="bidang-stat-item">
+                        <span class="stat-label">SAKIT</span>
+                        <div class="stat-bar"><div class="stat-bar-fill bg-sakit" id="tu-sakit-bar" style="width: 0.46%">0.46%</div></div>
+                    </div>
+                </div>
+                <div class="bidang-stats-row">
+                    <div class="bidang-stat-item">
+                        <span class="stat-label">UNDANGAN</span>
+                        <div class="stat-bar"><div class="stat-bar-fill bg-undangan" id="tu-undangan-bar" style="width: 1.32%">1.32%</div></div>
+                    </div>
+                </div>
+                <div class="bidang-stats-row">
+                    <div class="bidang-stat-item">
+                        <span class="stat-label">DINAS LUAR</span>
+                        <div class="stat-bar"><div class="stat-bar-fill bg-dinas" id="tu-dinas-bar" style="width: 5.79%">5.79%</div></div>
+                    </div>
+                </div>
+                <div class="bidang-stats-row">
+                    <div class="bidang-stat-item">
+                        <span class="stat-label">WFO</span>
+                        <div class="stat-bar"><div class="stat-bar-fill bg-wfo" id="tu-wfo-bar" style="width: 83.33%">83.33%</div></div>
+                    </div>
                 </div>
                 <div class="bidang-chart"><canvas id="chart-tu"></canvas></div>
             </div>
@@ -232,112 +561,98 @@
             <!-- Tindak Pidana Khusus -->
             <div class="bidang-card">
                 <div class="bidang-card-header">Tindak Pidana Khusus</div>
-                <div class="bidang-stats">
-                    <div class="bidang-stat-row"><span class="stat-label">TIDAK ABSEN</span><span class="stat-value tidak-absen" id="pidsus-tidakAbsen">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">CUTI</span><span class="stat-value cuti" id="pidsus-cuti">5.24%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">IJIN</span><span class="stat-value ijin" id="pidsus-ijin">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">SAKIT</span><span class="stat-value sakit" id="pidsus-sakit">0.67%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">UNDANGAN</span><span class="stat-value undangan" id="pidsus-undangan">2.38%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">DINAS LUAR</span><span class="stat-value dinas" id="pidsus-dinas">17.80%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">WFO</span><span class="stat-value wfo" id="pidsus-wfo">74.00%</span></div>
-                </div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="pidsus-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="pidsus-cuti-bar" style="width: 5.24%">5.24%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">IJIN</span><div class="stat-bar"><div class="stat-bar-fill bg-ijin" id="pidsus-ijin-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">SAKIT</span><div class="stat-bar"><div class="stat-bar-fill bg-sakit" id="pidsus-sakit-bar" style="width: 0.67%">0.67%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">UNDANGAN</span><div class="stat-bar"><div class="stat-bar-fill bg-undangan" id="pidsus-undangan-bar" style="width: 2.38%">2.38%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">DINAS LUAR</span><div class="stat-bar"><div class="stat-bar-fill bg-dinas" id="pidsus-dinas-bar" style="width: 17.8%">17.80%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">WFO</span><div class="stat-bar"><div class="stat-bar-fill bg-wfo" id="pidsus-wfo-bar" style="width: 74%">74.00%</div></div></div></div>
                 <div class="bidang-chart"><canvas id="chart-pidsus"></canvas></div>
             </div>
             
             <!-- Tindak Pidana Umum -->
             <div class="bidang-card">
                 <div class="bidang-card-header">Tindak Pidana Umum</div>
-                <div class="bidang-stats">
-                    <div class="bidang-stat-row"><span class="stat-label">TIDAK ABSEN</span><span class="stat-value tidak-absen" id="pidum-tidakAbsen">1.70%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">CUTI</span><span class="stat-value cuti" id="pidum-cuti">2.01%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">IJIN</span><span class="stat-value ijin" id="pidum-ijin">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">SAKIT</span><span class="stat-value sakit" id="pidum-sakit">0.75%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">UNDANGAN</span><span class="stat-value undangan" id="pidum-undangan">4.05%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">DINAS LUAR</span><span class="stat-value dinas" id="pidum-dinas">24.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">WFO</span><span class="stat-value wfo" id="pidum-wfo">65.50%</span></div>
-                </div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="pidum-tidakabsen-bar" style="width: 1.7%">1.70%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="pidum-cuti-bar" style="width: 2.01%">2.01%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">IJIN</span><div class="stat-bar"><div class="stat-bar-fill bg-ijin" id="pidum-ijin-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">SAKIT</span><div class="stat-bar"><div class="stat-bar-fill bg-sakit" id="pidum-sakit-bar" style="width: 0.75%">0.75%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">UNDANGAN</span><div class="stat-bar"><div class="stat-bar-fill bg-undangan" id="pidum-undangan-bar" style="width: 4.05%">4.05%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">DINAS LUAR</span><div class="stat-bar"><div class="stat-bar-fill bg-dinas" id="pidum-dinas-bar" style="width: 14%">14.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">WFO</span><div class="stat-bar"><div class="stat-bar-fill bg-wfo" id="pidum-wfo-bar" style="width: 77.5%">77.50%</div></div></div></div>
                 <div class="bidang-chart"><canvas id="chart-pidum"></canvas></div>
             </div>
             
             <!-- Intelijen -->
             <div class="bidang-card">
                 <div class="bidang-card-header">Intelijen</div>
-                <div class="bidang-stats">
-                    <div class="bidang-stat-row"><span class="stat-label">TIDAK ABSEN</span><span class="stat-value tidak-absen" id="intel-tidakAbsen">0.52%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">CUTI</span><span class="stat-value cuti" id="intel-cuti">3.17%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">IJIN</span><span class="stat-value ijin" id="intel-ijin">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">SAKIT</span><span class="stat-value sakit" id="intel-sakit">0.51%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">UNDANGAN</span><span class="stat-value undangan" id="intel-undangan">5.67%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">DINAS LUAR</span><span class="stat-value dinas" id="intel-dinas">12.70%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">WFO</span><span class="stat-value wfo" id="intel-wfo">76.51%</span></div>
-                </div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="intel-tidakabsen-bar" style="width: 0.52%">0.52%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="intel-cuti-bar" style="width: 3.17%">3.17%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">IJIN</span><div class="stat-bar"><div class="stat-bar-fill bg-ijin" id="intel-ijin-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">SAKIT</span><div class="stat-bar"><div class="stat-bar-fill bg-sakit" id="intel-sakit-bar" style="width: 0.51%">0.51%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">UNDANGAN</span><div class="stat-bar"><div class="stat-bar-fill bg-undangan" id="intel-undangan-bar" style="width: 4.49%">4.49%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">DINAS LUAR</span><div class="stat-bar"><div class="stat-bar-fill bg-dinas" id="intel-dinas-bar" style="width: 14.7%">14.70%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">WFO</span><div class="stat-bar"><div class="stat-bar-fill bg-wfo" id="intel-wfo-bar" style="width: 76.5%">76.50%</div></div></div></div>
                 <div class="bidang-chart"><canvas id="chart-intel"></canvas></div>
             </div>
             
             <!-- Pengawasan -->
             <div class="bidang-card">
                 <div class="bidang-card-header">Pengawasan</div>
-                <div class="bidang-stats">
-                    <div class="bidang-stat-row"><span class="stat-label">TIDAK ABSEN</span><span class="stat-value tidak-absen" id="was-tidakAbsen">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">CUTI</span><span class="stat-value cuti" id="was-cuti">4.40%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">IJIN</span><span class="stat-value ijin" id="was-ijin">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">SAKIT</span><span class="stat-value sakit" id="was-sakit">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">UNDANGAN</span><span class="stat-value undangan" id="was-undangan">5.67%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">DINAS LUAR</span><span class="stat-value dinas" id="was-dinas">21.60%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">WFO</span><span class="stat-value wfo" id="was-wfo">61.17%</span></div>
-                </div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="was-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="was-cuti-bar" style="width: 6.41%">6.41%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">IJIN</span><div class="stat-bar"><div class="stat-bar-fill bg-ijin" id="was-ijin-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">SAKIT</span><div class="stat-bar"><div class="stat-bar-fill bg-sakit" id="was-sakit-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">UNDANGAN</span><div class="stat-bar"><div class="stat-bar-fill bg-undangan" id="was-undangan-bar" style="width: 3.87%">3.87%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">DINAS LUAR</span><div class="stat-bar"><div class="stat-bar-fill bg-dinas" id="was-dinas-bar" style="width: 20.6%">20.60%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">WFO</span><div class="stat-bar"><div class="stat-bar-fill bg-wfo" id="was-wfo-bar" style="width: 61.17%">61.17%</div></div></div></div>
                 <div class="bidang-chart"><canvas id="chart-was"></canvas></div>
             </div>
             
             <!-- Perdata dan Tata Usaha Negara -->
             <div class="bidang-card">
-                <div class="bidang-card-header">Perdata dan TUN</div>
-                <div class="bidang-stats">
-                    <div class="bidang-stat-row"><span class="stat-label">TIDAK ABSEN</span><span class="stat-value tidak-absen" id="datun-tidakAbsen">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">CUTI</span><span class="stat-value cuti" id="datun-cuti">3.79%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">IJIN</span><span class="stat-value ijin" id="datun-ijin">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">SAKIT</span><span class="stat-value sakit" id="datun-sakit">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">UNDANGAN</span><span class="stat-value undangan" id="datun-undangan">1.19%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">DINAS LUAR</span><span class="stat-value dinas" id="datun-dinas">17.26%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">WFO</span><span class="stat-value wfo" id="datun-wfo">78.06%</span></div>
-                </div>
+                <div class="bidang-card-header">Perdata dan Tata Usaha Negara</div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="datun-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="datun-cuti-bar" style="width: 3.79%">3.79%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">IJIN</span><div class="stat-bar"><div class="stat-bar-fill bg-ijin" id="datun-ijin-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">SAKIT</span><div class="stat-bar"><div class="stat-bar-fill bg-sakit" id="datun-sakit-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">UNDANGAN</span><div class="stat-bar"><div class="stat-bar-fill bg-undangan" id="datun-undangan-bar" style="width: 1.19%">1.19%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">DINAS LUAR</span><div class="stat-bar"><div class="stat-bar-fill bg-dinas" id="datun-dinas-bar" style="width: 17.26%">17.26%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">WFO</span><div class="stat-bar"><div class="stat-bar-fill bg-wfo" id="datun-wfo-bar" style="width: 78.06%">78.06%</div></div></div></div>
                 <div class="bidang-chart"><canvas id="chart-datun"></canvas></div>
             </div>
             
             <!-- Pemulihan Aset -->
             <div class="bidang-card">
                 <div class="bidang-card-header">Pemulihan Aset</div>
-                <div class="bidang-stats">
-                    <div class="bidang-stat-row"><span class="stat-label">TIDAK ABSEN</span><span class="stat-value tidak-absen" id="aset-tidakAbsen">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">CUTI</span><span class="stat-value cuti" id="aset-cuti">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">IJIN</span><span class="stat-value ijin" id="aset-ijin">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">SAKIT</span><span class="stat-value sakit" id="aset-sakit">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">UNDANGAN</span><span class="stat-value undangan" id="aset-undangan">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">DINAS LUAR</span><span class="stat-value dinas" id="aset-dinas">39.05%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">WFO</span><span class="stat-value wfo" id="aset-wfo">60.95%</span></div>
-                </div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="aset-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="aset-cuti-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">IJIN</span><div class="stat-bar"><div class="stat-bar-fill bg-ijin" id="aset-ijin-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">SAKIT</span><div class="stat-bar"><div class="stat-bar-fill bg-sakit" id="aset-sakit-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">UNDANGAN</span><div class="stat-bar"><div class="stat-bar-fill bg-undangan" id="aset-undangan-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">DINAS LUAR</span><div class="stat-bar"><div class="stat-bar-fill bg-dinas" id="aset-dinas-bar" style="width: 39.05%">39.05%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">WFO</span><div class="stat-bar"><div class="stat-bar-fill bg-wfo" id="aset-wfo-bar" style="width: 60.95%">60.95%</div></div></div></div>
                 <div class="bidang-chart"><canvas id="chart-aset"></canvas></div>
             </div>
             
             <!-- Koordinator -->
             <div class="bidang-card">
                 <div class="bidang-card-header">Koordinator</div>
-                <div class="bidang-stats">
-                    <div class="bidang-stat-row"><span class="stat-label">TIDAK ABSEN</span><span class="stat-value tidak-absen" id="kor-tidakAbsen">1.19%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">CUTI</span><span class="stat-value cuti" id="kor-cuti">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">IJIN</span><span class="stat-value ijin" id="kor-ijin">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">SAKIT</span><span class="stat-value sakit" id="kor-sakit">0.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">UNDANGAN</span><span class="stat-value undangan" id="kor-undangan">1.19%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">DINAS LUAR</span><span class="stat-value dinas" id="kor-dinas">30.00%</span></div>
-                    <div class="bidang-stat-row"><span class="stat-label">WFO</span><span class="stat-value wfo" id="kor-wfo">65.00%</span></div>
-                </div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="kor-tidakabsen-bar" style="width: 1.19%">1.19%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="kor-cuti-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">IJIN</span><div class="stat-bar"><div class="stat-bar-fill bg-ijin" id="kor-ijin-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">SAKIT</span><div class="stat-bar"><div class="stat-bar-fill bg-sakit" id="kor-sakit-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">UNDANGAN</span><div class="stat-bar"><div class="stat-bar-fill bg-undangan" id="kor-undangan-bar" style="width: 1.19%">1.19%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">DINAS LUAR</span><div class="stat-bar"><div class="stat-bar-fill bg-dinas" id="kor-dinas-bar" style="width: 30%">30.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">WFO</span><div class="stat-bar"><div class="stat-bar-fill bg-wfo" id="kor-wfo-bar" style="width: 65%">65.00%</div></div></div></div>
                 <div class="bidang-chart"><canvas id="chart-kor"></canvas></div>
             </div>
         </div>
 
         <!-- Table Section -->
         <div class="table-section">
-            <h3 id="tableTitle" style="margin-bottom: 15px; color: #333;">📋 Detail Data Harian - Desember 2025</h3>
+            <h3 class="table-title" id="tableTitle">📋 Detail Data Harian - DESEMBER 2025</h3>
             <div class="table-container">
                 <table>
                     <thead>
@@ -383,25 +698,31 @@
 
         // Data Bidang Pegawai
         const dataBidang = {
-            labels: ['Pembinaan', 'Tata Usaha', 'Pidsus', 'Pidum', 'Pengawasan', 'Datun', 'Intel', 'Koordinator'],
-            data: [33, 22, 19, 18, 15, 15, 4, 8],
-            colors: ['#5DADE2', '#F39C12', '#E74C3C', '#9B59B6', '#1ABC9C', '#3498DB', '#E67E22', '#95A5A6']
+            labels: ['Pembinaan', 'Tata Usaha', 'Pidsus', 'Pidum', 'Pengawasan', 'Intel', 'Datun', 'Koordinator'],
+            data: [33, 22, 19, 18, 15, 15, 12, 8],
+            colors: ['#5DADE2', '#F39C12', '#E74C3C', '#9B59B6', '#1ABC9C', '#E67E22', '#3498DB', '#95A5A6']
         };
 
         const bulanNama = { januari: 'JANUARI', februari: 'FEBRUARI', maret: 'MARET', april: 'APRIL', mei: 'MEI', juni: 'JUNI', juli: 'JULI', agustus: 'AGUSTUS', september: 'SEPTEMBER', oktober: 'OKTOBER', november: 'NOVEMBER', desember: 'DESEMBER' };
 
-        let chartInstance, bidangChartInstance, kehadiranDonutInstance, absenDonutInstance, pembinaanChartInstance;
+        let bidangChartInstance, kehadiranDonutInstance, absenDonutInstance, pembinaanChartInstance, ringkasanChartInstance;
         let bidangCharts = {};
 
-        const datasetConfig = { wfo: { label: 'WFO', color: '#28a745', border: '#1e7e34' }, dinasLuar: { label: 'Dinas Luar', color: '#17a2b8', border: '#138496' }, undangan: { label: 'Undangan', color: '#6f42c1', border: '#5a32a3' }, sakit: { label: 'Sakit', color: '#fd7e14', border: '#e0a800' }, ijin: { label: 'Ijin', color: '#20c997', border: '#1aa179' }, cuti: { label: 'Cuti', color: '#ffc107', border: '#d4a100' }, tidakAbsen: { label: 'Tidak Absen', color: '#dc3545', border: '#c82333' } };
-
-        function getSelectedData() { const bulan = document.getElementById('bulanFilter').value; const tahun = document.getElementById('tahunFilter').value; if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) { return dataAbsensi[tahun][bulan]; } return null; }
+        function getSelectedData() { 
+            const bulan = document.getElementById('bulanFilter').value; 
+            const tahun = document.getElementById('tahunFilter').value; 
+            if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) { 
+                return dataAbsensi[tahun][bulan]; 
+            } 
+            return null; 
+        }
 
         function initCharts() {
             initBidangChart();
             initKehadiranDonutChart();
             initAbsenDonutChart();
             initPembinaanChart();
+            initRingkasanChart();
             initBidangSmallCharts();
             updateStats();
             updateTable();
@@ -416,19 +737,30 @@
                     datasets: [{
                         data: dataBidang.data,
                         backgroundColor: dataBidang.colors,
-                        borderRadius: 5
+                        borderRadius: 4,
+                        barThickness: 22
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     indexAxis: 'y',
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#333',
+                            font: { size: 10, weight: '600' },
+                            formatter: (value) => value
+                        }
+                    },
                     scales: {
-                        x: { beginAtZero: true, grid: { display: false } },
-                        y: { grid: { display: false } }
+                        x: { beginAtZero: true, grid: { display: false }, max: 40 },
+                        y: { grid: { display: false }, ticks: { font: { size: 10 } } }
                     }
-                }
+                },
+                plugins: [ChartDataLabels]
             });
         }
         
@@ -436,7 +768,6 @@
             const ctx = document.getElementById('kehadiranDonutChart').getContext('2d');
             const data = getSelectedData() || dataAbsensi[2025].desember;
             const sum = arr => arr.reduce((a, b) => a + b, 0);
-            const total = sum(data.wfo) + sum(data.dinasLuar) + sum(data.undangan) + sum(data.sakit) + sum(data.ijin) + sum(data.cuti) + sum(data.tidakAbsen);
             
             kehadiranDonutInstance = new Chart(ctx, {
                 type: 'doughnut',
@@ -451,10 +782,36 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    cutout: '65%',
-                    plugins: { legend: { display: false } }
-                }
+                    cutout: '60%',
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#fff',
+                            font: { size: 9, weight: 'bold' },
+                            formatter: (value, ctx) => {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = ((value / total) * 100).toFixed(1);
+                                return pct > 3 ? pct + '%' : '';
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
             });
+            updateLegendValues(data);
+        }
+        
+        function updateLegendValues(data) {
+            const sum = arr => arr.reduce((a, b) => a + b, 0);
+            const total = sum(data.wfo) + sum(data.dinasLuar) + sum(data.undangan) + sum(data.sakit) + sum(data.ijin) + sum(data.cuti) + sum(data.tidakAbsen);
+            
+            document.getElementById('leg-wfo').textContent = ((sum(data.wfo) / total) * 100).toFixed(1) + '%';
+            document.getElementById('leg-dinas').textContent = ((sum(data.dinasLuar) / total) * 100).toFixed(1) + '%';
+            document.getElementById('leg-undangan').textContent = ((sum(data.undangan) / total) * 100).toFixed(1) + '%';
+            document.getElementById('leg-sakit').textContent = ((sum(data.sakit) / total) * 100).toFixed(1) + '%';
+            document.getElementById('leg-ijin').textContent = ((sum(data.ijin) / total) * 100).toFixed(1) + '%';
+            document.getElementById('leg-cuti').textContent = ((sum(data.cuti) / total) * 100).toFixed(1) + '%';
+            document.getElementById('leg-tidakabsen').textContent = ((sum(data.tidakAbsen) / total) * 100).toFixed(1) + '%';
         }
         
         function initAbsenDonutChart() {
@@ -463,6 +820,12 @@
             const sum = arr => arr.reduce((a, b) => a + b, 0);
             const totalAbsen = sum(data.wfo) + sum(data.dinasLuar) + sum(data.undangan);
             const totalTidakAbsen = sum(data.sakit) + sum(data.ijin) + sum(data.cuti) + sum(data.tidakAbsen);
+            const total = totalAbsen + totalTidakAbsen;
+            const absenPct = ((totalAbsen / total) * 100).toFixed(2);
+            
+            document.getElementById('absenPercent').textContent = absenPct + '%';
+            document.getElementById('tanpaKeteranganValue').textContent = sum(data.tidakAbsen);
+            document.getElementById('tanpaKeteranganPersen').textContent = ((sum(data.tidakAbsen) / total) * 100).toFixed(2) + '%';
             
             absenDonutInstance = new Chart(ctx, {
                 type: 'doughnut',
@@ -477,8 +840,8 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    cutout: '65%',
-                    plugins: { legend: { display: false } }
+                    cutout: '70%',
+                    plugins: { legend: { display: false }, datalabels: { display: false } }
                 }
             });
         }
@@ -489,6 +852,44 @@
             const sum = arr => arr.reduce((a, b) => a + b, 0);
             
             pembinaanChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['WFO', 'DL', 'UND', 'SAKIT', 'IJIN', 'CUTI', 'TA'],
+                    datasets: [{
+                        label: 'Jumlah',
+                        data: [sum(data.wfo), sum(data.dinasLuar), sum(data.undangan), sum(data.sakit), sum(data.ijin), sum(data.cuti), sum(data.tidakAbsen)],
+                        backgroundColor: ['#28a745', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997', '#ffc107', '#dc3545'],
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#333',
+                            font: { size: 9 }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, grid: { display: false } },
+                        y: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+        
+        function initRingkasanChart() {
+            const ctx = document.getElementById('ringkasanChart').getContext('2d');
+            const data = getSelectedData() || dataAbsensi[2025].desember;
+            const sum = arr => arr.reduce((a, b) => a + b, 0);
+            
+            ringkasanChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: ['WFO', 'Dinas Luar', 'Undangan', 'Sakit', 'Ijin', 'Cuti', 'Tidak Absen'],
@@ -502,20 +903,28 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            color: '#333',
+                            font: { size: 10, weight: 'bold' }
+                        }
+                    },
                     scales: {
                         x: { grid: { display: false } },
                         y: { beginAtZero: true, grid: { color: '#f0f0f0' } }
                     }
-                }
+                },
+                plugins: [ChartDataLabels]
             });
         }
         
         function initBidangSmallCharts() {
             const bidangIds = ['tu', 'pidsus', 'pidum', 'intel', 'was', 'datun', 'aset', 'kor'];
-            const bidangNames = ['Tata Usaha', 'Tindak Pidana Khusus', 'Tindak Pidana Umum', 'Intelijen', 'Pengawasan', 'Perdata TUN', 'Pemulihan Aset', 'Koordinator'];
             
-            bidangIds.forEach((id, index) => {
+            bidangIds.forEach((id) => {
                 const ctx = document.getElementById(`chart-${id}`);
                 if (ctx) {
                     bidangCharts[id] = new Chart(ctx.getContext('2d'), {
@@ -523,18 +932,18 @@
                         data: {
                             labels: ['WFO', 'DL', 'UND', 'S', 'I', 'C', 'TA'],
                             datasets: [{
-                                data: [80 + Math.random() * 20, 10 + Math.random() * 30, 2 + Math.random() * 5, Math.random() * 2, 0, 2 + Math.random() * 5, Math.random() * 2],
+                                data: [80, 15, 3, 1, 0, 3, 0],
                                 backgroundColor: ['#28a745', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997', '#ffc107', '#dc3545'],
-                                borderRadius: 3
+                                borderRadius: 2
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
+                            plugins: { legend: { display: false }, datalabels: { display: false } },
                             scales: {
-                                x: { grid: { display: false }, ticks: { font: { size: 8 } } },
-                                y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { font: { size: 8 } } }
+                                x: { grid: { display: false }, ticks: { font: { size: 7 } } },
+                                y: { beginAtZero: true, grid: { color: '#f0f0f0' }, ticks: { font: { size: 7 } } }
                             }
                         }
                     });
@@ -546,6 +955,9 @@
             const bulan = document.getElementById('bulanFilter').value;
             const tahun = document.getElementById('tahunFilter').value;
             const data = getSelectedData();
+            
+            // Update title
+            document.getElementById('dashboardTitle').textContent = 'DASHBOARD ABSENSI ' + bulanNama[bulan] + ' ' + tahun;
             
             if (!data) {
                 updateStatsEmpty();
@@ -559,14 +971,19 @@
             if (kehadiranDonutInstance) {
                 kehadiranDonutInstance.data.datasets[0].data = [sum(data.wfo), sum(data.dinasLuar), sum(data.undangan), sum(data.sakit), sum(data.ijin), sum(data.cuti), sum(data.tidakAbsen)];
                 kehadiranDonutInstance.update();
+                updateLegendValues(data);
             }
             
             // Update Absen Donut
             if (absenDonutInstance) {
                 const totalAbsen = sum(data.wfo) + sum(data.dinasLuar) + sum(data.undangan);
                 const totalTidakAbsen = sum(data.sakit) + sum(data.ijin) + sum(data.cuti) + sum(data.tidakAbsen);
+                const total = totalAbsen + totalTidakAbsen;
                 absenDonutInstance.data.datasets[0].data = [totalAbsen, totalTidakAbsen];
                 absenDonutInstance.update();
+                document.getElementById('absenPercent').textContent = ((totalAbsen / total) * 100).toFixed(2) + '%';
+                document.getElementById('tanpaKeteranganValue').textContent = sum(data.tidakAbsen);
+                document.getElementById('tanpaKeteranganPersen').textContent = ((sum(data.tidakAbsen) / total) * 100).toFixed(2) + '%';
             }
             
             // Update Pembinaan Chart
@@ -575,22 +992,31 @@
                 pembinaanChartInstance.update();
             }
             
+            // Update Ringkasan Chart
+            if (ringkasanChartInstance) {
+                ringkasanChartInstance.data.datasets[0].data = [sum(data.wfo), sum(data.dinasLuar), sum(data.undangan), sum(data.sakit), sum(data.ijin), sum(data.cuti), sum(data.tidakAbsen)];
+                ringkasanChartInstance.update();
+            }
+            
             updateStats();
             updateTable();
         }
 
         function updateStats() {
+            const bulan = document.getElementById('bulanFilter').value;
+            const tahun = document.getElementById('tahunFilter').value;
             const data = getSelectedData();
+            
+            document.getElementById('dashboardTitle').textContent = 'DASHBOARD ABSENSI ' + bulanNama[bulan] + ' ' + tahun;
+            
             if (!data) { updateStatsEmpty(); return; }
             const sum = arr => arr.reduce((a, b) => a + b, 0);
             
             document.getElementById('statPegawai').textContent = data.totalPegawai;
             
-            // Calculate working days
             const workingDays = data.isWeekend.filter(w => !w).length;
             document.getElementById('statHariKerja').textContent = workingDays;
             
-            // Calculate check-in stats
             const totalCheckIn = sum(data.wfo) + sum(data.dinasLuar) + sum(data.undangan);
             const expectedCheckIn = data.totalPegawai * workingDays;
             document.getElementById('statCheckIn').textContent = totalCheckIn.toLocaleString();
