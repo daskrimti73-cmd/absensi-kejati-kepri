@@ -119,12 +119,12 @@
         .filter-group select:hover { border-color: #4A90A4; }
         .filter-group select:focus { outline: none; border-color: #4A90A4; }
         
-        /* Main Content - 3 Column Grid */
+        /* Main Content - 2 Column Grid */
         .main-grid { 
             display: grid; 
-            grid-template-columns: 1fr 2fr 1fr; 
+            grid-template-columns: 1fr 2fr; 
             gap: 15px; 
-            margin-bottom: 10px; 
+            margin-bottom: 15px; 
         }
         
         /* Cards */
@@ -353,7 +353,7 @@
         
         /* Responsive */
         @media (max-width: 1400px) { 
-            .main-grid { grid-template-columns: 1fr 1.5fr 1fr; }
+            .main-grid { grid-template-columns: 1fr 1.5fr; }
         }
         @media (max-width: 1200px) { 
             .bidang-grid { grid-template-columns: repeat(2, 1fr); } 
@@ -396,6 +396,8 @@
         .bidang-aset .bidang-card-header { border-bottom-color: #6B9A6B; }
         .bidang-kor .stat-bar-fill { background: #7C9CB5 !important; color: white !important; }
         .bidang-kor .bidang-card-header { border-bottom-color: #7C9CB5; }
+        .bidang-pembinaan .stat-bar-fill { background: #5B8DB8 !important; color: white !important; }
+        .bidang-pembinaan .bidang-card-header { border-bottom-color: #5B8DB8; }
     </style>
 </head>
 <body>
@@ -508,22 +510,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Pembinaan Card (Right) -->
-            <div class="card">
-                <div class="card-header">
-                    <span class="card-title">Pembinaan</span>
-                </div>
-                <div class="pembinaan-legend" id="pembinaanLegend">
-                    <div class="pembinaan-legend-item"><span class="label">TIDAK ABSEN</span><span class="value bg-tidak-absen">0.00%</span></div>
-                    <div class="pembinaan-legend-item"><span class="label">SAKIT</span><span class="value bg-sakit">0.19%</span></div>
-                    <div class="pembinaan-legend-item"><span class="label">UNDANGAN</span><span class="value bg-undangan">0.58%</span></div>
-                    <div class="pembinaan-legend-item"><span class="label">DINAS LUAR</span><span class="value bg-dinas">5.77%</span></div>
-                </div>
-                <div class="pembinaan-chart-container">
-                    <canvas id="pembinaanChart"></canvas>
-                </div>
-            </div>
         </div>
         
         <!-- Ringkasan Kehadiran Per Kategori -->
@@ -538,6 +524,23 @@
 
         <!-- Bidang Cards Grid -->
         <div class="bidang-grid">
+            <!-- Pembinaan -->
+            <div class="bidang-card bidang-pembinaan">
+                <div class="bidang-card-header">Pembinaan</div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill" id="pembinaan-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill" id="pembinaan-cuti-bar" style="width: 6.9%">6.90%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">IJIN</span><div class="stat-bar"><div class="stat-bar-fill" id="pembinaan-ijin-bar" style="width: 0%">0.00%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">SAKIT</span><div class="stat-bar"><div class="stat-bar-fill" id="pembinaan-sakit-bar" style="width: 0.19%">0.19%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">UNDANGAN</span><div class="stat-bar"><div class="stat-bar-fill" id="pembinaan-undangan-bar" style="width: 0.58%">0.58%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">DINAS LUAR</span><div class="stat-bar"><div class="stat-bar-fill" id="pembinaan-dinas-bar" style="width: 5.77%">5.77%</div></div></div></div>
+                <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">WFO</span><div class="stat-bar"><div class="stat-bar-fill" id="pembinaan-wfo-bar" style="width: 86.56%">86.56%</div></div></div></div>
+                <div class="bidang-chart"><canvas id="chart-pembinaan"></canvas></div>
+                <table class="bidang-data-table">
+                    <tr><th></th><th>WFO</th><th>DINAS<br>LUAR</th><th>UNDANGA<br>N</th><th>SAKIT</th><th>IJIN</th><th>CUTI</th><th>TIDAK<br>ABSEN</th></tr>
+                    <tr><td class="row-label">Jumlah</td><td id="pembinaan-wfo-val">600</td><td id="pembinaan-dinas-val">40</td><td id="pembinaan-und-val">4</td><td id="pembinaan-sakit-val">1</td><td id="pembinaan-ijin-val">0</td><td id="pembinaan-cuti-val">48</td><td id="pembinaan-ta-val">0</td></tr>
+                </table>
+            </div>
+            
             <!-- Tata Usaha -->
             <div class="bidang-card bidang-tu">
                 <div class="bidang-card-header">Tata Usaha</div>
@@ -756,7 +759,6 @@
             initBidangChart();
             initKehadiranDonutChart();
             initAbsenDonutChart();
-            initPembinaanChart();
             initRingkasanChart();
             initBidangSmallCharts();
             updateStats();
@@ -956,7 +958,7 @@
         }
         
         function initBidangSmallCharts() {
-            const bidangIds = ['tu', 'pidsus', 'pidum', 'intel', 'was', 'datun', 'aset', 'kor'];
+            const bidangIds = ['pembinaan', 'tu', 'pidsus', 'pidum', 'intel', 'was', 'datun', 'aset', 'kor'];
             
             bidangIds.forEach((id) => {
                 const ctx = document.getElementById(`chart-${id}`);
