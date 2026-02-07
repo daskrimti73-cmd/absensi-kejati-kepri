@@ -16,7 +16,7 @@
             font-family: 'Poppins', sans-serif; 
             background: linear-gradient(135deg, #3d3d3d 0%, #2c2c2c 100%); 
             min-height: 100vh; 
-            padding: 20px; 
+            padding: 10px; 
             color: #333; 
         }
         
@@ -29,31 +29,35 @@
         
         /* Main Title */
         .dashboard-title {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #5a4a78;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
         
         /* Top Summary Cards */
         .top-summary { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 15px; 
-            margin-bottom: 20px; 
+            display: flex; 
+            flex-wrap: wrap;
+            gap: 10px; 
+            margin-bottom: 10px; 
+            justify-content: center;
         }
         
         .summary-card { 
             display: flex; 
             align-items: center; 
-            gap: 12px; 
-            padding: 12px 18px; 
-            border-radius: 8px; 
+            gap: 8px; 
+            padding: 8px 15px; 
+            border-radius: 6px; 
             background: linear-gradient(135deg, #8B4513 0%, #6B3410 100%);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            flex: 1;
+            min-width: 180px;
+            max-width: 250px;
         }
         .summary-card.hari-kerja { background: linear-gradient(135deg, #6B8E23 0%, #556B2F 100%); }
         .summary-card.check-in { background: linear-gradient(135deg, #2E8B57 0%, #228B46 100%); }
@@ -62,23 +66,23 @@
         .summary-card .card-label { 
             background: rgba(0,0,0,0.35); 
             color: white; 
-            padding: 8px 12px; 
-            border-radius: 6px; 
-            font-size: 0.7rem; 
+            padding: 5px 8px; 
+            border-radius: 4px; 
+            font-size: 0.55rem; 
             font-weight: 600; 
             text-transform: uppercase; 
-            line-height: 1.3;
+            line-height: 1.2;
             text-align: center;
-            min-width: 60px;
+            min-width: 45px;
         }
         .summary-card .card-value { 
-            font-size: 2.2rem; 
+            font-size: 1.4rem; 
             font-weight: 700; 
             color: white; 
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
         .summary-card .card-icon { 
-            font-size: 2rem; 
+            font-size: 1.3rem; 
             margin-left: auto;
             filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.3));
         }
@@ -86,52 +90,53 @@
         /* Filter Section */
         .filter-section { 
             display: flex; 
-            gap: 20px; 
-            margin-bottom: 20px; 
-            justify-content: flex-start; 
+            gap: 15px; 
+            margin-bottom: 10px; 
+            justify-content: center; 
             background: rgba(255,255,255,0.08); 
-            padding: 12px 20px; 
-            border-radius: 10px; 
-            align-items: center;
-        }
-        .filter-group { display: flex; align-items: center; gap: 10px; }
-        .filter-group label { font-weight: 500; color: #fff; font-size: 0.85rem; }
-        .filter-group select { 
             padding: 8px 15px; 
-            font-size: 0.9rem; 
+            border-radius: 8px; 
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .filter-group { display: flex; align-items: center; gap: 6px; }
+        .filter-group label { font-weight: 500; color: #fff; font-size: 0.75rem; }
+        .filter-group select { 
+            padding: 5px 10px; 
+            font-size: 0.8rem; 
             border: none; 
-            border-radius: 6px; 
+            border-radius: 5px; 
             background: white; 
             cursor: pointer; 
-            min-width: 130px;
+            min-width: 100px;
             font-family: 'Poppins', sans-serif;
         }
         
         /* Main Content - 3 Column Grid */
         .main-grid { 
             display: grid; 
-            grid-template-columns: 1.2fr 2fr 1fr; 
-            gap: 15px; 
-            margin-bottom: 20px; 
+            grid-template-columns: 1fr 2fr 1fr; 
+            gap: 10px; 
+            margin-bottom: 10px; 
         }
         
         /* Cards */
         .card { 
             background: white; 
-            border-radius: 10px; 
-            padding: 15px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+            border-radius: 8px; 
+            padding: 10px; 
+            box-shadow: 0 3px 15px rgba(0,0,0,0.12); 
         }
         .card-header { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            margin-bottom: 12px; 
-            padding-bottom: 8px; 
+            margin-bottom: 8px; 
+            padding-bottom: 5px; 
             border-bottom: 2px solid #e0e0e0; 
         }
         .card-title { 
-            font-size: 0.85rem; 
+            font-size: 0.75rem; 
             font-weight: 700; 
             color: #333; 
             text-transform: uppercase; 
@@ -139,13 +144,13 @@
         }
         
         /* Bidang Pegawai Chart */
-        .bidang-chart-container { height: 320px; }
+        .bidang-chart-container { height: 200px; }
         
         /* Persentase Section - Center Card */
-        .persentase-card { padding: 15px; }
+        .persentase-card { padding: 10px; }
         .persentase-container { 
             display: flex; 
-            gap: 20px; 
+            gap: 15px; 
             justify-content: center; 
             align-items: flex-start; 
         }
@@ -156,8 +161,8 @@
         }
         .donut-wrapper { 
             position: relative; 
-            width: 180px; 
-            height: 180px;
+            width: 120px; 
+            height: 120px;
         }
         .donut-chart { width: 100% !important; height: 100% !important; }
         .donut-center-text { 
@@ -168,36 +173,36 @@
             text-align: center; 
             pointer-events: none;
         }
-        .donut-center-text .percentage { font-size: 1.4rem; font-weight: 700; color: #28a745; }
-        .donut-center-text .label { font-size: 0.7rem; color: #666; display: block; }
+        .donut-center-text .percentage { font-size: 1rem; font-weight: 700; color: #28a745; }
+        .donut-center-text .label { font-size: 0.55rem; color: #666; display: block; }
         
         /* Donut Legend */
         .donut-legend { 
             display: flex; 
             flex-wrap: wrap; 
-            gap: 6px 15px; 
-            margin-top: 10px; 
+            gap: 3px 8px; 
+            margin-top: 5px; 
             justify-content: center;
-            max-width: 250px;
+            max-width: 200px;
         }
-        .legend-item { display: flex; align-items: center; gap: 5px; font-size: 0.7rem; }
-        .legend-color { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+        .legend-item { display: flex; align-items: center; gap: 3px; font-size: 0.55rem; }
+        .legend-color { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
         .legend-value { font-weight: 600; color: #333; }
         
         /* Keterangan Box */
         .keterangan-box { 
             background: #f8f9fa; 
-            border-radius: 8px; 
-            padding: 12px 15px; 
+            border-radius: 6px; 
+            padding: 8px 10px; 
             text-align: center;
-            min-width: 100px;
+            min-width: 70px;
         }
-        .keterangan-title { font-size: 0.7rem; font-weight: 600; color: #666; margin-bottom: 8px; }
-        .keterangan-value { font-size: 1.5rem; font-weight: 700; color: #dc3545; }
-        .keterangan-percent { font-size: 0.8rem; color: #999; }
+        .keterangan-title { font-size: 0.55rem; font-weight: 600; color: #666; margin-bottom: 5px; }
+        .keterangan-value { font-size: 1.1rem; font-weight: 700; color: #dc3545; }
+        .keterangan-percent { font-size: 0.6rem; color: #999; }
         
         /* Pembinaan Section */
-        .pembinaan-chart-container { height: 320px; }
+        .pembinaan-chart-container { height: 200px; }
         .pembinaan-legend { 
             display: flex; 
             flex-direction: column; 
@@ -223,48 +228,48 @@
         .bidang-grid { 
             display: grid; 
             grid-template-columns: repeat(4, 1fr); 
-            gap: 12px; 
-            margin-bottom: 20px; 
+            gap: 8px; 
+            margin-bottom: 10px; 
         }
         
         .bidang-card { 
             background: white; 
-            border-radius: 8px; 
-            padding: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            border-radius: 6px; 
+            padding: 8px; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1); 
         }
         .bidang-card-header { 
-            font-size: 0.8rem; 
+            font-size: 0.65rem; 
             font-weight: 700; 
             color: #333; 
-            margin-bottom: 8px; 
+            margin-bottom: 5px; 
             text-align: center; 
-            border-bottom: 3px solid #B8860B; 
-            padding-bottom: 6px; 
+            border-bottom: 2px solid #B8860B; 
+            padding-bottom: 4px; 
         }
         
         /* Bidang Stats - Horizontal Layout */
         .bidang-stats-row {
             display: flex;
-            gap: 3px;
-            margin-bottom: 4px;
+            gap: 2px;
+            margin-bottom: 2px;
         }
         .bidang-stat-item {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            font-size: 0.55rem;
+            font-size: 0.45rem;
             flex: 1;
         }
         .bidang-stat-item .stat-label { 
             color: #888; 
             font-weight: 500;
             white-space: nowrap;
-            margin-bottom: 2px;
+            margin-bottom: 1px;
         }
         .bidang-stat-item .stat-bar {
             width: 100%;
-            height: 12px;
+            height: 10px;
             background: #e9ecef;
             border-radius: 2px;
             overflow: hidden;
@@ -284,7 +289,7 @@
             min-width: fit-content;
         }
         
-        .bidang-chart { height: 120px; margin-top: 8px; }
+        .bidang-chart { height: 70px; margin-top: 3px; }
         .bidang-chart-legend { 
             display: flex; 
             flex-wrap: wrap; 
