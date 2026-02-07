@@ -9,6 +9,7 @@
     <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -17,8 +18,8 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
             min-height: 100vh;
             padding: 20px;
         }
@@ -36,7 +37,7 @@
             text-align: center;
             margin-bottom: 30px;
             padding-bottom: 20px;
-            border-bottom: 3px solid #1a5f2a;
+            border-bottom: 3px solid #4A90A4;
         }
         
         .header img {
@@ -46,7 +47,7 @@
         }
         
         .header h1 {
-            color: #1a5f2a;
+            color: #2c3e50;
             font-size: 28px;
             margin-bottom: 10px;
         }
@@ -67,7 +68,7 @@
         }
         
         .filter-title {
-            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            background: linear-gradient(135deg, #4A90A4 0%, #5B9A8B 100%);
             color: white;
             font-size: 18px;
             font-weight: bold;
@@ -108,7 +109,7 @@
         
         .filter-group label {
             font-weight: 700;
-            color: #1a5f2a;
+            color: #4A90A4;
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -129,23 +130,23 @@
             font-weight: 600;
             color: #2c3e50;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a5f2a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234A90A4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 12px center;
             padding-right: 40px;
         }
         
         .filter-group select:hover {
-            border-color: #1a5f2a;
-            box-shadow: 0 6px 16px rgba(26,95,42,0.15);
+            border-color: #4A90A4;
+            box-shadow: 0 6px 16px rgba(74,144,164,0.15);
             transform: translateY(-2px);
-            background-color: #f8fdf9;
+            background-color: #f8fbfc;
         }
         
         .filter-group select:focus {
             outline: none;
-            border-color: #1a5f2a;
-            box-shadow: 0 0 0 4px rgba(26,95,42,0.1);
+            border-color: #4A90A4;
+            box-shadow: 0 0 0 4px rgba(74,144,164,0.1);
             background-color: white;
         }
         
@@ -168,14 +169,14 @@
             transform: translateY(-5px);
         }
         
-        .stat-card.pegawai { background: linear-gradient(135deg, #343a40 0%, #495057 100%); }
-        .stat-card.wfo { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
-        .stat-card.dinas { background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%); }
-        .stat-card.undangan { background: linear-gradient(135deg, #007bff 0%, #6610f2 100%); }
-        .stat-card.sakit { background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%); }
-        .stat-card.ijin { background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%); }
-        .stat-card.cuti { background: linear-gradient(135deg, #6c757d 0%, #495057 100%); }
-        .stat-card.alpha { background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); }
+        .stat-card.pegawai { background: linear-gradient(135deg, #4a5568 0%, #5a6b7a 100%); }
+        .stat-card.wfo { background: linear-gradient(135deg, #48bb78 0%, #68d391 100%); }
+        .stat-card.dinas { background: linear-gradient(135deg, #4299e1 0%, #63b3ed 100%); }
+        .stat-card.undangan { background: linear-gradient(135deg, #667eea 0%, #7c8cf0 100%); }
+        .stat-card.sakit { background: linear-gradient(135deg, #ecc94b 0%, #f6e05e 100%); }
+        .stat-card.ijin { background: linear-gradient(135deg, #4fd1c5 0%, #81e6d9 100%); }
+        .stat-card.cuti { background: linear-gradient(135deg, #718096 0%, #a0aec0 100%); }
+        .stat-card.alpha { background: linear-gradient(135deg, #e57373 0%, #ef9a9a 100%); }
         
         .stat-card h3 {
             font-size: 32px;
@@ -235,12 +236,12 @@
         .bidang-dashboard {
             margin-top: 40px;
             padding-top: 30px;
-            border-top: 3px solid #1a5f2a;
+            border-top: 3px solid #4A90A4;
         }
         
         .bidang-dashboard-title {
             text-align: center;
-            color: #1a5f2a;
+            color: #2c3e50;
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 30px;
@@ -270,10 +271,10 @@
         .bidang-card-header {
             font-size: 18px;
             font-weight: bold;
-            color: #1a5f2a;
+            color: #2c3e50;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #1a5f2a;
+            border-bottom: 2px solid #4A90A4;
         }
         
         .bidang-stats {
@@ -495,31 +496,31 @@
         <!-- Legend -->
         <div class="legend">
             <div class="legend-item">
-                <div class="legend-color" style="background: #28a745;"></div>
+                <div class="legend-color" style="background: #5B9A8B;"></div>
                 <span>WFO (Hadir)</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #17a2b8;"></div>
+                <div class="legend-color" style="background: #5B8DB8;"></div>
                 <span>Dinas Luar</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #007bff;"></div>
+                <div class="legend-color" style="background: #8B7B9B;"></div>
                 <span>Undangan</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #ffc107;"></div>
+                <div class="legend-color" style="background: #C1946A;"></div>
                 <span>Sakit</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #20c997;"></div>
+                <div class="legend-color" style="background: #6B9A8B;"></div>
                 <span>Ijin</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #6c757d;"></div>
+                <div class="legend-color" style="background: #D4A76A;"></div>
                 <span>Cuti</span>
             </div>
             <div class="legend-item">
-                <div class="legend-color" style="background: #dc3545;"></div>
+                <div class="legend-color" style="background: #C17B7B;"></div>
                 <span>Tidak Absen</span>
             </div>
         </div>
@@ -533,7 +534,7 @@
         </div>
         
         <div class="footer">
-            <p class="copyright">© 2025 Kejaksaan Tinggi Kepulauan Riau - Sistem Absensi Mobile</p>
+            <p class="copyright">© 2025 Kejaksaan Tinggi Kepulauan Riau</p>
         </div>
     </div>
 
@@ -775,13 +776,13 @@
         let chartInstance;
 
         const datasetConfig = {
-            wfo: { label: 'WFO (Hadir)', color: '#28a745', border: '#1e7e34' },
-            dinasLuar: { label: 'Dinas Luar', color: '#17a2b8', border: '#138496' },
-            undangan: { label: 'Undangan', color: '#007bff', border: '#0069d9' },
-            sakit: { label: 'Sakit', color: '#ffc107', border: '#e0a800' },
-            ijin: { label: 'Ijin', color: '#20c997', border: '#1aa179' },
-            cuti: { label: 'Cuti', color: '#6c757d', border: '#5a6268' },
-            tidakAbsen: { label: 'Tidak Absen', color: '#dc3545', border: '#c82333' }
+            wfo: { label: 'WFO (Hadir)', color: '#5B9A8B', border: '#4a8979' },
+            dinasLuar: { label: 'Dinas Luar', color: '#5B8DB8', border: '#4a7ca7' },
+            undangan: { label: 'Undangan', color: '#8B7B9B', border: '#7a6a8a' },
+            sakit: { label: 'Sakit', color: '#C1946A', border: '#b08359' },
+            ijin: { label: 'Ijin', color: '#6B9A8B', border: '#5a897a' },
+            cuti: { label: 'Cuti', color: '#D4A76A', border: '#c39659' },
+            tidakAbsen: { label: 'Tidak Absen', color: '#C17B7B', border: '#b06a6a' }
         };
 
         async function initChart() {
@@ -848,7 +849,7 @@
                             display: true,
                             text: 'GRAFIK BATANG ABSENSI HARIAN - DESEMBER 2025',
                             font: { size: 18, weight: 'bold' },
-                            color: '#1a5f2a',
+                            color: '#2c3e50',
                             padding: { bottom: 20 }
                         }
                     },
