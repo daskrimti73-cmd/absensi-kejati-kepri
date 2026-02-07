@@ -355,6 +355,16 @@
         .bg-ijin { background: #20c997; }
         .bg-cuti { background: #ffc107; color: #333 !important; }
         .bg-tidak-absen { background: #dc3545; }
+        
+        /* Bidang specific colors - single color per bidang */
+        .bidang-tu .stat-bar-fill { background: #E67E22 !important; color: white !important; }
+        .bidang-pidsus .stat-bar-fill { background: #9B59B6 !important; color: white !important; }
+        .bidang-pidum .stat-bar-fill { background: #3498DB !important; color: white !important; }
+        .bidang-intel .stat-bar-fill { background: #E74C3C !important; color: white !important; }
+        .bidang-was .stat-bar-fill { background: #F39C12 !important; color: white !important; }
+        .bidang-datun .stat-bar-fill { background: #1ABC9C !important; color: white !important; }
+        .bidang-aset .stat-bar-fill { background: #27AE60 !important; color: white !important; }
+        .bidang-kor .stat-bar-fill { background: #8E44AD !important; color: white !important; }
     </style>
 </head>
 <body>
@@ -498,7 +508,7 @@
         <!-- Bidang Cards Grid -->
         <div class="bidang-grid">
             <!-- Tata Usaha -->
-            <div class="bidang-card">
+            <div class="bidang-card bidang-tu">
                 <div class="bidang-card-header">Tata Usaha</div>
                 <div class="bidang-stats-row">
                     <div class="bidang-stat-item">
@@ -550,7 +560,7 @@
             </div>
             
             <!-- Tindak Pidana Khusus -->
-            <div class="bidang-card">
+            <div class="bidang-card bidang-pidsus">
                 <div class="bidang-card-header">Tindak Pidana Khusus</div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="pidsus-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="pidsus-cuti-bar" style="width: 5.24%">5.24%</div></div></div></div>
@@ -567,7 +577,7 @@
             </div>
             
             <!-- Tindak Pidana Umum -->
-            <div class="bidang-card">
+            <div class="bidang-card bidang-pidum">
                 <div class="bidang-card-header">Tindak Pidana Umum</div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="pidum-tidakabsen-bar" style="width: 1.7%">1.70%</div></div></div></div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="pidum-cuti-bar" style="width: 2.01%">2.01%</div></div></div></div>
@@ -584,7 +594,7 @@
             </div>
             
             <!-- Intelijen -->
-            <div class="bidang-card">
+            <div class="bidang-card bidang-intel">
                 <div class="bidang-card-header">Intelijen</div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="intel-tidakabsen-bar" style="width: 0.52%">0.52%</div></div></div></div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="intel-cuti-bar" style="width: 3.17%">3.17%</div></div></div></div>
@@ -601,7 +611,7 @@
             </div>
             
             <!-- Pengawasan -->
-            <div class="bidang-card">
+            <div class="bidang-card bidang-was">
                 <div class="bidang-card-header">Pengawasan</div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="was-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="was-cuti-bar" style="width: 6.41%">6.41%</div></div></div></div>
@@ -618,7 +628,7 @@
             </div>
             
             <!-- Perdata dan Tata Usaha Negara -->
-            <div class="bidang-card">
+            <div class="bidang-card bidang-datun">
                 <div class="bidang-card-header">Perdata dan Tata Usaha Negara</div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="datun-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="datun-cuti-bar" style="width: 3.79%">3.79%</div></div></div></div>
@@ -635,7 +645,7 @@
             </div>
             
             <!-- Pemulihan Aset -->
-            <div class="bidang-card">
+            <div class="bidang-card bidang-aset">
                 <div class="bidang-card-header">Pemulihan Aset</div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="aset-tidakabsen-bar" style="width: 0%">0.00%</div></div></div></div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="aset-cuti-bar" style="width: 0%">0.00%</div></div></div></div>
@@ -652,7 +662,7 @@
             </div>
             
             <!-- Koordinator -->
-            <div class="bidang-card">
+            <div class="bidang-card bidang-kor">
                 <div class="bidang-card-header">Koordinator</div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">TIDAK ABSEN</span><div class="stat-bar"><div class="stat-bar-fill bg-tidak-absen" id="kor-tidakabsen-bar" style="width: 1.19%">1.19%</div></div></div></div>
                 <div class="bidang-stats-row"><div class="bidang-stat-item"><span class="stat-label">CUTI</span><div class="stat-bar"><div class="stat-bar-fill bg-cuti" id="kor-cuti-bar" style="width: 0%">0.00%</div></div></div></div>
