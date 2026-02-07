@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Upload Data Absensi</title>
+    <title>Admin Panel - Upload Data Absensi v3.1.2</title>
+    
+    <!-- CACHE BUSTING: Prevent browser from caching old version -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -221,7 +227,464 @@
     </div>
 
     <script>
-        // Supabase Config
+        // ============================================
+        // VERSION & CACHE MANAGEMENT
+        // ============================================
+        const APP_VERSION = '3.0.0'; // Update: Smart Excel Parser - Auto-detect format
+        
+        // Clear old cache on load
+        if ('caches' in window) {
+            caches.keys().then(function(names) {
+                for (let name of names) {
+                    caches.delete(name);
+                }
+            });
+            console.log('🧹 Cache cleared');
+        }
+        
+        // Display version
+        console.log(`📦 Admin Panel Version: ${APP_VERSION}`);
+        console.log('✅ GABUNGAN auto-detection: ENABLED');
+        console.log('✅ Multi-sheet support: ENABLED');
+        console.log('✅ Validation after upload: ENABLED');
+        console.log('✅ Smart Excel Parser: ENABLED');
+        
+        // ============================================
+        // SMART EXCEL PARSER v3.1.1 - HELPER FUNCTIONS
+        // v3.1.0: Added auto-calculate GABUNGAN from bidang totals
+        // v3.1.1: Prioritize "CLEAN" sheet over "ALL" for GABUNGAN
+        // ============================================
+        
+        /**
+         * Detect date columns by looking for numbers 01-31 in header row
+         * @param {Array} headerRow - First or second row of Excel data
+         * @returns {Array} Array of {index, tanggal} objects
+         */
+        function detectDateColumns(headerRow) {
+            const dateColumns = [];
+            
+            console.log(`🔍 Scanning header row (length: ${headerRow.length}):`, headerRow.slice(0, 15));
+            
+            for (let i = 0; i < headerRow.length; i++) {
+                const cell = headerRow[i];
+                
+                // Skip empty cells
+                if (cell === '' || cell === null || cell === undefined) {
+                    continue;
+                }
+                
+                // Convert to string and trim
+                const cellStr = String(cell).trim();
+                
+                // Try multiple parsing methods:
+                
+                // Method 1: Direct parseInt (handles "1", "2", "31")
+                let num = parseInt(cellStr);
+                
+                // Method 2: If cell is already a number
+                if (typeof cell === 'number') {
+                    num = cell;
+                }
+                
+                // Method 3: Remove leading zeros ("01" → 1, "02" → 2)
+                if (isNaN(num) && /^0\d$/.test(cellStr)) {
+                    num = parseInt(cellStr.replace(/^0+/, ''));
+                }
+                
+                // Method 4: Check if it's a Date object (Excel sometimes converts to Date)
+                if (isNaN(num) && cell instanceof Date) {
+                    num = cell.getDate(); // Get day of month (1-31)
+                }
+                
+                // Method 5: Try parsing as date string
+                if (isNaN(num)) {
+                    const dateObj = new Date(cell);
+                    if (!isNaN(dateObj.getTime())) {
+                        num = dateObj.getDate();
+                    }
+                }
+                
+                // Check if it's a valid date (1-31)
+                if (!isNaN(num) && num >= 1 && num <= 31) {
+                    dateColumns.push({ 
+                        index: i, 
+                        tanggal: num 
+                    });
+                    
+                    // Debug: Log first few detections
+                    if (dateColumns.length <= 5) {
+                        console.log(`  ✅ Found date ${num} at column ${i} (cell value: "${cellStr}", type: ${typeof cell})`);
+                    }
+                }
+            }
+            
+            console.log(`📅 Detected ${dateColumns.length} date columns:`, 
+                        dateColumns.length > 0 ? dateColumns.map(d => `${d.tanggal}@col${d.index}`).join(', ') : 'NONE FOUND!');
+            
+            if (dateColumns.length === 0) {
+                console.error(`❌ No date columns found! Header row sample:`, headerRow.slice(0, 20));
+            }
+            
+            return dateColumns;
+        }
+        
+        /**
+         * Find summary rows by scanning ALL cells in the sheet
+         * STRATEGY: Scan from BOTTOM to TOP (summary rows usually at bottom)
+         * @param {Array} data - All rows from Excel sheet
+         * @returns {Object} Map of {dataKey: {rowIndex, data}} 
+         */
+        function findSummaryRows(data) {
+            const summaryRows = {};
+            const foundLabels = {}; // Track which labels we've found
+            
+            // Define labels with priority (longer strings first to avoid partial matches)
+            const labelPriority = [
+                { label: 'JUMLAH TIDAK ABSEN', key: 'tidak_absen' },
+                { label: 'JUMLAH WFO', key: 'wfo' },
+                { label: 'JUMLAH DINAS LUAR', key: 'dinas_luar' },
+                { label: 'JUMLAH UNDANGAN', key: 'undangan' },
+                { label: 'JUMLAH SAKIT', key: 'sakit' },
+                { label: 'JUMLAH IJIN', key: 'ijin' },
+                { label: 'JUMLAH CUTI', key: 'cuti' },
+                { label: 'JUMLAH ISOMAN', key: 'tidak_absen' }, // Fallback
+                // Fallback without "JUMLAH" prefix
+                { label: 'TIDAK ABSEN', key: 'tidak_absen' },
+                { label: 'WFO', key: 'wfo' },
+                { label: 'DINAS LUAR', key: 'dinas_luar' },
+                { label: 'UNDANGAN', key: 'undangan' },
+                { label: 'SAKIT', key: 'sakit' },
+                { label: 'IJIN', key: 'ijin' },
+                { label: 'CUTI', key: 'cuti' },
+                { label: 'ISOMAN', key: 'tidak_absen' }
+            ];
+            
+            console.log(`  🔍 Scanning ${data.length} rows from BOTTOM to TOP for summary rows...`);
+            
+            // IMPORTANT: Scan from BOTTOM to TOP (summary rows usually at bottom)
+            // This way we find the real summary rows first, not data rows
+            for (let rowIdx = data.length - 1; rowIdx >= 0; rowIdx--) {
+                const row = data[rowIdx];
+                
+                // Skip empty rows
+                if (!row || row.length === 0) continue;
+                
+                // Check if this row contains any summary label
+                for (let colIdx = 0; colIdx < Math.min(row.length, 10); colIdx++) {
+                    const cell = String(row[colIdx] || '').toUpperCase().trim();
+                    
+                    // Check against all labels (priority order)
+                    for (const { label, key } of labelPriority) {
+                        if (cell === label) {
+                            // Only add if not already found (priority - first from bottom wins)
+                            if (!foundLabels[key]) {
+                                summaryRows[key] = {
+                                    rowIndex: rowIdx,
+                                    data: row,
+                                    label: label
+                                };
+                                foundLabels[key] = true;
+                                console.log(`  ✅ Found "${label}" at row ${rowIdx} → ${key}`);
+                            }
+                            break; // Stop checking other labels for this cell
+                        }
+                    }
+                }
+                
+                // Stop scanning if we found all required labels
+                if (Object.keys(foundLabels).length >= 7) {
+                    console.log(`  ✅ Found all 7 summary rows, stopping scan at row ${rowIdx}`);
+                    break;
+                }
+            }
+            
+            console.log(`  📊 Total summary rows found: ${Object.keys(summaryRows).length}`);
+            return summaryRows;
+        }
+        
+        /**
+         * Validate that we have all required data
+         * @param {Array} dateColumns - Detected date columns
+         * @param {Object} summaryRows - Detected summary rows
+         * @returns {Array} Array of error messages (empty if valid)
+         */
+        function validateExcelData(dateColumns, summaryRows) {
+            const errors = [];
+            
+            // Check date columns
+            if (dateColumns.length === 0) {
+                errors.push('❌ Tidak ditemukan kolom tanggal (01-31). Pastikan baris header memiliki angka 1-31.');
+            }
+            
+            // Check summary rows
+            const required = ['wfo', 'dinas_luar', 'undangan', 'sakit', 'ijin', 'cuti', 'tidak_absen'];
+            const missing = [];
+            
+            for (const key of required) {
+                if (!summaryRows[key]) {
+                    missing.push(key.toUpperCase().replace('_', ' '));
+                }
+            }
+            
+            if (missing.length > 0) {
+                errors.push(`❌ Tidak ditemukan baris summary: ${missing.join(', ')}`);
+                errors.push(`   Pastikan Excel memiliki baris dengan label "JUMLAH WFO", "JUMLAH DINAS LUAR", dll.`);
+            }
+            
+            return errors;
+        }
+        
+        /**
+         * Detect Excel format automatically
+         * @param {Array} data - All rows from Excel sheet
+         * @returns {Object} Format information
+         */
+        function detectExcelFormat(data) {
+            if (data.length < 2) {
+                console.warn(`⚠️ Data too short: ${data.length} rows`);
+                return { 
+                    format: 'UNKNOWN', 
+                    headerRowIndex: -1,
+                    dateStartIndex: -1 
+                };
+            }
+            
+            console.log(`🔍 Detecting format from ${data.length} rows...`);
+            
+            // Check first few rows for header patterns
+            for (let rowIdx = 0; rowIdx < Math.min(5, data.length); rowIdx++) {
+                const row = data[rowIdx].map(c => String(c || '').toUpperCase().trim());
+                
+                console.log(`  Row ${rowIdx} (first 10 cells):`, row.slice(0, 10));
+                
+                // Look for common header keywords
+                const hasNo = row.some(c => c === 'NO' || c === 'NO.');
+                const hasNama = row.some(c => c === 'NAMA');
+                const hasNIP = row.some(c => c === 'NIP');
+                
+                // Look for date columns (01, 02, ..., 31)
+                let dateStartIndex = -1;
+                for (let i = 0; i < row.length; i++) {
+                    const num = parseInt(row[i]);
+                    if (!isNaN(num) && num === 1) {
+                        dateStartIndex = i;
+                        break;
+                    }
+                }
+                
+                if ((hasNo || hasNama || hasNIP) && dateStartIndex > 0) {
+                    console.log(`📋 Detected STANDARD format at row ${rowIdx}`);
+                    console.log(`   Header keywords: No=${hasNo}, Nama=${hasNama}, NIP=${hasNIP}`);
+                    console.log(`   Date columns start at index ${dateStartIndex}`);
+                    
+                    return {
+                        format: 'STANDARD',
+                        headerRowIndex: rowIdx,
+                        dateStartIndex: dateStartIndex
+                    };
+                }
+            }
+            
+            // If no standard format found, try to find date columns anyway
+            for (let rowIdx = 0; rowIdx < Math.min(5, data.length); rowIdx++) {
+                const row = data[rowIdx];
+                for (let i = 0; i < row.length; i++) {
+                    const num = parseInt(String(row[i]).trim());
+                    if (!isNaN(num) && num === 1) {
+                        console.log(`📋 Detected CUSTOM format with dates starting at row ${rowIdx}, col ${i}`);
+                        return {
+                            format: 'CUSTOM',
+                            headerRowIndex: rowIdx,
+                            dateStartIndex: i
+                        };
+                    }
+                }
+            }
+            
+            console.warn(`⚠️ Could not detect Excel format - no header row or date columns found`);
+            console.warn(`   First 3 rows:`, data.slice(0, 3));
+            return { 
+                format: 'UNKNOWN', 
+                headerRowIndex: -1,
+                dateStartIndex: -1 
+            };
+        }
+        
+        /**
+         * Extract data from Excel using smart detection
+         * @param {Array} jsonData - Raw Excel data
+         * @param {string} bidang - Bidang name
+         * @param {number} tahun - Year
+         * @param {string} bulan - Month name
+         * @returns {Array} Transformed data ready for database
+         */
+        function smartExtractData(jsonData, bidang, tahun, bulan) {
+            console.log(`\n🔍 Smart parsing sheet: ${bidang}`);
+            console.log(`   Total rows in sheet: ${jsonData.length}`);
+            
+            // Step 1: Detect format
+            const format = detectExcelFormat(jsonData);
+            if (format.format === 'UNKNOWN') {
+                console.warn(`⚠️ Format unknown, trying fallback method...`);
+                // Fallback: Try first 5 rows as potential header rows
+                for (let tryRow = 0; tryRow < Math.min(5, jsonData.length); tryRow++) {
+                    console.log(`   Trying row ${tryRow} as header...`);
+                    const dateColumns = detectDateColumns(jsonData[tryRow]);
+                    if (dateColumns.length > 0) {
+                        console.log(`   ✅ Found ${dateColumns.length} date columns at row ${tryRow}!`);
+                        format.headerRowIndex = tryRow;
+                        format.format = 'FALLBACK';
+                        break;
+                    }
+                }
+                
+                if (format.headerRowIndex === -1) {
+                    throw new Error(`Format Excel tidak dikenali untuk sheet "${bidang}". Pastikan ada baris header dengan kolom tanggal (01-31).`);
+                }
+            }
+            
+            // Step 2: Detect date columns from header row
+            const headerRow = jsonData[format.headerRowIndex];
+            const dateColumns = detectDateColumns(headerRow);
+            
+            // Step 3: Find summary rows
+            const summaryRows = findSummaryRows(jsonData);
+            
+            // Step 4: Validate
+            const errors = validateExcelData(dateColumns, summaryRows);
+            if (errors.length > 0) {
+                throw new Error(`Format Excel tidak valid untuk sheet "${bidang}":\n${errors.join('\n')}`);
+            }
+            
+            // Step 5: Extract data per tanggal
+            const transformedData = [];
+            
+            console.log(`   Extracting data from ${dateColumns.length} date columns...`);
+            
+            for (const dateCol of dateColumns) {
+                const tanggal = dateCol.tanggal;
+                const colIndex = dateCol.index;
+                
+                // Extract values from summary rows with better parsing
+                const parseValue = (row, col) => {
+                    const val = row?.data?.[col];
+                    if (val === '' || val === null || val === undefined) return 0;
+                    const num = parseInt(val);
+                    return isNaN(num) ? 0 : num;
+                };
+                
+                const wfo = parseValue(summaryRows['wfo'], colIndex);
+                const dinasLuar = parseValue(summaryRows['dinas_luar'], colIndex);
+                const undangan = parseValue(summaryRows['undangan'], colIndex);
+                const sakit = parseValue(summaryRows['sakit'], colIndex);
+                const ijin = parseValue(summaryRows['ijin'], colIndex);
+                const cuti = parseValue(summaryRows['cuti'], colIndex);
+                const tidakAbsen = parseValue(summaryRows['tidak_absen'], colIndex);
+                
+                // Skip if no data (weekend/holiday)
+                const total = wfo + dinasLuar + undangan + sakit + ijin + cuti + tidakAbsen;
+                if (total === 0) {
+                    continue;
+                }
+                
+                // Debug log for first few dates
+                if (tanggal <= 3) {
+                    console.log(`    Tanggal ${tanggal} (col ${colIndex}): WFO=${wfo}, DL=${dinasLuar}, U=${undangan}, Total=${total}`);
+                }
+                
+                transformedData.push({
+                    tahun: tahun,
+                    bulan: bulan,
+                    tanggal: tanggal,
+                    hari: '',
+                    bidang: bidang,
+                    wfo: wfo,
+                    dinas_luar: dinasLuar,
+                    undangan: undangan,
+                    sakit: sakit,
+                    ijin: ijin,
+                    cuti: cuti,
+                    tidak_absen: tidakAbsen
+                });
+            }
+            
+            console.log(`  ✅ Extracted ${transformedData.length} rows from "${bidang}"`);
+            
+            if (transformedData.length === 0) {
+                console.warn(`  ⚠️ No data extracted! Possible reasons:`);
+                console.warn(`     - All date columns have 0 values`);
+                console.warn(`     - Summary rows don't have data at date column positions`);
+                console.warn(`     Sample summary row data:`, summaryRows['wfo']?.data?.slice(0, 15));
+            }
+            
+            return transformedData;
+        }
+        
+        /**
+         * Fallback method for GABUNGAN sheet (uses old v2.1.0 logic)
+         * @param {Array} jsonData - Raw Excel data
+         * @param {string} bidang - Bidang name (should be "GABUNGAN")
+         * @param {number} tahun - Year
+         * @param {string} bulan - Month name
+         * @returns {Array} Transformed data
+         */
+        function extractGabunganFallback(jsonData, bidang, tahun, bulan) {
+            console.log(`  🔄 Using fallback method for GABUNGAN...`);
+            
+            // Old v2.1.0 logic: hard-coded column positions
+            const DATE_START_COLUMN = 6;
+            const DATE_END_COLUMN = 36;
+            
+            // Find summary rows (old method)
+            const summaryLabels = {
+                'JUMLAH WFO': 'wfo',
+                'WFO': 'wfo',
+                'JUMLAH DINAS LUAR': 'dinas_luar',
+                'DINAS LUAR': 'dinas_luar',
+                'JUMLAH UNDANGAN': 'undangan',
+                'UNDANGAN': 'undangan',
+                'JUMLAH SAKIT': 'sakit',
+                'SAKIT': 'sakit',
+                'JUMLAH IJIN': 'ijin',
+                'IJIN': 'ijin',
+                'JUMLAH CUTI': 'cuti',
+                'CUTI': 'cuti',
+                'JUMLAH TIDAK ABSEN': 'tidak_absen',
+                'TIDAK ABSEN': 'tidak_absen',
+                'JUMLAH ISOMAN': 'tidak_absen',
+                'ISOMAN': 'tidak_absen'
+            };
+            
+            const summaryData = {};
+            
+            // Scan from bottom to top
+            for (let i = jsonData.length - 1; i >= 0; i--) {
+                const row = jsonData[i];
+                for (let j = 0; j < Math.min(row.length, 10); j++) {
+                    const cellValue = String(row[j] || '').toUpperCase().trim();
+                    if (summaryLabels[cellValue]) {
+                        const dataKey = summaryLabels[cellValue];
+                        if (!summaryData[dataKey]) {
+                            summaryData[dataKey] = row;
+                        }
+                    }
+                }
+                if (Object.keys(summaryData).length >= 7) break;
+            }
+            
+            if (Object.keys(summaryData).length < 5) {
+                throw new Error('GABUNGAN fallback: Not enough summary rows found (need at least 5)');
+            }
+            
+            console.log(`  🔄 GABUNGAN sheet has no summary rows - will calculate from bidang totals`);
+            
+            // Return empty array - GABUNGAN will be calculated from sum of all bidang
+            return [];
+        }
+        
+        // ============================================
+        // SUPABASE CONFIG
+        // ============================================
         const SUPABASE_URL = 'https://iudtxznbakaqzygpkaxf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
         
@@ -262,22 +725,70 @@
                 // Valid bidang names (case-insensitive)
                 const validBidang = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR'];
                 
+                // Keywords for GABUNGAN sheet (case-insensitive)
+                // Priority: "ALL CLEAN" or "CLEAN" > "GABUNGAN" > "ALL" > others
+                const gabunganKeywords = ['CLEAN', 'GABUNGAN', 'ALL', 'SEMUA', 'TOTAL', 'COMBINED'];
+                
+                // Find ALL GABUNGAN sheets and prioritize
+                let gabunganSheetIndex = -1;
+                let gabunganCandidates = [];
+                
+                for (let i = 0; i < workbook.SheetNames.length; i++) {
+                    const sheetNameUpper = workbook.SheetNames[i].trim().toUpperCase();
+                    if (gabunganKeywords.some(keyword => sheetNameUpper.includes(keyword))) {
+                        gabunganCandidates.push({
+                            index: i,
+                            name: workbook.SheetNames[i],
+                            nameUpper: sheetNameUpper
+                        });
+                    }
+                }
+                
+                // Prioritize GABUNGAN sheet selection
+                if (gabunganCandidates.length > 0) {
+                    // Priority 1: Sheet with "CLEAN" in name (e.g., "ALL CLEAN", "CLEAN", "GABUNGAN CLEAN")
+                    let cleanSheet = gabunganCandidates.find(s => s.nameUpper.includes('CLEAN'));
+                    
+                    if (cleanSheet) {
+                        gabunganSheetIndex = cleanSheet.index;
+                        console.log(`✅ Found GABUNGAN sheet (CLEAN priority): "${cleanSheet.name}" at index ${cleanSheet.index}`);
+                    } else {
+                        // Priority 2: Use first match
+                        gabunganSheetIndex = gabunganCandidates[0].index;
+                        console.log(`✅ Found GABUNGAN sheet: "${gabunganCandidates[0].name}" at index ${gabunganCandidates[0].index}`);
+                    }
+                    
+                    // Log if multiple GABUNGAN sheets found
+                    if (gabunganCandidates.length > 1) {
+                        console.log(`⚠️ Multiple GABUNGAN sheets found (${gabunganCandidates.length}):`, gabunganCandidates.map(s => s.name));
+                        console.log(`   Using: "${workbook.SheetNames[gabunganSheetIndex]}" (CLEAN has priority)`);
+                    }
+                } else {
+                    // If no GABUNGAN sheet found by name, use first sheet as fallback
+                    gabunganSheetIndex = 0;
+                    console.log(`⚠️ No GABUNGAN sheet found by name, using first sheet as GABUNGAN: "${workbook.SheetNames[0]}"`);
+                }
+                
                 for (let i = 0; i < workbook.SheetNames.length; i++) {
                     const sheetName = workbook.SheetNames[i];
                     const sheetNameUpper = sheetName.trim().toUpperCase();
                     
-                    // First sheet is always processed as "GABUNGAN" (combined data for main chart)
-                    // Other sheets are only processed if they match valid bidang names
+                    // Determine bidang name based on sheet
                     let bidangName;
-                    if (i === 0) {
-                        console.log(`\n🔍 Processing sheet: ${sheetName} (FIRST SHEET - will be saved as "GABUNGAN")`);
+                    if (i === gabunganSheetIndex) {
+                        console.log(`\n🔍 Processing sheet: ${sheetName} (GABUNGAN SHEET - detected by name or position)`);
                         bidangName = 'GABUNGAN';
-                    } else if (!validBidang.includes(sheetNameUpper)) {
-                        console.log(`⏭️ Skipping sheet: ${sheetName} (not a valid bidang)`);
-                        continue;
                     } else {
-                        console.log(`\n🔍 Processing sheet: ${sheetName}`);
-                        bidangName = sheetNameUpper;
+                        // Check if sheet name contains any valid bidang keyword (partial match)
+                        const matchedBidang = validBidang.find(bidang => sheetNameUpper.includes(bidang));
+                        
+                        if (!matchedBidang) {
+                            console.log(`⏭️ Skipping sheet: ${sheetName} (not a valid bidang)`);
+                            continue;
+                        }
+                        
+                        console.log(`\n🔍 Processing sheet: ${sheetName} → Detected as: ${matchedBidang}`);
+                        bidangName = matchedBidang; // Use the matched bidang name (without suffix)
                     }
                     
                     const worksheet = workbook.Sheets[sheetName];
@@ -299,121 +810,30 @@
                 const bidang = bidangName;
                 console.log(`📌 Bidang detected: ${bidang}`);
                 
-                // Debug: Log first 10 rows to see structure
-                console.log('First 5 rows:', jsonData.slice(0, 5));
-                
-                // Detect format: Vertical atau Horizontal
-                let transformedData = [];
-                
-                // Since we're reading as array, we need to find summary rows by checking first column
-                // Summary rows have labels like "JUMLAH WFO", "JUMLAH DINAS LUAR", etc in column D (index 3) or later
-                
-                // Find rows that contain summary labels
-                const summaryRowIndices = [];
-                const summaryLabels = {
-                    'JUMLAH WFO': 'wfo',
-                    'WFO': 'wfo',
-                    'JUMLAH DINAS LUAR': 'dinas_luar',
-                    'DINAS LUAR': 'dinas_luar',
-                    'JUMLAH UNDANGAN': 'undangan',
-                    'UNDANGAN': 'undangan',
-                    'JUMLAH SAKIT': 'sakit',
-                    'SAKIT': 'sakit',
-                    'JUMLAH IJIN': 'ijin',
-                    'IJIN': 'ijin',
-                    'JUMLAH CUTI': 'cuti',
-                    'CUTI': 'cuti',
-                    'JUMLAH ISOMAN': 'tidak_absen',
-                    'ISOMAN': 'tidak_absen',
-                    'JUMLAH TIDAK ABSEN': 'tidak_absen',
-                    'TIDAK ABSEN': 'tidak_absen'
-                };
-                
-                // Find summary rows and map them
-                const summaryData = {};
-                for (let i = 0; i < jsonData.length; i++) {
-                    const row = jsonData[i];
-                    // Check all columns for summary labels
-                    for (let j = 0; j < row.length; j++) {
-                        const cellValue = String(row[j] || '').toUpperCase().trim();
-                        if (summaryLabels[cellValue]) {
-                            summaryRowIndices.push(i);
-                            summaryData[summaryLabels[cellValue]] = row;
-                            console.log(`  Found summary row at index ${i}: ${cellValue}`);
-                            break;
+                // ============================================
+                // USE SMART PARSER v3.1.1
+                // ============================================
+                try {
+                    const transformedData = smartExtractData(jsonData, bidang, tahun, bulan);
+                    allTransformedData = allTransformedData.concat(transformedData);
+                } catch (error) {
+                    console.error(`❌ Error parsing sheet "${sheetName}":`, error.message);
+                    
+                    // If GABUNGAN sheet fails, try to use old parser as fallback
+                    if (bidang === 'GABUNGAN') {
+                        console.warn(`⚠️ GABUNGAN sheet failed with smart parser, trying fallback method...`);
+                        try {
+                            const fallbackData = extractGabunganFallback(jsonData, bidang, tahun, bulan);
+                            allTransformedData = allTransformedData.concat(fallbackData);
+                            console.log(`✅ GABUNGAN extracted using fallback method: ${fallbackData.length} rows`);
+                        } catch (fallbackError) {
+                            console.error(`❌ Fallback also failed:`, fallbackError.message);
+                            console.warn(`⚠️ Skipping GABUNGAN sheet`);
                         }
+                    } else {
+                        throw error; // Re-throw for non-GABUNGAN sheets
                     }
                 }
-                
-                if (summaryRowIndices.length === 0) {
-                    console.log(`⚠️ Sheet "${sheetName}" - No summary rows found, skipping...`);
-                    continue;
-                }
-                
-                console.log(`  Summary rows found: ${summaryRowIndices.length}`);
-                
-                // Now extract data per tanggal (from columns)
-                // Based on CSV analysis: columns 0-5 are headers (No, Nama, NIP, Satker, Golongan, Eselon)
-                // Columns 6-36 are dates (01-31)
-                const firstSummaryRow = jsonData[summaryRowIndices[0]];
-                
-                console.log(`  First summary row length: ${firstSummaryRow.length}`);
-                
-                // Data tanggal dimulai dari kolom index 6 (kolom G)
-                const DATE_START_COLUMN = 6;
-                
-                // Extract data for each date (tanggal 1-31)
-                let sheetDataCount = 0;
-                for (let tanggal = 1; tanggal <= 31; tanggal++) {
-                    const colIndex = DATE_START_COLUMN + (tanggal - 1); // Column 6 = tanggal 1, column 7 = tanggal 2, etc.
-                    
-                    if (colIndex >= firstSummaryRow.length) {
-                        break;
-                    }
-                    
-                    // Check if this column has any data
-                    let hasData = false;
-                    for (const key in summaryData) {
-                        const value = summaryData[key][colIndex];
-                        if (value !== '' && value !== undefined && !isNaN(value) && parseInt(value) > 0) {
-                            hasData = true;
-                            break;
-                        }
-                    }
-                    
-                    // Skip dates with no data (weekends, holidays)
-                    if (!hasData) {
-                        continue;
-                    }
-                    
-                    // Extract data for this tanggal
-                    const wfo = parseInt(summaryData['wfo']?.[colIndex]) || 0;
-                    const dinasLuar = parseInt(summaryData['dinas_luar']?.[colIndex]) || 0;
-                    const undangan = parseInt(summaryData['undangan']?.[colIndex]) || 0;
-                    const sakit = parseInt(summaryData['sakit']?.[colIndex]) || 0;
-                    const ijin = parseInt(summaryData['ijin']?.[colIndex]) || 0;
-                    const cuti = parseInt(summaryData['cuti']?.[colIndex]) || 0;
-                    const tidakAbsen = parseInt(summaryData['tidak_absen']?.[colIndex]) || 0;
-                    
-                    transformedData.push({
-                        tahun: tahun,
-                        bulan: bulan,  // Keep original format (kapital pertama)
-                        tanggal: tanggal,
-                        hari: '',
-                        bidang: bidang,  // Add bidang field
-                        wfo: wfo,
-                        dinas_luar: dinasLuar,
-                        undangan: undangan,
-                        sakit: sakit,
-                        ijin: ijin,
-                        cuti: cuti,
-                        tidak_absen: tidakAbsen
-                    });
-                    sheetDataCount++;
-                }
-                
-                console.log(`  ✅ Sheet "${sheetName}" - Extracted ${sheetDataCount} rows`);
-                allTransformedData = allTransformedData.concat(transformedData);
                 
                 } // End of sheet loop
                 
@@ -421,6 +841,95 @@
                 
                 if (allTransformedData.length === 0) {
                     throw new Error('Tidak ada data valid! Pastikan format Excel sesuai dengan baris ringkasan (JUMLAH WFO, dll).');
+                }
+                
+                // Calculate GABUNGAN from bidang totals if GABUNGAN is missing
+                const hasGabungan = allTransformedData.some(row => row.bidang === 'GABUNGAN');
+                if (!hasGabungan) {
+                    console.log('\n🔄 GABUNGAN not found, calculating from bidang totals...');
+                    
+                    // Group by date and sum all bidang
+                    const dateMap = {};
+                    allTransformedData.forEach(row => {
+                        const key = `${row.tahun}-${row.bulan}-${row.tanggal}`;
+                        if (!dateMap[key]) {
+                            dateMap[key] = {
+                                tahun: row.tahun,
+                                bulan: row.bulan,
+                                tanggal: row.tanggal,
+                                hari: row.hari,
+                                bidang: 'GABUNGAN',
+                                wfo: 0,
+                                dinas_luar: 0,
+                                undangan: 0,
+                                sakit: 0,
+                                ijin: 0,
+                                cuti: 0,
+                                tidak_absen: 0
+                            };
+                        }
+                        dateMap[key].wfo += row.wfo;
+                        dateMap[key].dinas_luar += row.dinas_luar;
+                        dateMap[key].undangan += row.undangan;
+                        dateMap[key].sakit += row.sakit;
+                        dateMap[key].ijin += row.ijin;
+                        dateMap[key].cuti += row.cuti;
+                        dateMap[key].tidak_absen += row.tidak_absen;
+                    });
+                    
+                    const gabunganData = Object.values(dateMap);
+                    allTransformedData = allTransformedData.concat(gabunganData);
+                    console.log(`✅ Calculated GABUNGAN: ${gabunganData.length} dates`);
+                }
+                
+                console.log(`\n📊 Final total with GABUNGAN: ${allTransformedData.length} rows`);
+                
+                // ============================================
+                // DUPLICATE CHECK (for Append mode)
+                // ============================================
+                if (uploadMode === 'append') {
+                    showStatus('info', '⏳ Checking for existing data...');
+                    
+                    // Check if data already exists
+                    const { data: existingData, error: checkError } = await sbClient
+                        .from('absensi')
+                        .select('tahun, bulan, tanggal, bidang')
+                        .eq('tahun', tahun)
+                        .eq('bulan', bulan);
+                    
+                    if (checkError) {
+                        console.warn('⚠️ Could not check for duplicates:', checkError);
+                    } else if (existingData && existingData.length > 0) {
+                        // Found existing data
+                        const existingCount = existingData.length;
+                        const existingBidang = [...new Set(existingData.map(d => d.bidang))];
+                        
+                        console.warn(`\n⚠️ WARNING: Data already exists for ${bulan} ${tahun}!`);
+                        console.warn(`   Existing rows: ${existingCount}`);
+                        console.warn(`   Existing bidang: ${existingBidang.join(', ')}`);
+                        console.warn(`   New rows to insert: ${allTransformedData.length}`);
+                        console.warn(`\n   Using APPEND mode will create DUPLICATES!`);
+                        console.warn(`   Recommendation: Use REPLACE mode instead.`);
+                        
+                        // Ask user confirmation (via alert)
+                        const confirmAppend = confirm(
+                            `⚠️ WARNING: Data already exists for ${bulan} ${tahun}!\n\n` +
+                            `Existing: ${existingCount} rows\n` +
+                            `New: ${allTransformedData.length} rows\n\n` +
+                            `Using APPEND mode will create DUPLICATES.\n\n` +
+                            `Do you want to continue?\n\n` +
+                            `Click OK to continue (create duplicates)\n` +
+                            `Click Cancel to stop (recommended: use REPLACE mode instead)`
+                        );
+                        
+                        if (!confirmAppend) {
+                            throw new Error('Upload cancelled by user to prevent duplicates. Please use REPLACE mode.');
+                        }
+                        
+                        console.log(`   ⚠️ User confirmed: Proceeding with APPEND (duplicates will be created)`);
+                    } else {
+                        console.log(`   ✅ No existing data found for ${bulan} ${tahun} - Safe to append`);
+                    }
                 }
                 
                 // Delete old data if replace mode
@@ -433,6 +942,8 @@
                         .eq('bulan', bulan);
                     
                     if (deleteError) throw deleteError;
+                    
+                    console.log(`   ✅ Deleted old data for ${bulan} ${tahun}`);
                 }
                 
                 // Insert new data
@@ -443,7 +954,90 @@
                 
                 if (insertError) throw insertError;
                 
-                showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!`);
+                // Wait a bit for data to be fully inserted
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // AUTO-CLEANUP: Remove TOTAL columns (data with suspiciously high values)
+                // Different thresholds for different bidang:
+                // - GABUNGAN: WFO > 1000 (monthly total ~2000-3000)
+                // - Individual bidang: WFO > 200 (monthly total ~400-800, daily max ~40-50)
+                showStatus('info', '⏳ Membersihkan kolom TOTAL...');
+                
+                // Cleanup GABUNGAN (threshold: 1000)
+                const { data: deletedGabungan, error: cleanupError1 } = await sbClient
+                    .from('absensi')
+                    .delete()
+                    .eq('tahun', tahun)
+                    .eq('bulan', bulan)
+                    .eq('bidang', 'GABUNGAN')
+                    .gt('wfo', 1000)
+                    .select();
+                
+                // Cleanup individual bidang (threshold: 200)
+                const { data: deletedBidang, error: cleanupError2 } = await sbClient
+                    .from('absensi')
+                    .delete()
+                    .eq('tahun', tahun)
+                    .eq('bulan', bulan)
+                    .neq('bidang', 'GABUNGAN')
+                    .gt('wfo', 200)
+                    .select();
+                
+                const totalDeleted = (deletedGabungan?.length || 0) + (deletedBidang?.length || 0);
+                
+                if (cleanupError1 || cleanupError2) {
+                    console.warn('⚠️ Cleanup warning:', cleanupError1 || cleanupError2);
+                } else if (totalDeleted > 0) {
+                    console.log(`✅ Cleaned up ${totalDeleted} TOTAL column rows`);
+                }
+                
+                // VALIDATION: Check uploaded data vs Excel summary
+                showStatus('info', '⏳ Memvalidasi data yang diupload...');
+                
+                const { data: uploadedData, error: validateError } = await sbClient
+                    .from('absensi')
+                    .select('bidang, wfo, dinas_luar, undangan, sakit, ijin, cuti, tidak_absen')
+                    .eq('tahun', tahun)
+                    .eq('bulan', bulan);
+                
+                if (validateError) {
+                    console.warn('⚠️ Validation error:', validateError);
+                } else {
+                    // Calculate totals per bidang
+                    const totals = {};
+                    uploadedData.forEach(row => {
+                        if (!totals[row.bidang]) {
+                            totals[row.bidang] = { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, tidak_absen: 0, total: 0 };
+                        }
+                        totals[row.bidang].wfo += row.wfo;
+                        totals[row.bidang].dinas_luar += row.dinas_luar;
+                        totals[row.bidang].undangan += row.undangan;
+                        totals[row.bidang].sakit += row.sakit;
+                        totals[row.bidang].ijin += row.ijin;
+                        totals[row.bidang].cuti += row.cuti;
+                        totals[row.bidang].tidak_absen += row.tidak_absen;
+                        totals[row.bidang].total += row.wfo + row.dinas_luar + row.undangan + row.sakit + row.ijin + row.cuti + row.tidak_absen;
+                    });
+                    
+                    console.log('\n📊 VALIDASI HASIL UPLOAD:');
+                    console.log('═'.repeat(80));
+                    Object.keys(totals).sort().forEach(bidang => {
+                        const t = totals[bidang];
+                        console.log(`${bidang}:`);
+                        console.log(`  WFO=${t.wfo}, DL=${t.dinas_luar}, U=${t.undangan}, S=${t.sakit}, I=${t.ijin}, C=${t.cuti}, TA=${t.tidak_absen}`);
+                        console.log(`  TOTAL = ${t.total}`);
+                    });
+                    console.log('═'.repeat(80));
+                    console.log('⚠️ PENTING: Bandingkan angka di atas dengan Excel!');
+                    console.log('⚠️ Jika ada yang tidak sesuai, gunakan query SQL untuk memperbaiki.');
+                }
+                
+                if (totalDeleted > 0) {
+                    showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data (${totalDeleted} kolom TOTAL dihapus) untuk ${bulan} ${tahun}!\n\n⚠️ CEK CONSOLE (F12) untuk validasi hasil!`);
+                } else {
+                    showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!\n\n⚠️ CEK CONSOLE (F12) untuk validasi hasil!`);
+                }
+                
                 fileInput.value = '';
                 
             } catch (error) {
