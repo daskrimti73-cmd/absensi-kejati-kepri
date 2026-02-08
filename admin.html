@@ -1732,7 +1732,7 @@
                     
                     if (rekapData) {
                         console.log('✅ Rekapitulasi data found, uploading to Supabase...');
-                        const rekapSuccess = await uploadRekapitulasi(supabaseClient, rekapData);
+                        const rekapSuccess = await uploadRekapitulasi(sbClient, rekapData);
                         
                         if (rekapSuccess) {
                             console.log('✅ Rekapitulasi uploaded successfully!');
