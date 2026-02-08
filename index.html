@@ -1095,6 +1095,7 @@
             const rekapData = await fetchRekapitulasi(bulan, tahun);
             
             let finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal;
+            let pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha;
             
             if (rekapData && rekapData.total > 0) {
                 // Use rekapitulasi data from database
@@ -1107,6 +1108,28 @@
                 finalCuti = rekapData.cuti;
                 finalAlpha = rekapData.tidak_absen;
                 finalTotal = rekapData.total;
+                
+                // PRIORITAS: Gunakan persentase dari Excel jika ada
+                if (rekapData.wfo_pct !== null) {
+                    console.log('✅ Using PERCENTAGE from Excel (not calculated)');
+                    pctWfo = rekapData.wfo_pct.toFixed(1);
+                    pctDinas = (rekapData.dinas_luar_pct || 0).toFixed(1);
+                    pctUndangan = (rekapData.undangan_pct || 0).toFixed(1);
+                    pctSakit = (rekapData.sakit_pct || 0).toFixed(1);
+                    pctIjin = (rekapData.ijin_pct || 0).toFixed(1);
+                    pctCuti = (rekapData.cuti_pct || 0).toFixed(1);
+                    pctAlpha = (rekapData.tidak_absen_pct || 0).toFixed(1);
+                } else {
+                    // Fallback: Hitung dari angka mentah
+                    console.log('ℹ️ Calculating percentage from raw numbers');
+                    pctWfo = ((finalWfo / finalTotal) * 100).toFixed(1);
+                    pctDinas = ((finalDinas / finalTotal) * 100).toFixed(1);
+                    pctUndangan = ((finalUndangan / finalTotal) * 100).toFixed(1);
+                    pctSakit = ((finalSakit / finalTotal) * 100).toFixed(1);
+                    pctIjin = ((finalIjin / finalTotal) * 100).toFixed(1);
+                    pctCuti = ((finalCuti / finalTotal) * 100).toFixed(1);
+                    pctAlpha = ((finalAlpha / finalTotal) * 100).toFixed(1);
+                }
             } else {
                 // Use calculated data from absensi table (existing logic)
                 console.log('ℹ️ Using CALCULATED data for donut chart');
@@ -1118,10 +1141,20 @@
                 finalCuti = totalCutiAll;
                 finalAlpha = totalAlphaAll;
                 finalTotal = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalAlphaAll;
+                
+                // Hitung persentase
+                pctWfo = ((finalWfo / finalTotal) * 100).toFixed(1);
+                pctDinas = ((finalDinas / finalTotal) * 100).toFixed(1);
+                pctUndangan = ((finalUndangan / finalTotal) * 100).toFixed(1);
+                pctSakit = ((finalSakit / finalTotal) * 100).toFixed(1);
+                pctIjin = ((finalIjin / finalTotal) * 100).toFixed(1);
+                pctCuti = ((finalCuti / finalTotal) * 100).toFixed(1);
+                pctAlpha = ((finalAlpha / finalTotal) * 100).toFixed(1);
             }
             
-            // Generate Attendance Donut Chart
-            generateAttendanceDonut(finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal);
+            // Generate Attendance Donut Chart (dengan persentase custom)
+            generateAttendanceDonut(finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal, 
+                                   pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha);
             
             // Generate Absence Donut Chart
             generateAbsenceDonut(finalAlpha, finalTotal - finalAlpha);
@@ -1137,20 +1170,24 @@
             `).join('');
         }
         
-        function generateAttendanceDonut(wfo, dinas, undangan, sakit, ijin, cuti, alpha, total) {
+        function generateAttendanceDonut(wfo, dinas, undangan, sakit, ijin, cuti, alpha, total, 
+                                         pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha) {
             const ctx = document.getElementById('attendanceDonutChart').getContext('2d');
             
             if (attendanceDonutChart) {
                 attendanceDonutChart.destroy();
             }
             
-            const pctWfo = total > 0 ? ((wfo / total) * 100).toFixed(1) : 0;
-            const pctDinas = total > 0 ? ((dinas / total) * 100).toFixed(1) : 0;
-            const pctUndangan = total > 0 ? ((undangan / total) * 100).toFixed(1) : 0;
-            const pctSakit = total > 0 ? ((sakit / total) * 100).toFixed(1) : 0;
-            const pctIjin = total > 0 ? ((ijin / total) * 100).toFixed(1) : 0;
-            const pctCuti = total > 0 ? ((cuti / total) * 100).toFixed(1) : 0;
-            const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
+            // Jika persentase tidak diberikan, hitung dari angka mentah
+            if (pctWfo === undefined) {
+                pctWfo = total > 0 ? ((wfo / total) * 100).toFixed(1) : 0;
+                pctDinas = total > 0 ? ((dinas / total) * 100).toFixed(1) : 0;
+                pctUndangan = total > 0 ? ((undangan / total) * 100).toFixed(1) : 0;
+                pctSakit = total > 0 ? ((sakit / total) * 100).toFixed(1) : 0;
+                pctIjin = total > 0 ? ((ijin / total) * 100).toFixed(1) : 0;
+                pctCuti = total > 0 ? ((cuti / total) * 100).toFixed(1) : 0;
+                pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
+            }
             
             attendanceDonutChart = new Chart(ctx, {
                 type: 'doughnut',
