@@ -856,6 +856,19 @@
             'KOORDINATOR': 'Koordinator',
             'PEMULIHAN ASET': 'Pemulihan Aset'
         };
+        
+        // Jumlah pegawai per bidang (data statis)
+        const bidangJumlahPegawai = {
+            'PEMBINAAN': 33,
+            'INTELIJEN': 15,
+            'PIDUM': 19,
+            'PIDSUS': 20,
+            'DATUN': 8,
+            'PENGAWASAN': 16,
+            'TATA USAHA': 22,
+            'KOORDINATOR': 4,
+            'PEMULIHAN ASET': 5
+        };
 
         // Get selected data with Supabase fallback
         async function getSelectedData() {
@@ -987,11 +1000,18 @@
             let totalSakitAll = 0, totalIjinAll = 0, totalCutiAll = 0, totalAlphaAll = 0;
             let uniqueDates = new Set();
             
-            // Fetch data for all bidang
+            // Build treemap with static employee count
+            for (let i = 0; i < bidangList.length; i++) {
+                bidangData.push({
+                    name: bidangList[i],
+                    value: bidangJumlahPegawai[bidangList[i]] || 0,
+                    color: bidangColors[i]
+                });
+            }
+            
+            // Fetch data for all bidang for donut charts
             for (let i = 0; i < bidangList.length; i++) {
                 const data = await fetchFromSupabase(tahun, bulan, bidangList[i]);
-                
-                let grandTotal = 0;
                 
                 if (data && data.labels.length > 0) {
                     const sum = arr => arr.reduce((a, b) => a + b, 0);
@@ -1002,7 +1022,6 @@
                     const totalIjin = sum(data.ijin);
                     const totalCuti = sum(data.cuti);
                     const totalAlpha = sum(data.tidakAbsen);
-                    grandTotal = totalWfo + totalDinas + totalUndangan + totalSakit + totalIjin + totalCuti + totalAlpha;
                     
                     totalWfoAll += totalWfo;
                     totalDinasAll += totalDinas;
@@ -1015,13 +1034,6 @@
                     // Collect unique dates
                     data.labels.forEach(date => uniqueDates.add(date));
                 }
-                
-                // Always add bidang to treemap, even if no data (show 0)
-                bidangData.push({
-                    name: bidangList[i],
-                    value: grandTotal,
-                    color: bidangColors[i]
-                });
             }
             
             // Update Info Cards
