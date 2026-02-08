@@ -296,8 +296,8 @@
         
         .treemap-container {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
             gap: 2px;
             height: 280px;
         }
@@ -644,6 +644,7 @@
                         <option value="PENGAWASAN">Pengawasan</option>
                         <option value="TATA USAHA">Tata Usaha</option>
                         <option value="KOORDINATOR">Koordinator</option>
+                        <option value="PEMULIHAN ASET">Pemulihan Aset</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -962,8 +963,8 @@
                 return;
             }
             
-            const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR'];
-            const bidangColors = ['#1e3a8a', '#0284c7', '#06b6d4', '#f59e0b', '#fbbf24', '#d97706', '#b45309', '#dc2626'];
+            const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR', 'PEMULIHAN ASET'];
+            const bidangColors = ['#1e3a8a', '#0284c7', '#06b6d4', '#f59e0b', '#fbbf24', '#d97706', '#b45309', '#dc2626', '#059669'];
             
             let bidangData = [];
             let totalWfoAll = 0, totalDinasAll = 0, totalUndanganAll = 0;
@@ -1148,7 +1149,7 @@
             }
             
             // List of bidang
-            const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR'];
+            const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR', 'PEMULIHAN ASET'];
             
             bidangGrid.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">⏳ Memuat data per bidang...</div>';
             
