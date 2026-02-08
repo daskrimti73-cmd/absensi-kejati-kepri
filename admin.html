@@ -56,25 +56,76 @@
         const sheet = workbook.Sheets[rekapSheet];
         const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
         
-        let startRow = -1;
+        console.log(`📄 Sheet has ${data.length} rows`);
         
+        // Step 1: Cari section "KEHADIRAN KESELURUHAN"
+        let sectionRow = -1;
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
             for (let j = 0; j < row.length; j++) {
                 const cell = String(row[j] || '').toUpperCase().trim();
-                if ((cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN')) || 
-                    cell === 'WFO' || 
-                    cell === 'JENIS KEHADIRAN') {
-                    startRow = i;
-                    console.log(`✅ Found data starting at row ${i}`);
+                if (cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN')) {
+                    sectionRow = i;
+                    console.log(`✅ Found "KEHADIRAN KESELURUHAN" at row ${i}`);
                     break;
                 }
             }
-            if (startRow !== -1) break;
+            if (sectionRow !== -1) break;
         }
         
-        if (startRow === -1) {
-            console.log('❌ Tidak dapat menemukan data kehadiran');
+        if (sectionRow === -1) {
+            console.log('⚠️ Section "KEHADIRAN KESELURUHAN" tidak ditemukan');
+            return null;
+        }
+        
+        // Step 2: Cari header row (Jenis Kehadiran, Jumlah)
+        let headerRow = -1;
+        let labelCol = -1;
+        let valueCol = -1;
+        
+        for (let i = sectionRow; i < Math.min(sectionRow + 10, data.length); i++) {
+            const row = data[i];
+            for (let j = 0; j < row.length; j++) {
+                const cell = String(row[j] || '').toUpperCase().trim();
+                if (cell.includes('JENIS') && cell.includes('KEHADIRAN')) {
+                    headerRow = i;
+                    labelCol = j;
+                    // Cari kolom "Jumlah"
+                    for (let k = j + 1; k < row.length; k++) {
+                        const nextCell = String(row[k] || '').toUpperCase().trim();
+                        if (nextCell.includes('JUMLAH')) {
+                            valueCol = k;
+                            break;
+                        }
+                    }
+                    console.log(`✅ Found header at row ${i}, labelCol=${labelCol}, valueCol=${valueCol}`);
+                    break;
+                }
+            }
+            if (headerRow !== -1) break;
+        }
+        
+        // Jika tidak ada header "Jenis Kehadiran", coba cari langsung data WFO
+        if (headerRow === -1) {
+            console.log('⚠️ Header "Jenis Kehadiran" tidak ditemukan, mencari data WFO langsung...');
+            for (let i = sectionRow; i < Math.min(sectionRow + 20, data.length); i++) {
+                const row = data[i];
+                for (let j = 0; j < row.length; j++) {
+                    const cell = String(row[j] || '').toUpperCase().trim();
+                    if (cell === 'WFO') {
+                        headerRow = i - 1; // Anggap baris sebelumnya adalah header
+                        labelCol = j;
+                        valueCol = j + 1; // Anggap kolom sebelahnya adalah nilai
+                        console.log(`✅ Found WFO at row ${i}, using labelCol=${labelCol}, valueCol=${valueCol}`);
+                        break;
+                    }
+                }
+                if (headerRow !== -1) break;
+            }
+        }
+        
+        if (headerRow === -1 || labelCol === -1 || valueCol === -1) {
+            console.log('❌ Tidak dapat menemukan struktur data');
             return null;
         }
         
@@ -91,66 +142,59 @@
             total: 0
         };
         
-        // Mapping label dengan berbagai variasi dan typo
+        // Step 3: Baca data dari baris setelah header
         const labelMap = [
             { patterns: ['WFO'], key: 'wfo' },
             { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar' },
             { patterns: ['UNDANGAN'], key: 'undangan' },
             { patterns: ['SAKIT'], key: 'sakit' },
-            { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin' }, // Tambah IIJN dan IJN
+            { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin' },
             { patterns: ['CUTI'], key: 'cuti' },
-            { patterns: ['ISOMAN'], key: 'ijin' }, // ISOMAN di-map ke IJIN
+            { patterns: ['ISOMAN'], key: 'ijin' }, // ISOMAN ditambahkan ke IJIN
             { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA', 'TANPA KETERANGAN'], key: 'tidak_absen' },
             { patterns: ['TOTAL'], key: 'total' }
         ];
         
-        for (let i = startRow; i < Math.min(startRow + 50, data.length); i++) {
+        for (let i = headerRow + 1; i < Math.min(headerRow + 20, data.length); i++) {
             const row = data[i];
             if (!row || row.length === 0) continue;
             
-            for (let colIdx = 0; colIdx < row.length; colIdx++) {
-                const label = String(row[colIdx] || '').toUpperCase().trim();
-                if (!label) continue;
-                
-                for (const { patterns, key } of labelMap) {
-                    let matched = false;
-                    for (const pattern of patterns) {
-                        if (label === pattern || label.includes(pattern)) {
-                            matched = true;
-                            break;
-                        }
+            const label = String(row[labelCol] || '').toUpperCase().trim();
+            if (!label) continue;
+            
+            // Cek apakah label cocok dengan pattern
+            for (const { patterns, key } of labelMap) {
+                let matched = false;
+                for (const pattern of patterns) {
+                    if (label === pattern || label.includes(pattern)) {
+                        matched = true;
+                        break;
                     }
-                    
-                    if (matched) {
-                        let value = 0;
-                        for (let valueCol = colIdx + 1; valueCol < row.length; valueCol++) {
-                            const numValue = parseInt(row[valueCol]);
-                            if (!isNaN(numValue)) {
-                                value = numValue;
-                                break;
-                            }
-                        }
-                        
-                        // Jika key sudah ada nilai, tambahkan (untuk ISOMAN + IJIN)
-                        if (rekapData[key] > 0 && label.includes('ISOMAN')) {
-                            rekapData[key] += value;
-                            console.log(`  ✅ ${patterns[0]}: ${value} (added to existing ${key})`);
+                }
+                
+                if (matched) {
+                    const value = parseInt(row[valueCol]);
+                    if (!isNaN(value)) {
+                        // Jika ISOMAN, tambahkan ke IJIN
+                        if (label.includes('ISOMAN')) {
+                            rekapData.ijin += value;
+                            console.log(`  ✅ ISOMAN: ${value} (added to IJIN, total IJIN now: ${rekapData.ijin})`);
                         } else {
                             rekapData[key] = value;
                             console.log(`  ✅ ${patterns[0]}: ${value}`);
                         }
-                        break;
                     }
+                    break;
                 }
             }
         }
         
         if (rekapData.wfo === 0 && rekapData.total === 0) {
-            console.log('⚠️ Data rekapitulasi tidak valid');
+            console.log('⚠️ Data rekapitulasi tidak valid (WFO dan TOTAL = 0)');
             return null;
         }
         
-        console.log('📊 Rekapitulasi parsed:', rekapData);
+        console.log('📊 Rekapitulasi parsed successfully:', rekapData);
         return rekapData;
     }
     
