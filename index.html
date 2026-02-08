@@ -17,9 +17,33 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* ============================================
-           PROFESSIONAL UI/UX v3.2.0
-           Dashboard Absensi Mobile
+           CLEAN PROFESSIONAL UI v3.4.0
+           Dashboard Absensi Mobile - Minimalist Design
            ============================================ */
+        
+        :root {
+            --primary: #1a5f2a;
+            --primary-light: #2d8f4e;
+            --primary-dark: #0f3d1a;
+            --accent: #4ade80;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            
+            /* Professional Color Palette */
+            --color-slate: #64748b;
+            --color-emerald: #059669;
+            --color-sky: #0284c7;
+            --color-blue: #2563eb;
+            --color-amber: #d97706;
+            --color-teal: #0d9488;
+            --color-indigo: #4f46e5;
+            --color-rose: #e11d48;
+        }
         
         * {
             margin: 0;
@@ -29,9 +53,9 @@
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 32px 20px;
             -webkit-font-smoothing: antialiased;
         }
         
@@ -39,373 +63,434 @@
             max-width: 1200px;
             margin: 0 auto;
             background: white;
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-            animation: fadeInUp 0.6s cubic-bezier(0, 0, 0.2, 1);
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            padding: 48px;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 48px;
             padding-bottom: 24px;
-            border-bottom: 3px solid #1a5f2a;
+            border-bottom: 1px solid var(--gray-200);
         }
         
         .header img {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
+            width: 72px;
+            height: 72px;
+            margin-bottom: 16px;
         }
         
         .header h1 {
             font-family: 'Poppins', sans-serif;
-            color: #1a5f2a;
+            color: var(--primary);
             font-size: 2rem;
-            margin-bottom: 12px;
-            font-weight: 800;
+            margin-bottom: 8px;
+            font-weight: 700;
             letter-spacing: -0.5px;
         }
         
         .header p {
-            color: #757575;
+            color: var(--gray-600);
             font-size: 1rem;
             font-weight: 500;
+        }
+        
+        /* Info Cards Section */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--gray-200);
+        }
+        
+        .info-card.blue { border-left: 4px solid #1e40af; }
+        .info-card.purple { border-left: 4px solid #7c3aed; }
+        .info-card.red { border-left: 4px solid #dc2626; }
+        .info-card.orange { border-left: 4px solid #ea580c; }
+        
+        .info-card-content {
+            flex: 1;
+        }
+        
+        .info-card-label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .info-card-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            font-family: 'Poppins', sans-serif;
+            line-height: 1;
+        }
+        
+        .info-card-icon {
+            font-size: 3rem;
+            opacity: 0.15;
+            margin-left: 16px;
+        }
+        
+        @media (max-width: 1024px) {
+            .info-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .info-cards {
+                grid-template-columns: 1fr;
+            }
         }
         
         .filter-section {
             background: white;
             padding: 0;
-            border-radius: 20px;
+            border-radius: 12px;
             margin-bottom: 40px;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--gray-200);
             overflow: hidden;
-            transition: all 0.3s;
-        }
-        
-        .filter-section:hover {
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .filter-title {
-            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            background: linear-gradient(135deg, #1a5f2a 0%, #0f3d1a 100%);
             color: white;
-            font-size: 1.125rem;
-            font-weight: 700;
-            padding: 24px 32px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 16px 24px;
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            letter-spacing: 1px;
+            gap: 8px;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
         
         .filter-controls {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 0;
-            padding: 32px;
-            background: #fafbfc;
+            gap: 20px;
+            padding: 24px;
+            background: white;
         }
         
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding: 0 16px;
-            position: relative;
-        }
-        
-        .filter-group:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 10%;
-            height: 80%;
-            width: 1px;
-            background: linear-gradient(to bottom, transparent, #dee2e6, transparent);
+            gap: 8px;
         }
         
         .filter-group label {
-            font-weight: 700;
-            color: #1a5f2a;
+            font-weight: 600;
+            color: var(--gray-700);
             font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
+            gap: 6px;
         }
         
         .filter-group select {
-            padding: 16px 20px;
+            padding: 12px 16px;
             font-size: 0.9375rem;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
             background: white;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
-            color: #2c3e50;
+            font-weight: 500;
+            color: var(--gray-900);
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a5f2a' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 44px;
+            background-position: right 12px center;
+            padding-right: 36px;
             font-family: 'Inter', sans-serif;
-        }
-        
-        .filter-group select:hover {
-            border-color: #1a5f2a;
-            box-shadow: 0 6px 16px rgba(26,95,42,0.15);
-            transform: translateY(-2px);
-            background-color: #f8fdf9;
         }
         
         .filter-group select:focus {
             outline: none;
-            border-color: #1a5f2a;
-            box-shadow: 0 0 0 4px rgba(26,95,42,0.1);
-            background-color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 95, 42, 0.1);
         }
         
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 16px;
-            margin-bottom: 40px;
-        }
         
-        .stat-card {
-            color: white;
-            padding: 24px 16px;
-            border-radius: 16px;
-            text-align: center;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-        
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            transition: transform 0.6s;
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-8px) scale(1.02);
-        }
-        
-        .stat-card:hover::before {
-            transform: translate(-25%, -25%);
-        }
-        
-        .stat-card.pegawai { 
-            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
-            box-shadow: 0 4px 14px 0 rgba(52,58,64,0.39);
-        }
-        .stat-card.wfo { 
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            box-shadow: 0 4px 14px 0 rgba(40,167,69,0.39);
-        }
-        .stat-card.dinas { 
-            background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
-            box-shadow: 0 4px 14px 0 rgba(23,162,184,0.39);
-        }
-        .stat-card.undangan { 
-            background: linear-gradient(135deg, #007bff 0%, #6610f2 100%);
-            box-shadow: 0 4px 14px 0 rgba(0,123,255,0.39);
-        }
-        .stat-card.sakit { 
-            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
-            box-shadow: 0 4px 14px 0 rgba(255,193,7,0.39);
-        }
-        .stat-card.ijin { 
-            background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
-            box-shadow: 0 4px 14px 0 rgba(32,201,151,0.39);
-        }
-        .stat-card.cuti { 
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-            box-shadow: 0 4px 14px 0 rgba(108,117,125,0.39);
-        }
-        .stat-card.alpha { 
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            box-shadow: 0 4px 14px 0 rgba(220,53,69,0.39);
-        }
-        
-        .stat-card h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 2.25rem;
-            margin-bottom: 8px;
-            font-weight: 800;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .stat-card p {
-            font-size: 0.75rem;
-            opacity: 0.95;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 450px;
-            margin-bottom: 40px;
-            background: #fafafa;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            border: 1px solid #e0e0e0;
-        }
-        
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            flex-wrap: wrap;
-            margin: 24px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
-        }
-        
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .legend-color {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
         
         .footer {
             text-align: center;
             margin-top: 40px;
             padding-top: 24px;
-            border-top: 2px solid #eee;
-            color: #757575;
+            border-top: 1px solid var(--gray-200);
+            color: var(--gray-600);
+        }
+        
+        .footer p {
+            margin: 6px 0;
+        }
+        
+        .footer .copyright {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .footer .info {
+            font-size: 0.75rem;
+            color: var(--gray-600);
         }
         
         /* Dashboard Per Bidang */
         .bidang-dashboard {
-            margin-top: 48px;
-            padding-top: 32px;
-            border-top: 3px solid #1a5f2a;
+            margin-top: 16px;
+            padding-top: 0;
+        }
+        
+        /* Summary Charts Section */
+        .summary-charts {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        
+        .summary-chart-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .summary-chart-title {
+            text-align: center;
+            color: var(--gray-700);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-chart-container {
+            position: relative;
+            height: 280px;
+        }
+        
+        .treemap-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 2px;
+            height: 280px;
+        }
+        
+        .treemap-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-align: center;
+            padding: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .treemap-item-label {
+            font-size: 0.75rem;
+            margin-bottom: 4px;
+            opacity: 0.9;
+        }
+        
+        .treemap-item-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        @media (max-width: 1024px) {
+            .summary-charts {
+                grid-template-columns: 1fr;
+            }
         }
         
         .bidang-dashboard-title {
             text-align: center;
-            color: #1a5f2a;
+            color: var(--primary);
             font-size: 1.75rem;
-            font-weight: 800;
+            font-weight: 700;
             margin-bottom: 32px;
             font-family: 'Poppins', sans-serif;
             letter-spacing: -0.5px;
+            position: relative;
+            padding-bottom: 16px;
+        }
+        
+        .bidang-dashboard-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
         }
         
         .bidang-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 32px;
             margin-bottom: 32px;
         }
         
         .bidang-card {
             background: white;
-            border: 2px solid #e9ecef;
+            border: 1px solid var(--gray-200);
             border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .bidang-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
-            border-color: #1a5f2a;
+            padding: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
         
         .bidang-card-header {
-            font-size: 1.125rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #1a5f2a;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #1a5f2a;
+            color: var(--gray-700);
+            margin-bottom: 24px;
+            padding-bottom: 0;
+            border-bottom: none;
             font-family: 'Poppins', sans-serif;
+            letter-spacing: -0.5px;
+            text-align: center;
         }
         
         .bidang-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-            font-size: 0.8125rem;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+            font-size: 0.875rem;
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
         }
         
         .bidang-stat-item {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 0;
+            border-bottom: none;
+            gap: 12px;
         }
         
         .bidang-stat-label {
-            color: #757575;
-            font-weight: 500;
+            color: var(--gray-700);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            min-width: 120px;
+            text-align: left;
+        }
+        
+        .bidang-stat-bar {
+            flex: 1;
+            height: 24px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bidang-stat-bar-fill {
+            height: 100%;
+            background: #0284c7;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
         
         .bidang-stat-value {
             font-weight: 700;
-            color: #2c3e50;
+            color: var(--gray-900);
+            font-size: 0.875rem;
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        .bidang-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+            font-size: 0.875rem;
+        }
+        
+        .bidang-table th {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+        }
+        
+        .bidang-table td {
+            padding: 12px 8px;
+            text-align: center;
+            border: 1px solid var(--gray-200);
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+        
+        .bidang-table td:first-child {
+            background: var(--gray-50);
+            font-weight: 600;
+            color: var(--gray-900);
         }
         
         .bidang-chart-container {
-            height: 200px;
-            margin-bottom: 16px;
+            display: none;
         }
         
         .bidang-no-data {
             text-align: center;
-            padding: 48px;
-            color: #9e9e9e;
+            padding: 60px 24px;
+            color: var(--gray-600);
             font-size: 1rem;
             font-weight: 500;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
         }
         
         .footer p {
@@ -425,7 +510,7 @@
         .no-data {
             text-align: center;
             padding: 60px;
-            color: #9e9e9e;
+            color: var(--gray-600);
             font-size: 1.125rem;
             font-weight: 500;
         }
@@ -437,10 +522,6 @@
             
             .header h1 {
                 font-size: 1.5rem;
-            }
-            
-            .chart-container {
-                height: 350px;
             }
             
             .filter-section {
@@ -471,14 +552,6 @@
                 font-size: 0.875rem;
             }
             
-            .stats-cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .stat-card h3 {
-                font-size: 1.75rem;
-            }
-            
             .bidang-grid {
                 grid-template-columns: 1fr;
             }
@@ -492,6 +565,41 @@
             <p>Kejaksaan Tinggi Kepulauan Riau</p>
         </div>
         
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card blue">
+                <div class="info-card-content">
+                    <div class="info-card-label">Total Pegawai</div>
+                    <div class="info-card-value" id="infoTotalPegawai">142</div>
+                </div>
+                <div class="info-card-icon">👥</div>
+            </div>
+            
+            <div class="info-card purple">
+                <div class="info-card-content">
+                    <div class="info-card-label">Hari Kerja</div>
+                    <div class="info-card-value" id="infoHariKerja">21</div>
+                </div>
+                <div class="info-card-icon">📅</div>
+            </div>
+            
+            <div class="info-card red">
+                <div class="info-card-content">
+                    <div class="info-card-label">Check In</div>
+                    <div class="info-card-value" id="infoCheckIn">2965/2982</div>
+                </div>
+                <div class="info-card-icon">📊</div>
+            </div>
+            
+            <div class="info-card orange">
+                <div class="info-card-content">
+                    <div class="info-card-label">Total Bidang</div>
+                    <div class="info-card-value" id="infoTotalBidang">9</div>
+                </div>
+                <div class="info-card-icon">🏢</div>
+            </div>
+        </div>
+        
         <!-- Filter Section -->
         <div class="filter-section">
             <div class="filter-title">
@@ -501,7 +609,7 @@
             <div class="filter-controls">
                 <div class="filter-group">
                     <label for="bulanFilter">📅 Pilih Bulan</label>
-                    <select id="bulanFilter" onchange="updateChart()">
+                    <select id="bulanFilter" onchange="updateBidangDashboard()">
                         <option value="semua">Semua Bulan</option>
                         <option value="Januari">Januari</option>
                         <option value="Februari">Februari</option>
@@ -519,14 +627,14 @@
                 </div>
                 <div class="filter-group">
                     <label for="tahunFilter">� Pilih Tahun</label>
-                    <select id="tahunFilter" onchange="updateChart()">
+                    <select id="tahunFilter" onchange="updateBidangDashboard()">
                         <option value="2025" selected>2025</option>
                         <option value="2026">2026</option>
                     </select>
                 </div>
                 <div class="filter-group">
                     <label for="bidangFilter">🏢 Pilih Bidang</label>
-                    <select id="bidangFilter" onchange="updateChart()">
+                    <select id="bidangFilter" onchange="updateBidangDashboard()">
                         <option value="semua">Semua Bidang</option>
                         <option value="PEMBINAAN">Pembinaan</option>
                         <option value="INTELIJEN">Intelijen</option>
@@ -540,7 +648,7 @@
                 </div>
                 <div class="filter-group">
                     <label for="kategoriFilter">📋 Kategori Data</label>
-                    <select id="kategoriFilter" onchange="updateChart()">
+                    <select id="kategoriFilter" onchange="updateBidangDashboard()">
                         <option value="semua">Semua Kategori</option>
                         <option value="wfo">WFO (Hadir)</option>
                         <option value="dinasLuar">Dinas Luar</option>
@@ -554,76 +662,32 @@
             </div>
         </div>
         
-        <!-- Statistics Cards -->
-        <div class="stats-cards">
-            <div class="stat-card pegawai">
-                <h3 id="statPegawai">142</h3>
-                <p>Total Pegawai</p>
-            </div>
-            <div class="stat-card wfo">
-                <h3 id="statWfo">0</h3>
-                <p>Total WFO</p>
-            </div>
-            <div class="stat-card dinas">
-                <h3 id="statDinas">0</h3>
-                <p>Dinas Luar</p>
-            </div>
-            <div class="stat-card undangan">
-                <h3 id="statUndangan">0</h3>
-                <p>Undangan</p>
-            </div>
-            <div class="stat-card sakit">
-                <h3 id="statSakit">0</h3>
-                <p>Sakit</p>
-            </div>
-            <div class="stat-card ijin">
-                <h3 id="statIjin">0</h3>
-                <p>Ijin</p>
-            </div>
-            <div class="stat-card cuti">
-                <h3 id="statCuti">0</h3>
-                <p>Cuti</p>
-            </div>
-            <div class="stat-card alpha">
-                <h3 id="statAlpha">0</h3>
-                <p>Tidak Absen</p>
-            </div>
-        </div>
         
-        <!-- Chart -->
-        <div class="chart-container">
-            <canvas id="absensiChart"></canvas>
-        </div>
         
-        <!-- Legend -->
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color" style="background: #28a745;"></div>
-                <span>WFO (Hadir)</span>
+        <!-- Summary Charts Section -->
+        <div class="summary-charts" id="summaryCharts">
+            <!-- Treemap: Bidang Pegawai -->
+            <div class="summary-chart-card">
+                <h3 class="summary-chart-title">Bidang Pegawai</h3>
+                <div class="treemap-container" id="treemapContainer">
+                    <!-- Will be generated dynamically -->
+                </div>
             </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #17a2b8;"></div>
-                <span>Dinas Luar</span>
+            
+            <!-- Donut Chart: Persentase Kehadiran -->
+            <div class="summary-chart-card">
+                <h3 class="summary-chart-title">Persentase Kehadiran Keseluruhan</h3>
+                <div class="summary-chart-container">
+                    <canvas id="attendanceDonutChart"></canvas>
+                </div>
             </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #007bff;"></div>
-                <span>Undangan</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #ffc107;"></div>
-                <span>Sakit</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #20c997;"></div>
-                <span>Ijin</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #6c757d;"></div>
-                <span>Cuti</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background: #dc3545;"></div>
-                <span>Tidak Absen</span>
+            
+            <!-- Donut Chart: Tanpa Keterangan -->
+            <div class="summary-chart-card">
+                <h3 class="summary-chart-title">Tanpa Keterangan</h3>
+                <div class="summary-chart-container">
+                    <canvas id="absenceDonutChart"></canvas>
+                </div>
             </div>
         </div>
         
@@ -875,8 +939,7 @@
 
 
 
-        let chartInstance;
-
+        // datasetConfig still used by bidang dashboard
         const datasetConfig = {
             wfo: { label: 'WFO (Hadir)', color: '#28a745', border: '#1e7e34' },
             dinasLuar: { label: 'Dinas Luar', color: '#17a2b8', border: '#138496' },
@@ -887,180 +950,186 @@
             tidakAbsen: { label: 'Tidak Absen', color: '#dc3545', border: '#c82333' }
         };
 
-        async function initChart() {
-            const ctx = document.getElementById('absensiChart').getContext('2d');
-            const data = await getSelectedData();
-            
-            // If no data, show empty chart
-            if (!data) {
-                chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: { labels: [], datasets: [] },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            title: {
-                                display: true,
-                                text: 'DATA BELUM TERSEDIA',
-                                font: { size: 18, weight: 'bold' },
-                                color: '#6c757d',
-                                padding: { bottom: 20 }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                stacked: true,
-                                title: { display: true, text: 'TANGGAL', font: { weight: 'bold', size: 14 } },
-                                grid: { display: false }
-                            },
-                            y: {
-                                stacked: true,
-                                beginAtZero: true,
-                                max: 160,
-                                title: { display: true, text: 'JUMLAH PEGAWAI', font: { weight: 'bold', size: 14 } }
-                            }
-                        }
-                    }
-                });
-                updateStatsEmpty();
+        // Update Summary Charts (Treemap + Donut Charts)
+        let attendanceDonutChart = null;
+        let absenceDonutChart = null;
+        
+        async function updateSummaryCharts(bulan, tahun) {
+            if (bulan === 'semua') {
+                document.getElementById('treemapContainer').innerHTML = '<div style="text-align:center; padding:40px; color:#666;">Pilih bulan spesifik</div>';
+                document.getElementById('infoHariKerja').textContent = '-';
+                document.getElementById('infoCheckIn').textContent = '-';
                 return;
             }
             
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
+            const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR'];
+            const bidangColors = ['#1e3a8a', '#0284c7', '#06b6d4', '#f59e0b', '#fbbf24', '#d97706', '#b45309', '#dc2626'];
+            
+            let bidangData = [];
+            let totalWfoAll = 0, totalDinasAll = 0, totalUndanganAll = 0;
+            let totalSakitAll = 0, totalIjinAll = 0, totalCutiAll = 0, totalAlphaAll = 0;
+            let uniqueDates = new Set();
+            
+            // Fetch data for all bidang
+            for (let i = 0; i < bidangList.length; i++) {
+                const data = await fetchFromSupabase(tahun, bulan, bidangList[i]);
+                if (data && data.labels.length > 0) {
+                    const sum = arr => arr.reduce((a, b) => a + b, 0);
+                    const totalWfo = sum(data.wfo);
+                    const totalDinas = sum(data.dinasLuar);
+                    const totalUndangan = sum(data.undangan);
+                    const totalSakit = sum(data.sakit);
+                    const totalIjin = sum(data.ijin);
+                    const totalCuti = sum(data.cuti);
+                    const totalAlpha = sum(data.tidakAbsen);
+                    const grandTotal = totalWfo + totalDinas + totalUndangan + totalSakit + totalIjin + totalCuti + totalAlpha;
+                    
+                    bidangData.push({
+                        name: bidangList[i],
+                        value: grandTotal,
+                        color: bidangColors[i]
+                    });
+                    
+                    totalWfoAll += totalWfo;
+                    totalDinasAll += totalDinas;
+                    totalUndanganAll += totalUndangan;
+                    totalSakitAll += totalSakit;
+                    totalIjinAll += totalIjin;
+                    totalCutiAll += totalCuti;
+                    totalAlphaAll += totalAlpha;
+                    
+                    // Collect unique dates
+                    data.labels.forEach(date => uniqueDates.add(date));
+                }
+            }
+            
+            // Update Info Cards
+            const hariKerja = uniqueDates.size;
+            const totalCheckIn = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll;
+            const totalExpected = 142 * hariKerja; // Total pegawai * hari kerja
+            
+            document.getElementById('infoHariKerja').textContent = hariKerja;
+            document.getElementById('infoCheckIn').textContent = `${totalCheckIn}/${totalExpected}`;
+            
+            // Generate Treemap
+            generateTreemap(bidangData);
+            
+            // Generate Attendance Donut Chart
+            const grandTotalAll = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalAlphaAll;
+            generateAttendanceDonut(totalWfoAll, totalDinasAll, totalUndanganAll, totalSakitAll, totalIjinAll, totalCutiAll, totalAlphaAll, grandTotalAll);
+            
+            // Generate Absence Donut Chart
+            generateAbsenceDonut(totalAlphaAll, grandTotalAll - totalAlphaAll);
+        }
+        
+        function generateTreemap(bidangData) {
+            const container = document.getElementById('treemapContainer');
+            container.innerHTML = bidangData.map(item => `
+                <div class="treemap-item" style="background: ${item.color};">
+                    <div class="treemap-item-label">${item.name}</div>
+                    <div class="treemap-item-value">${item.value}</div>
+                </div>
+            `).join('');
+        }
+        
+        function generateAttendanceDonut(wfo, dinas, undangan, sakit, ijin, cuti, alpha, total) {
+            const ctx = document.getElementById('attendanceDonutChart').getContext('2d');
+            
+            if (attendanceDonutChart) {
+                attendanceDonutChart.destroy();
+            }
+            
+            const pctWfo = total > 0 ? ((wfo / total) * 100).toFixed(1) : 0;
+            const pctDinas = total > 0 ? ((dinas / total) * 100).toFixed(1) : 0;
+            const pctUndangan = total > 0 ? ((undangan / total) * 100).toFixed(1) : 0;
+            const pctSakit = total > 0 ? ((sakit / total) * 100).toFixed(1) : 0;
+            const pctIjin = total > 0 ? ((ijin / total) * 100).toFixed(1) : 0;
+            const pctCuti = total > 0 ? ((cuti / total) * 100).toFixed(1) : 0;
+            const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
+            
+            attendanceDonutChart = new Chart(ctx, {
+                type: 'doughnut',
                 data: {
-                    labels: data.labels,
-                    datasets: Object.keys(datasetConfig).map(key => ({
-                        label: datasetConfig[key].label,
-                        data: data[key],
-                        backgroundColor: datasetConfig[key].color,
-                        borderColor: datasetConfig[key].border,
-                        borderWidth: 1,
-                        barPercentage: 0.9,
-                        categoryPercentage: 1.0
-                    }))
+                    labels: ['WFO', 'Dinas Luar', 'Undangan', 'Sakit', 'Ijin', 'Cuti', 'Tidak Absen'],
+                    datasets: [{
+                        data: [wfo, dinas, undangan, sakit, ijin, cuti, alpha],
+                        backgroundColor: ['#059669', '#0284c7', '#2563eb', '#d97706', '#0d9488', '#4f46e5', '#e11d48'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { display: false },
-                        title: {
-                            display: true,
-                            text: 'GRAFIK BATANG ABSENSI HARIAN - DESEMBER 2025',
-                            font: { size: 18, weight: 'bold' },
-                            color: '#1a5f2a',
-                            padding: { bottom: 20 }
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: { size: 10 },
+                                padding: 8,
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => ({
+                                        text: `${label} ${[pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha][i]}%`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    }));
+                                }
+                            }
                         }
                     },
-                    scales: {
-                        x: {
-                            stacked: true,
-                            title: { display: true, text: 'TANGGAL', font: { weight: 'bold', size: 14 } },
-                            grid: { display: false },
-                            ticks: {
-                                autoSkip: false,
-                                maxRotation: 0,
-                                minRotation: 0,
-                                font: { size: 10 }
-                            }
-                        },
-                        y: {
-                            stacked: true,
-                            beginAtZero: true,
-                            max: 160,
-                            title: { display: true, text: 'JUMLAH PEGAWAI', font: { weight: 'bold', size: 14 } }
-                        }
-                    }
+                    cutout: '60%'
                 }
             });
-            
-            updateStats();
-            updateBidangDashboard(); // Init dashboard per bidang
         }
-
-        async function updateChart() {
-            const bulan = document.getElementById('bulanFilter').value;
-            const tahun = document.getElementById('tahunFilter').value;
-            const kategori = document.getElementById('kategoriFilter').value;
-            const data = await getSelectedData();
-
-            // Jika data tidak tersedia untuk kombinasi tahun/bulan yang dipilih
-            if (!data) {
-                chartInstance.data.labels = [];
-                chartInstance.data.datasets = [];
-                chartInstance.options.plugins.title.text = 'DATA BELUM TERSEDIA - ' + bulanNama[bulan] + ' ' + tahun;
-                chartInstance.update();
-                updateStatsEmpty();
-                return;
-            }
-
-            if (kategori === 'semua') {
-                chartInstance.data.datasets = Object.keys(datasetConfig).map(key => ({
-                    label: datasetConfig[key].label,
-                    data: data[key],
-                    backgroundColor: datasetConfig[key].color,
-                    borderColor: datasetConfig[key].border,
-                    borderWidth: 1,
-                    barPercentage: 0.9,
-                    categoryPercentage: 1.0
-                }));
-                chartInstance.options.scales.x.stacked = true;
-                chartInstance.options.scales.y.stacked = true;
-                chartInstance.options.scales.y.max = 160;
-            } else {
-                const config = datasetConfig[kategori];
-                chartInstance.data.datasets = [{
-                    label: config.label,
-                    data: data[kategori],
-                    backgroundColor: config.color,
-                    borderColor: config.border,
-                    borderWidth: 1,
-                    barPercentage: 0.9,
-                    categoryPercentage: 1.0
-                }];
-                chartInstance.options.scales.x.stacked = false;
-                chartInstance.options.scales.y.stacked = false;
-                chartInstance.options.scales.y.max = kategori === 'wfo' ? 150 : 80;
-            }
-
-            chartInstance.data.labels = data.labels;
-            chartInstance.options.plugins.title.text = 'GRAFIK BATANG ABSENSI HARIAN - ' + bulanNama[bulan] + ' ' + tahun;
-            chartInstance.update();
+        
+        function generateAbsenceDonut(alpha, hadir) {
+            const ctx = document.getElementById('absenceDonutChart').getContext('2d');
             
-            updateStats();
-            updateBidangDashboard(); // Update dashboard per bidang
-        }
-
-        async function updateStats() {
-            const data = await getSelectedData();
-            if (!data) {
-                updateStatsEmpty();
-                return;
+            if (absenceDonutChart) {
+                absenceDonutChart.destroy();
             }
-            const sum = arr => arr.reduce((a, b) => a + b, 0);
             
-            document.getElementById('statPegawai').textContent = data.totalPegawai;
-            document.getElementById('statWfo').textContent = sum(data.wfo).toLocaleString();
-            document.getElementById('statDinas').textContent = sum(data.dinasLuar).toLocaleString();
-            document.getElementById('statUndangan').textContent = sum(data.undangan).toLocaleString();
-            document.getElementById('statSakit').textContent = sum(data.sakit).toLocaleString();
-            document.getElementById('statIjin').textContent = sum(data.ijin).toLocaleString();
-            document.getElementById('statCuti').textContent = sum(data.cuti).toLocaleString();
-            document.getElementById('statAlpha').textContent = sum(data.tidakAbsen).toLocaleString();
-        }
-
-        function updateStatsEmpty() {
-            document.getElementById('statPegawai').textContent = '-';
-            document.getElementById('statWfo').textContent = '-';
-            document.getElementById('statDinas').textContent = '-';
-            document.getElementById('statUndangan').textContent = '-';
-            document.getElementById('statSakit').textContent = '-';
-            document.getElementById('statIjin').textContent = '-';
-            document.getElementById('statCuti').textContent = '-';
-            document.getElementById('statAlpha').textContent = '-';
+            const total = alpha + hadir;
+            const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
+            const pctHadir = total > 0 ? ((hadir / total) * 100).toFixed(1) : 0;
+            
+            absenceDonutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Tanpa Keterangan', 'Absen'],
+                    datasets: [{
+                        data: [alpha, hadir],
+                        backgroundColor: ['#1e3a8a', '#e5e7eb'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 11 },
+                                padding: 12,
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => ({
+                                        text: `${label} ${[pctAlpha, pctHadir][i]}%`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    }));
+                                }
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
         }
 
         // Update Dashboard Per Bidang
@@ -1068,6 +1137,9 @@
             const bulan = document.getElementById('bulanFilter').value;
             const tahun = document.getElementById('tahunFilter').value;
             const bidangGrid = document.getElementById('bidangGrid');
+            
+            // Update summary charts first
+            await updateSummaryCharts(bulan, tahun);
             
             // Skip if "semua bulan" selected
             if (bulan === 'semua') {
@@ -1120,38 +1192,95 @@
                             <div class="bidang-card-header">${bidang}</div>
                             <div class="bidang-stats">
                                 <div class="bidang-stat-item">
-                                    <span class="bidang-stat-label">TOTAL ABSEN:</span>
-                                    <span class="bidang-stat-value">${grandTotal}</span>
+                                    <span class="bidang-stat-label">TIDAK ABSEN</span>
+                                    <div class="bidang-stat-bar">
+                                        <div class="bidang-stat-bar-fill" style="width: ${pctAlpha}%; background: #e11d48;">
+                                            ${pctAlpha > 5 ? pctAlpha + '%' : ''}
+                                        </div>
+                                    </div>
+                                    <span class="bidang-stat-value">${pctAlpha}%</span>
                                 </div>
                                 <div class="bidang-stat-item">
-                                    <span class="bidang-stat-label">WFO:</span>
-                                    <span class="bidang-stat-value">${pctWfo}%</span>
-                                </div>
-                                <div class="bidang-stat-item">
-                                    <span class="bidang-stat-label">DINAS LUAR:</span>
-                                    <span class="bidang-stat-value">${pctDinas}%</span>
-                                </div>
-                                <div class="bidang-stat-item">
-                                    <span class="bidang-stat-label">UNDANGAN:</span>
-                                    <span class="bidang-stat-value">${pctUndangan}%</span>
-                                </div>
-                                <div class="bidang-stat-item">
-                                    <span class="bidang-stat-label">SAKIT:</span>
-                                    <span class="bidang-stat-value">${pctSakit}%</span>
-                                </div>
-                                <div class="bidang-stat-item">
-                                    <span class="bidang-stat-label">IJIN:</span>
-                                    <span class="bidang-stat-value">${pctIjin}%</span>
-                                </div>
-                                <div class="bidang-stat-item">
-                                    <span class="bidang-stat-label">CUTI:</span>
+                                    <span class="bidang-stat-label">CUTI</span>
+                                    <div class="bidang-stat-bar">
+                                        <div class="bidang-stat-bar-fill" style="width: ${pctCuti}%; background: #4f46e5;">
+                                            ${pctCuti > 5 ? pctCuti + '%' : ''}
+                                        </div>
+                                    </div>
                                     <span class="bidang-stat-value">${pctCuti}%</span>
                                 </div>
                                 <div class="bidang-stat-item">
-                                    <span class="bidang-stat-label">TIDAK ABSEN:</span>
-                                    <span class="bidang-stat-value">${pctAlpha}%</span>
+                                    <span class="bidang-stat-label">IJIN</span>
+                                    <div class="bidang-stat-bar">
+                                        <div class="bidang-stat-bar-fill" style="width: ${pctIjin}%; background: #0d9488;">
+                                            ${pctIjin > 5 ? pctIjin + '%' : ''}
+                                        </div>
+                                    </div>
+                                    <span class="bidang-stat-value">${pctIjin}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">SAKIT</span>
+                                    <div class="bidang-stat-bar">
+                                        <div class="bidang-stat-bar-fill" style="width: ${pctSakit}%; background: #d97706;">
+                                            ${pctSakit > 5 ? pctSakit + '%' : ''}
+                                        </div>
+                                    </div>
+                                    <span class="bidang-stat-value">${pctSakit}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">UNDANGAN</span>
+                                    <div class="bidang-stat-bar">
+                                        <div class="bidang-stat-bar-fill" style="width: ${pctUndangan}%; background: #2563eb;">
+                                            ${pctUndangan > 5 ? pctUndangan + '%' : ''}
+                                        </div>
+                                    </div>
+                                    <span class="bidang-stat-value">${pctUndangan}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">DINAS LUAR</span>
+                                    <div class="bidang-stat-bar">
+                                        <div class="bidang-stat-bar-fill" style="width: ${pctDinas}%; background: #0284c7;">
+                                            ${pctDinas > 5 ? pctDinas + '%' : ''}
+                                        </div>
+                                    </div>
+                                    <span class="bidang-stat-value">${pctDinas}%</span>
+                                </div>
+                                <div class="bidang-stat-item">
+                                    <span class="bidang-stat-label">WFO</span>
+                                    <div class="bidang-stat-bar">
+                                        <div class="bidang-stat-bar-fill" style="width: ${pctWfo}%; background: #059669;">
+                                            ${pctWfo > 5 ? pctWfo + '%' : ''}
+                                        </div>
+                                    </div>
+                                    <span class="bidang-stat-value">${pctWfo}%</span>
                                 </div>
                             </div>
+                            <table class="bidang-table">
+                                <thead>
+                                    <tr>
+                                        <th>📊 Jumlah</th>
+                                        <th>WFO</th>
+                                        <th>DINAS LUAR</th>
+                                        <th>UNDANGAN</th>
+                                        <th>SAKIT</th>
+                                        <th>IJIN</th>
+                                        <th>CUTI</th>
+                                        <th>TIDAK ABSEN</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Total</td>
+                                        <td>${totalWfo}</td>
+                                        <td>${totalDinas}</td>
+                                        <td>${totalUndangan}</td>
+                                        <td>${totalSakit}</td>
+                                        <td>${totalIjin}</td>
+                                        <td>${totalCuti}</td>
+                                        <td>${totalAlpha}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                             <div class="bidang-chart-container">
                                 <canvas id="${canvasId}"></canvas>
                             </div>
@@ -1213,7 +1342,7 @@
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            initChart();
+            updateBidangDashboard();
         });
     </script>
 </body>
