@@ -984,6 +984,47 @@
         let attendanceDonutChart = null;
         let absenceDonutChart = null;
         
+        /**
+         * Fetch rekapitulasi data from Supabase (OPTIONAL)
+         * @param {string} bulan - Nama bulan
+         * @param {number} tahun - Tahun
+         * @returns {Promise<Object|null>} Rekapitulasi data atau null
+         */
+        async function fetchRekapitulasi(bulan, tahun) {
+            if (!supabaseClient) return null;
+            
+            try {
+                console.log(`🔍 Checking for rekapitulasi data: ${bulan} ${tahun}`);
+                
+                const { data, error } = await supabaseClient
+                    .from('rekapitulasi')
+                    .select('*')
+                    .eq('bulan', bulan)
+                    .eq('tahun', parseInt(tahun))
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        // No rows found - this is OK
+                        console.log('ℹ️ No rekapitulasi data found, will use calculated data');
+                        return null;
+                    }
+                    console.error('⚠️ Error fetching rekapitulasi:', error);
+                    return null;
+                }
+                
+                if (data) {
+                    console.log('✅ Using rekapitulasi data from database:', data);
+                    return data;
+                }
+                
+                return null;
+            } catch (error) {
+                console.error('⚠️ Error in fetchRekapitulasi:', error);
+                return null;
+            }
+        }
+        
         async function updateSummaryCharts(bulan, tahun) {
             if (bulan === 'semua') {
                 document.getElementById('treemapContainer').innerHTML = '<div style="text-align:center; padding:40px; color:#666;">Pilih bulan spesifik</div>';
@@ -1047,12 +1088,43 @@
             // Generate Treemap
             generateTreemap(bidangData);
             
+            // ============================================
+            // TRY TO USE REKAPITULASI DATA (OPTIONAL)
+            // If not available, use calculated data
+            // ============================================
+            const rekapData = await fetchRekapitulasi(bulan, tahun);
+            
+            let finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal;
+            
+            if (rekapData && rekapData.total > 0) {
+                // Use rekapitulasi data from database
+                console.log('✅ Using REKAPITULASI data for donut chart');
+                finalWfo = rekapData.wfo;
+                finalDinas = rekapData.dinas_luar;
+                finalUndangan = rekapData.undangan;
+                finalSakit = rekapData.sakit;
+                finalIjin = rekapData.ijin;
+                finalCuti = rekapData.cuti;
+                finalAlpha = rekapData.tidak_absen;
+                finalTotal = rekapData.total;
+            } else {
+                // Use calculated data from absensi table (existing logic)
+                console.log('ℹ️ Using CALCULATED data for donut chart');
+                finalWfo = totalWfoAll;
+                finalDinas = totalDinasAll;
+                finalUndangan = totalUndanganAll;
+                finalSakit = totalSakitAll;
+                finalIjin = totalIjinAll;
+                finalCuti = totalCutiAll;
+                finalAlpha = totalAlphaAll;
+                finalTotal = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalAlphaAll;
+            }
+            
             // Generate Attendance Donut Chart
-            const grandTotalAll = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalAlphaAll;
-            generateAttendanceDonut(totalWfoAll, totalDinasAll, totalUndanganAll, totalSakitAll, totalIjinAll, totalCutiAll, totalAlphaAll, grandTotalAll);
+            generateAttendanceDonut(finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal);
             
             // Generate Absence Donut Chart
-            generateAbsenceDonut(totalAlphaAll, grandTotalAll - totalAlphaAll);
+            generateAbsenceDonut(finalAlpha, finalTotal - finalAlpha);
         }
         
         function generateTreemap(bidangData) {
