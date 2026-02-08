@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Kejaksaan Tinggi Kepulauan Riau</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* ============================================
+           PROFESSIONAL UI/UX v3.2.0
+           Analytics Dashboard
+           ============================================ */
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            animation: fadeInUp 0.6s cubic-bezier(0, 0, 0.2, 1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 3px solid #1a5f2a;
+        }
+        
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            color: #1a5f2a;
+            font-size: 2rem;
+            margin-bottom: 12px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            color: #757575;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            padding: 24px;
+            background: #fafbfc;
+            border-radius: 16px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .controls select, .controls button {
+            padding: 14px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .controls select {
+            background: white;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+        
+        .controls select:hover {
+            border-color: #1a5f2a;
+            box-shadow: 0 4px 12px rgba(26,95,42,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .controls select:focus {
+            outline: none;
+            border-color: #1a5f2a;
+            box-shadow: 0 0 0 4px rgba(26,95,42,0.1);
+        }
+        
+        .controls button {
+            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            box-shadow: 0 4px 14px 0 rgba(26,95,42,0.39);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .controls button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(26,95,42,0.5);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            border-left: 5px solid #1a5f2a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(26,95,42,0.05) 0%, transparent 70%);
+            transition: transform 0.6s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card:hover::before {
+            transform: translate(-25%, -25%);
+        }
+        
+        .stat-card h3 {
+            color: #757575;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        
+        .stat-card .value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #1a5f2a;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-card .trend {
+            font-size: 0.875rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .trend.up { color: #28a745; }
+        .trend.down { color: #dc3545; }
+        .trend.neutral { color: #6c757d; }
+        
+        .chart-container {
+            background: #fafafa;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .chart-container:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .chart-container h2 {
+            font-family: 'Poppins', sans-serif;
+            color: #1a5f2a;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .top-bidang {
+            background: #fafafa;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .top-bidang h2 {
+            font-family: 'Poppins', sans-serif;
+            color: #1a5f2a;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .bidang-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 24px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 4px solid transparent;
+        }
+        
+        .bidang-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            border-left-color: #1a5f2a;
+        }
+        
+        .bidang-rank {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1a5f2a;
+            width: 60px;
+            text-align: center;
+        }
+        
+        .bidang-name {
+            flex: 1;
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: #2c3e50;
+        }
+        
+        .bidang-value {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #2d8f4e;
+        }
+        
+        .alert-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 24px 28px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 12px rgba(255,193,7,0.2);
+        }
+        
+        .alert-box h3 {
+            font-family: 'Poppins', sans-serif;
+            color: #856404;
+            margin-bottom: 16px;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .alert-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #ffeaa7;
+            font-weight: 500;
+            color: #856404;
+        }
+        
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #757575;
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-card .value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Analytics Dashboard</h1>
+            <p>Analisis Data Absensi - Kejaksaan Tinggi Kepulauan Riau</p>
+        </div>
+        
+        <div class="controls">
+            <select id="tahun">
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+                <option value="2027">2027</option>
+            </select>
+            <select id="bulan">
+                <option value="Januari">Januari</option>
+                <option value="Februari">Februari</option>
+                <option value="Maret">Maret</option>
+                <option value="April">April</option>
+                <option value="Mei">Mei</option>
+                <option value="Juni">Juni</option>
+                <option value="Juli">Juli</option>
+                <option value="Agustus">Agustus</option>
+                <option value="September">September</option>
+                <option value="Oktober">Oktober</option>
+                <option value="November" selected>November</option>
+                <option value="Desember">Desember</option>
+            </select>
+            <button onclick="loadAnalytics()">🔄 Refresh Data</button>
+            <button onclick="window.location.href='index.html'">🏠 Dashboard Utama</button>
+        </div>
+        
+        <div id="loading" class="loading">
+            ⏳ Memuat data analytics...
+        </div>
+        
+        <div id="content" style="display: none;">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>📈 Trend WFO</h3>
+                    <div class="value" id="trendWFO">-</div>
+                    <div class="trend" id="trendWFOText">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🚗 Trend Dinas Luar</h3>
+                    <div class="value" id="trendDL">-</div>
+                    <div class="trend" id="trendDLText">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⚠️ Trend Tidak Absen</h3>
+                    <div class="value" id="trendTA">-</div>
+                    <div class="trend" id="trendTAText">-</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📊 Rata-rata Harian</h3>
+                    <div class="value" id="avgDaily">-</div>
+                    <div class="trend" id="avgDailyText">pegawai/hari</div>
+                </div>
+            </div>
+            
+            <!-- Trend Chart -->
+            <div class="chart-container">
+                <h2>📈 Trend 6 Bulan Terakhir</h2>
+                <canvas id="trendChart"></canvas>
+            </div>
+            
+            <!-- Top Bidang -->
+            <div class="top-bidang">
+                <h2>🏆 Top 5 Bidang (WFO Tertinggi)</h2>
+                <div id="topBidang"></div>
+            </div>
+            
+            <!-- Alerts -->
+            <div class="alert-box" id="alertBox" style="display: none;">
+                <h3>⚠️ Perhatian Khusus</h3>
+                <div id="alerts"></div>
+            </div>
+            
+            <!-- Comparison Chart -->
+            <div class="chart-container">
+                <h2>📊 Perbandingan Per Bidang</h2>
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://iudtxznbakaqzygpkaxf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
+        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let trendChart, comparisonChart;
+        
+        async function loadAnalytics() {
+            const tahun = parseInt(document.getElementById('tahun').value);
+            const bulan = document.getElementById('bulan').value;
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+            
+            try {
+                // Get current month data
+                const { data: currentData } = await sbClient
+                    .from('absensi')
+                    .select('*')
+                    .eq('tahun', tahun)
+                    .eq('bulan', bulan);
+                
+                // Get previous month data for comparison
+                const prevMonth = getPreviousMonth(bulan);
+                const { data: prevData } = await sbClient
+                    .from('absensi')
+                    .select('*')
+                    .eq('tahun', prevMonth.tahun)
+                    .eq('bulan', prevMonth.bulan);
+                
+                // Get 6 months data for trend
+                const last6Months = getLast6Months(tahun, bulan);
+                const trendData = await Promise.all(
+                    last6Months.map(m => 
+                        sbClient.from('absensi').select('*').eq('tahun', m.tahun).eq('bulan', m.bulan)
+                    )
+                );
+                
+                // Calculate analytics
+                calculateTrends(currentData, prevData);
+                renderTopBidang(currentData);
+                renderAlerts(currentData, prevData);
+                renderTrendChart(trendData, last6Months);
+                renderComparisonChart(currentData);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                alert('Error loading analytics: ' + error.message);
+            }
+        }
+        
+        function calculateTrends(current, previous) {
+            const currentTotals = calculateTotals(current);
+            const prevTotals = calculateTotals(previous);
+            
+            // WFO Trend
+            const wfoChange = ((currentTotals.wfo - prevTotals.wfo) / prevTotals.wfo * 100).toFixed(1);
+            document.getElementById('trendWFO').textContent = wfoChange > 0 ? `+${wfoChange}%` : `${wfoChange}%`;
+            document.getElementById('trendWFOText').textContent = wfoChange > 0 ? '↗️ Naik vs bulan lalu' : wfoChange < 0 ? '↘️ Turun vs bulan lalu' : '→ Stabil';
+            document.getElementById('trendWFOText').className = 'trend ' + (wfoChange > 0 ? 'up' : wfoChange < 0 ? 'down' : 'neutral');
+            
+            // Dinas Luar Trend
+            const dlChange = ((currentTotals.dinas_luar - prevTotals.dinas_luar) / prevTotals.dinas_luar * 100).toFixed(1);
+            document.getElementById('trendDL').textContent = dlChange > 0 ? `+${dlChange}%` : `${dlChange}%`;
+            document.getElementById('trendDLText').textContent = dlChange > 0 ? '↗️ Naik vs bulan lalu' : dlChange < 0 ? '↘️ Turun vs bulan lalu' : '→ Stabil';
+            document.getElementById('trendDLText').className = 'trend ' + (dlChange > 0 ? 'up' : dlChange < 0 ? 'down' : 'neutral');
+            
+            // Tidak Absen Trend
+            const taChange = ((currentTotals.tidak_absen - prevTotals.tidak_absen) / prevTotals.tidak_absen * 100).toFixed(1);
+            document.getElementById('trendTA').textContent = taChange > 0 ? `+${taChange}%` : `${taChange}%`;
+            document.getElementById('trendTAText').textContent = taChange > 0 ? '↗️ Naik vs bulan lalu' : taChange < 0 ? '↘️ Turun vs bulan lalu' : '→ Stabil';
+            document.getElementById('trendTAText').className = 'trend ' + (taChange > 0 ? 'down' : taChange < 0 ? 'up' : 'neutral'); // Reversed: up is bad
+            
+            // Average Daily
+            const uniqueDates = [...new Set(current.map(r => r.tanggal))].length;
+            const avgDaily = Math.round(currentTotals.wfo / uniqueDates);
+            document.getElementById('avgDaily').textContent = avgDaily;
+            document.getElementById('avgDailyText').textContent = `dari ${uniqueDates} hari kerja`;
+        }
+        
+        function calculateTotals(data) {
+            return data.reduce((acc, row) => ({
+                wfo: acc.wfo + row.wfo,
+                dinas_luar: acc.dinas_luar + row.dinas_luar,
+                tidak_absen: acc.tidak_absen + row.tidak_absen
+            }), { wfo: 0, dinas_luar: 0, tidak_absen: 0 });
+        }
+        
+        function renderTopBidang(data) {
+            const bidangTotals = {};
+            data.filter(r => r.bidang !== 'GABUNGAN').forEach(row => {
+                if (!bidangTotals[row.bidang]) bidangTotals[row.bidang] = 0;
+                bidangTotals[row.bidang] += row.wfo;
+            });
+            
+            const sorted = Object.entries(bidangTotals)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            const html = sorted.map((item, index) => `
+                <div class="bidang-item">
+                    <div class="bidang-rank">${index + 1}</div>
+                    <div class="bidang-name">${item[0]}</div>
+                    <div class="bidang-value">${item[1]}</div>
+                </div>
+            `).join('');
+            
+            document.getElementById('topBidang').innerHTML = html;
+        }
+        
+        function renderAlerts(current, previous) {
+            const alerts = [];
+            
+            // Check each bidang for significant changes
+            const bidangs = [...new Set(current.map(r => r.bidang))].filter(b => b !== 'GABUNGAN');
+            
+            bidangs.forEach(bidang => {
+                const currTA = current.filter(r => r.bidang === bidang).reduce((sum, r) => sum + r.tidak_absen, 0);
+                const prevTA = previous.filter(r => r.bidang === bidang).reduce((sum, r) => sum + r.tidak_absen, 0);
+                
+                if (prevTA > 0) {
+                    const change = ((currTA - prevTA) / prevTA * 100).toFixed(1);
+                    if (Math.abs(change) > 15) {
+                        alerts.push(`${bidang}: Tidak Absen ${change > 0 ? 'naik' : 'turun'} ${Math.abs(change)}% vs bulan lalu`);
+                    }
+                }
+            });
+            
+            if (alerts.length > 0) {
+                document.getElementById('alertBox').style.display = 'block';
+                document.getElementById('alerts').innerHTML = alerts.map(a => `<div class="alert-item">⚠️ ${a}</div>`).join('');
+            } else {
+                document.getElementById('alertBox').style.display = 'none';
+            }
+        }
+        
+        function renderTrendChart(trendData, months) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            const labels = months.map(m => m.bulan);
+            const wfoData = trendData.map(d => d.data ? d.data.reduce((sum, r) => sum + r.wfo, 0) : 0);
+            const dlData = trendData.map(d => d.data ? d.data.reduce((sum, r) => sum + r.dinas_luar, 0) : 0);
+            const taData = trendData.map(d => d.data ? d.data.reduce((sum, r) => sum + r.tidak_absen, 0) : 0);
+            
+            if (trendChart) trendChart.destroy();
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'WFO',
+                            data: wfoData,
+                            borderColor: '#1a5f2a',
+                            backgroundColor: 'rgba(26, 95, 42, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Dinas Luar',
+                            data: dlData,
+                            borderColor: '#2d8f4e',
+                            backgroundColor: 'rgba(45, 143, 78, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Tidak Absen',
+                            data: taData,
+                            borderColor: '#dc3545',
+                            backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+        
+        function renderComparisonChart(data) {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            
+            const bidangs = [...new Set(data.map(r => r.bidang))].filter(b => b !== 'GABUNGAN');
+            const wfoData = bidangs.map(b => data.filter(r => r.bidang === b).reduce((sum, r) => sum + r.wfo, 0));
+            const dlData = bidangs.map(b => data.filter(r => r.bidang === b).reduce((sum, r) => sum + r.dinas_luar, 0));
+            
+            if (comparisonChart) comparisonChart.destroy();
+            
+            comparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: bidangs,
+                    datasets: [
+                        {
+                            label: 'WFO',
+                            data: wfoData,
+                            backgroundColor: '#1a5f2a'
+                        },
+                        {
+                            label: 'Dinas Luar',
+                            data: dlData,
+                            backgroundColor: '#2d8f4e'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+        
+        function getPreviousMonth(bulan) {
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const index = months.indexOf(bulan);
+            const tahun = parseInt(document.getElementById('tahun').value);
+            
+            if (index === 0) {
+                return { tahun: tahun - 1, bulan: 'Desember' };
+            } else {
+                return { tahun: tahun, bulan: months[index - 1] };
+            }
+        }
+        
+        function getLast6Months(tahun, bulan) {
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const result = [];
+            let currentIndex = months.indexOf(bulan);
+            let currentYear = tahun;
+            
+            for (let i = 0; i < 6; i++) {
+                result.unshift({ tahun: currentYear, bulan: months[currentIndex] });
+                currentIndex--;
+                if (currentIndex < 0) {
+                    currentIndex = 11;
+                    currentYear--;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Load on page load
+        window.addEventListener('load', loadAnalytics);
+    </script>
+</body>
+</html>

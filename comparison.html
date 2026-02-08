@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparison Mode - Kejaksaan Tinggi Kepulauan Riau</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        /* ============================================
+           PROFESSIONAL UI/UX v3.2.0
+           Comparison Mode
+           ============================================ */
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            animation: fadeInUp 0.6s cubic-bezier(0, 0, 0.2, 1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 3px solid #1a5f2a;
+        }
+        
+        .header h1 {
+            font-family: 'Poppins', sans-serif;
+            color: #1a5f2a;
+            font-size: 2rem;
+            margin-bottom: 12px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .header p {
+            color: #757575;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .control-group {
+            background: #fafbfc;
+            padding: 28px;
+            border-radius: 16px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .control-group:hover {
+            border-color: #1a5f2a;
+            box-shadow: 0 6px 16px rgba(26,95,42,0.1);
+        }
+        
+        .control-group h3 {
+            font-family: 'Poppins', sans-serif;
+            color: #1a5f2a;
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .control-group select {
+            width: 100%;
+            padding: 14px 20px;
+            margin-bottom: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 0.9375rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            background: white;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .control-group select:hover {
+            border-color: #1a5f2a;
+            box-shadow: 0 4px 12px rgba(26,95,42,0.15);
+            transform: translateY(-2px);
+        }
+        
+        .control-group select:focus {
+            outline: none;
+            border-color: #1a5f2a;
+            box-shadow: 0 0 0 4px rgba(26,95,42,0.1);
+        }
+        
+        .btn-compare {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #1a5f2a 0%, #2d8f4e 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 14px 0 rgba(26,95,42,0.39);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-compare::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-compare:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(26,95,42,0.5);
+        }
+        
+        .btn-compare:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .comparison-card {
+            background: #fafafa;
+            padding: 28px;
+            border-radius: 16px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        
+        .comparison-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+        }
+        
+        .comparison-card h3 {
+            font-family: 'Poppins', sans-serif;
+            color: #1a5f2a;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .stat-row:hover {
+            transform: translateX(6px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9375rem;
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            color: #1a5f2a;
+            font-size: 1rem;
+        }
+        
+        .diff-indicator {
+            margin-left: 12px;
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .diff-up {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .diff-down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .diff-neutral {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .chart-container {
+            background: #fafafa;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .chart-container:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .chart-container h2 {
+            font-family: 'Poppins', sans-serif;
+            color: #1a5f2a;
+            margin-bottom: 24px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #757575;
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-buttons button {
+            padding: 12px 24px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(108,117,125,0.3);
+        }
+        
+        .nav-buttons button:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108,117,125,0.4);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .controls {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚖️ Comparison Mode</h1>
+            <p>Bandingkan Data Absensi 2 Bulan</p>
+        </div>
+        
+        <div class="nav-buttons">
+            <button onclick="window.location.href='index.html'">🏠 Dashboard Utama</button>
+            <button onclick="window.location.href='analytics.html'">📊 Analytics</button>
+            <button onclick="window.location.href='admin.html'">📤 Upload Data</button>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3>📅 Periode 1</h3>
+                <select id="tahun1">
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
+                <select id="bulan1">
+                    <option value="Januari">Januari</option>
+                    <option value="Februari">Februari</option>
+                    <option value="Maret">Maret</option>
+                    <option value="April">April</option>
+                    <option value="Mei">Mei</option>
+                    <option value="Juni">Juni</option>
+                    <option value="Juli">Juli</option>
+                    <option value="Agustus">Agustus</option>
+                    <option value="September">September</option>
+                    <option value="Oktober" selected>Oktober</option>
+                    <option value="November">November</option>
+                    <option value="Desember">Desember</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <h3>📅 Periode 2</h3>
+                <select id="tahun2">
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
+                <select id="bulan2">
+                    <option value="Januari">Januari</option>
+                    <option value="Februari">Februari</option>
+                    <option value="Maret">Maret</option>
+                    <option value="April">April</option>
+                    <option value="Mei">Mei</option>
+                    <option value="Juni">Juni</option>
+                    <option value="Juli">Juli</option>
+                    <option value="Agustus">Agustus</option>
+                    <option value="September">September</option>
+                    <option value="Oktober">Oktober</option>
+                    <option value="November" selected>November</option>
+                    <option value="Desember">Desember</option>
+                </select>
+            </div>
+        </div>
+        
+        <button class="btn-compare" onclick="compareData()">⚖️ Bandingkan Data</button>
+        
+        <div id="loading" class="loading" style="display: none;">
+            ⏳ Memuat data perbandingan...
+        </div>
+        
+        <div id="content" style="display: none;">
+            <!-- Comparison Stats -->
+            <div class="comparison-grid">
+                <div class="comparison-card">
+                    <h3 id="period1Title">-</h3>
+                    <div id="stats1"></div>
+                </div>
+                <div class="comparison-card">
+                    <h3 id="period2Title">-</h3>
+                    <div id="stats2"></div>
+                </div>
+            </div>
+            
+            <!-- Comparison Chart -->
+            <div class="chart-container">
+                <h2>📊 Perbandingan Visual</h2>
+                <canvas id="comparisonChart"></canvas>
+            </div>
+            
+            <!-- Per Bidang Comparison -->
+            <div class="chart-container">
+                <h2>📋 Perbandingan Per Bidang</h2>
+                <canvas id="bidangChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://iudtxznbakaqzygpkaxf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
+        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let comparisonChart, bidangChart;
+        
+        async function compareData() {
+            const tahun1 = parseInt(document.getElementById('tahun1').value);
+            const bulan1 = document.getElementById('bulan1').value;
+            const tahun2 = parseInt(document.getElementById('tahun2').value);
+            const bulan2 = document.getElementById('bulan2').value;
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+            
+            try {
+                // Fetch data for both periods
+                const { data: data1 } = await sbClient
+                    .from('absensi')
+                    .select('*')
+                    .eq('tahun', tahun1)
+                    .eq('bulan', bulan1);
+                
+                const { data: data2 } = await sbClient
+                    .from('absensi')
+                    .select('*')
+                    .eq('tahun', tahun2)
+                    .eq('bulan', bulan2);
+                
+                if (!data1 || data1.length === 0) {
+                    alert(`Tidak ada data untuk ${bulan1} ${tahun1}`);
+                    return;
+                }
+                
+                if (!data2 || data2.length === 0) {
+                    alert(`Tidak ada data untuk ${bulan2} ${tahun2}`);
+                    return;
+                }
+                
+                // Calculate totals
+                const totals1 = calculateTotals(data1);
+                const totals2 = calculateTotals(data2);
+                
+                // Render comparison
+                renderComparison(bulan1, tahun1, totals1, bulan2, tahun2, totals2);
+                renderCharts(bulan1, totals1, bulan2, totals2, data1, data2);
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error loading data: ' + error.message);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        function calculateTotals(data) {
+            return data.reduce((acc, row) => ({
+                wfo: acc.wfo + row.wfo,
+                dinas_luar: acc.dinas_luar + row.dinas_luar,
+                undangan: acc.undangan + row.undangan,
+                sakit: acc.sakit + row.sakit,
+                ijin: acc.ijin + row.ijin,
+                cuti: acc.cuti + row.cuti,
+                tidak_absen: acc.tidak_absen + row.tidak_absen
+            }), { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, tidak_absen: 0 });
+        }
+        
+        function renderComparison(bulan1, tahun1, totals1, bulan2, tahun2, totals2) {
+            document.getElementById('period1Title').textContent = `${bulan1} ${tahun1}`;
+            document.getElementById('period2Title').textContent = `${bulan2} ${tahun2}`;
+            
+            const metrics = [
+                { label: 'WFO', key: 'wfo' },
+                { label: 'Dinas Luar', key: 'dinas_luar' },
+                { label: 'Undangan', key: 'undangan' },
+                { label: 'Sakit', key: 'sakit' },
+                { label: 'Ijin', key: 'ijin' },
+                { label: 'Cuti', key: 'cuti' },
+                { label: 'Tidak Absen', key: 'tidak_absen' }
+            ];
+            
+            const stats1HTML = metrics.map(m => `
+                <div class="stat-row">
+                    <span class="stat-label">${m.label}</span>
+                    <span class="stat-value">${totals1[m.key].toLocaleString()}</span>
+                </div>
+            `).join('');
+            
+            const stats2HTML = metrics.map(m => {
+                const diff = totals2[m.key] - totals1[m.key];
+                const diffPercent = totals1[m.key] > 0 ? ((diff / totals1[m.key]) * 100).toFixed(1) : 0;
+                const diffClass = diff > 0 ? 'diff-up' : diff < 0 ? 'diff-down' : 'diff-neutral';
+                const diffSymbol = diff > 0 ? '↗️' : diff < 0 ? '↘️' : '→';
+                
+                return `
+                    <div class="stat-row">
+                        <span class="stat-label">${m.label}</span>
+                        <span class="stat-value">
+                            ${totals2[m.key].toLocaleString()}
+                            <span class="diff-indicator ${diffClass}">
+                                ${diffSymbol} ${diffPercent}%
+                            </span>
+                        </span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('stats1').innerHTML = stats1HTML;
+            document.getElementById('stats2').innerHTML = stats2HTML;
+        }
+        
+        function renderCharts(bulan1, totals1, bulan2, totals2, data1, data2) {
+            // Main comparison chart
+            const ctx1 = document.getElementById('comparisonChart').getContext('2d');
+            
+            if (comparisonChart) comparisonChart.destroy();
+            
+            comparisonChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['WFO', 'Dinas Luar', 'Undangan', 'Sakit', 'Ijin', 'Cuti', 'Tidak Absen'],
+                    datasets: [
+                        {
+                            label: bulan1,
+                            data: [totals1.wfo, totals1.dinas_luar, totals1.undangan, totals1.sakit, totals1.ijin, totals1.cuti, totals1.tidak_absen],
+                            backgroundColor: '#1a5f2a'
+                        },
+                        {
+                            label: bulan2,
+                            data: [totals2.wfo, totals2.dinas_luar, totals2.undangan, totals2.sakit, totals2.ijin, totals2.cuti, totals2.tidak_absen],
+                            backgroundColor: '#2d8f4e'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            
+            // Per bidang comparison
+            const ctx2 = document.getElementById('bidangChart').getContext('2d');
+            
+            const bidangs = [...new Set([...data1.map(r => r.bidang), ...data2.map(r => r.bidang)])].filter(b => b !== 'GABUNGAN');
+            
+            const bidangData1 = bidangs.map(b => data1.filter(r => r.bidang === b).reduce((sum, r) => sum + r.wfo, 0));
+            const bidangData2 = bidangs.map(b => data2.filter(r => r.bidang === b).reduce((sum, r) => sum + r.wfo, 0));
+            
+            if (bidangChart) bidangChart.destroy();
+            
+            bidangChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: bidangs,
+                    datasets: [
+                        {
+                            label: `${bulan1} - WFO`,
+                            data: bidangData1,
+                            backgroundColor: '#1a5f2a'
+                        },
+                        {
+                            label: `${bulan2} - WFO`,
+                            data: bidangData2,
+                            backgroundColor: '#2d8f4e'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
