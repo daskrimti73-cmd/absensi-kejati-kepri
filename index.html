@@ -1144,13 +1144,13 @@
                 attendanceDonutChart.destroy();
             }
             
-            const pctWfo = total > 0 ? ((wfo / total) * 100).toFixed(2) : 0;
-            const pctDinas = total > 0 ? ((dinas / total) * 100).toFixed(2) : 0;
-            const pctUndangan = total > 0 ? ((undangan / total) * 100).toFixed(2) : 0;
-            const pctSakit = total > 0 ? ((sakit / total) * 100).toFixed(2) : 0;
-            const pctIjin = total > 0 ? ((ijin / total) * 100).toFixed(2) : 0;
-            const pctCuti = total > 0 ? ((cuti / total) * 100).toFixed(2) : 0;
-            const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(2) : 0;
+            const pctWfo = total > 0 ? ((wfo / total) * 100).toFixed(1) : 0;
+            const pctDinas = total > 0 ? ((dinas / total) * 100).toFixed(1) : 0;
+            const pctUndangan = total > 0 ? ((undangan / total) * 100).toFixed(1) : 0;
+            const pctSakit = total > 0 ? ((sakit / total) * 100).toFixed(1) : 0;
+            const pctIjin = total > 0 ? ((ijin / total) * 100).toFixed(1) : 0;
+            const pctCuti = total > 0 ? ((cuti / total) * 100).toFixed(1) : 0;
+            const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
             
             attendanceDonutChart = new Chart(ctx, {
                 type: 'doughnut',
@@ -1197,8 +1197,8 @@
             }
             
             const total = alpha + hadir;
-            const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(2) : 0;
-            const pctHadir = total > 0 ? ((hadir / total) * 100).toFixed(2) : 0;
+            const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
+            const pctHadir = total > 0 ? ((hadir / total) * 100).toFixed(1) : 0;
             
             absenceDonutChart = new Chart(ctx, {
                 type: 'doughnut',
@@ -1280,13 +1280,13 @@
                     const grandTotal = totalWfo + totalDinas + totalUndangan + totalSakit + totalIjin + totalCuti + totalAlpha;
                     
                     // Calculate percentages
-                    const pctWfo = grandTotal > 0 ? ((totalWfo / grandTotal) * 100).toFixed(2) : 0;
-                    const pctDinas = grandTotal > 0 ? ((totalDinas / grandTotal) * 100).toFixed(2) : 0;
-                    const pctUndangan = grandTotal > 0 ? ((totalUndangan / grandTotal) * 100).toFixed(2) : 0;
-                    const pctSakit = grandTotal > 0 ? ((totalSakit / grandTotal) * 100).toFixed(2) : 0;
-                    const pctIjin = grandTotal > 0 ? ((totalIjin / grandTotal) * 100).toFixed(2) : 0;
-                    const pctCuti = grandTotal > 0 ? ((totalCuti / grandTotal) * 100).toFixed(2) : 0;
-                    const pctAlpha = grandTotal > 0 ? ((totalAlpha / grandTotal) * 100).toFixed(2) : 0;
+                    const pctWfo = grandTotal > 0 ? ((totalWfo / grandTotal) * 100).toFixed(1) : 0;
+                    const pctDinas = grandTotal > 0 ? ((totalDinas / grandTotal) * 100).toFixed(1) : 0;
+                    const pctUndangan = grandTotal > 0 ? ((totalUndangan / grandTotal) * 100).toFixed(1) : 0;
+                    const pctSakit = grandTotal > 0 ? ((totalSakit / grandTotal) * 100).toFixed(1) : 0;
+                    const pctIjin = grandTotal > 0 ? ((totalIjin / grandTotal) * 100).toFixed(1) : 0;
+                    const pctCuti = grandTotal > 0 ? ((totalCuti / grandTotal) * 100).toFixed(1) : 0;
+                    const pctAlpha = grandTotal > 0 ? ((totalAlpha / grandTotal) * 100).toFixed(1) : 0;
                     
                     // Create card HTML
                     const cardId = `bidang-${bidang.toLowerCase().replace(/\s+/g, '-')}`;
