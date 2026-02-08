@@ -25,7 +25,7 @@
     // ============================================
     
     function parseRekapitulasi(workbook, bulan, tahun) {
-        console.log('📊 Parsing REKAPITULASI sheet...');
+        console.log('📊 Parsing REKAPITULASI sheet v2.0 (with percentage support)...');
         
         const sheetNames = workbook.SheetNames;
         
@@ -58,13 +58,148 @@
         
         console.log(`📄 Sheet has ${data.length} rows`);
         
-        // Step 1: Cari section "KEHADIRAN KESELURUHAN"
+        const rekapData = {
+            bulan: bulan,
+            tahun: tahun,
+            wfo: 0,
+            dinas_luar: 0,
+            undangan: 0,
+            sakit: 0,
+            ijin: 0,
+            cuti: 0,
+            tidak_absen: 0,
+            total: 0,
+            // Kolom persentase baru
+            wfo_pct: null,
+            dinas_luar_pct: null,
+            undangan_pct: null,
+            sakit_pct: null,
+            ijin_pct: null,
+            cuti_pct: null,
+            tidak_absen_pct: null
+        };
+        
+        // ============================================
+        // STEP 1: COBA BACA PERSENTASE (PRIORITAS 1)
+        // ============================================
+        console.log('\n🔍 STEP 1: Mencari PERSENTASE KEHADIRAN KESELURUHAN...');
+        
+        let persentaseFound = false;
+        for (let i = 0; i < data.length; i++) {
+            const row = data[i];
+            for (let j = 0; j < row.length; j++) {
+                const cell = String(row[j] || '').toUpperCase().trim();
+                if (cell.includes('PERSENTASE') && (cell.includes('KEHADIRAN') || cell.includes('GABUNGAN'))) {
+                    console.log(`✅ Found "PERSENTASE" section at row ${i}`);
+                    
+                    // Cari header dan kolom TOTAL
+                    let headerRow = -1;
+                    let labelCol = -1;
+                    let totalCol = -1;
+                    
+                    for (let k = i; k < Math.min(i + 5, data.length); k++) {
+                        const headerRowData = data[k];
+                        for (let m = 0; m < headerRowData.length; m++) {
+                            const headerCell = String(headerRowData[m] || '').toUpperCase().trim();
+                            if (headerCell === 'JENIS' || headerCell === 'JENIS KEHADIRAN') {
+                                headerRow = k;
+                                labelCol = m;
+                                // Cari kolom TOTAL
+                                for (let n = m + 1; n < headerRowData.length; n++) {
+                                    const colName = String(headerRowData[n] || '').toUpperCase().trim();
+                                    if (colName === 'TOTAL') {
+                                        totalCol = n;
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        if (headerRow !== -1) break;
+                    }
+                    
+                    if (headerRow !== -1 && labelCol !== -1 && totalCol !== -1) {
+                        console.log(`✅ Found percentage header at row ${headerRow}, labelCol=${labelCol}, totalCol=${totalCol}`);
+                        
+                        // Baca persentase
+                        const pctLabelMap = [
+                            { patterns: ['WFO'], key: 'wfo_pct' },
+                            { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar_pct' },
+                            { patterns: ['UNDANGAN'], key: 'undangan_pct' },
+                            { patterns: ['SAKIT'], key: 'sakit_pct' },
+                            { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin_pct' },
+                            { patterns: ['CUTI'], key: 'cuti_pct' },
+                            { patterns: ['ISOMAN'], key: 'ijin_pct' },
+                            { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA'], key: 'tidak_absen_pct' }
+                        ];
+                        
+                        for (let k = headerRow + 1; k < Math.min(headerRow + 15, data.length); k++) {
+                            const pctRow = data[k];
+                            if (!pctRow || pctRow.length === 0) continue;
+                            
+                            const label = String(pctRow[labelCol] || '').toUpperCase().trim();
+                            if (!label) continue;
+                            
+                            for (const { patterns, key } of pctLabelMap) {
+                                let matched = false;
+                                for (const pattern of patterns) {
+                                    if (label === pattern || label.includes(pattern)) {
+                                        matched = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (matched) {
+                                    let pctValue = pctRow[totalCol];
+                                    
+                                    // Parse persentase (bisa format "84.4%" atau 0.844)
+                                    if (typeof pctValue === 'string' && pctValue.includes('%')) {
+                                        pctValue = parseFloat(pctValue.replace('%', ''));
+                                    } else if (typeof pctValue === 'number' && pctValue < 1) {
+                                        pctValue = pctValue * 100; // Convert 0.844 to 84.4
+                                    } else {
+                                        pctValue = parseFloat(pctValue);
+                                    }
+                                    
+                                    if (!isNaN(pctValue)) {
+                                        // Jika ISOMAN, tambahkan ke IJIN
+                                        if (label.includes('ISOMAN') && rekapData.ijin_pct !== null) {
+                                            rekapData.ijin_pct += pctValue;
+                                            console.log(`  ✅ ISOMAN: ${pctValue}% (added to IJIN, total: ${rekapData.ijin_pct.toFixed(1)}%)`);
+                                        } else {
+                                            rekapData[key] = pctValue;
+                                            console.log(`  ✅ ${patterns[0]}: ${pctValue}%`);
+                                        }
+                                        persentaseFound = true;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+            if (persentaseFound) break;
+        }
+        
+        if (persentaseFound) {
+            console.log('✅ Persentase berhasil dibaca dari Excel!');
+        } else {
+            console.log('⚠️ Persentase tidak ditemukan, akan gunakan angka mentah');
+        }
+        
+        // ============================================
+        // STEP 2: BACA ANGKA MENTAH (SELALU DIBUTUHKAN)
+        // ============================================
+        console.log('\n🔍 STEP 2: Membaca KEHADIRAN KESELURUHAN (angka mentah)...');
+        
         let sectionRow = -1;
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
             for (let j = 0; j < row.length; j++) {
                 const cell = String(row[j] || '').toUpperCase().trim();
-                if (cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN')) {
+                if (cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN') && !cell.includes('PERSENTASE')) {
                     sectionRow = i;
                     console.log(`✅ Found "KEHADIRAN KESELURUHAN" at row ${i}`);
                     break;
@@ -78,7 +213,7 @@
             return null;
         }
         
-        // Step 2: Cari header row (Jenis Kehadiran, Jumlah)
+        // Cari header row (Jenis Kehadiran, Jumlah)
         let headerRow = -1;
         let labelCol = -1;
         let valueCol = -1;
@@ -113,9 +248,9 @@
                 for (let j = 0; j < row.length; j++) {
                     const cell = String(row[j] || '').toUpperCase().trim();
                     if (cell === 'WFO') {
-                        headerRow = i - 1; // Anggap baris sebelumnya adalah header
+                        headerRow = i - 1;
                         labelCol = j;
-                        valueCol = j + 1; // Anggap kolom sebelahnya adalah nilai
+                        valueCol = j + 1;
                         console.log(`✅ Found WFO at row ${i}, using labelCol=${labelCol}, valueCol=${valueCol}`);
                         break;
                     }
@@ -129,20 +264,7 @@
             return null;
         }
         
-        const rekapData = {
-            bulan: bulan,
-            tahun: tahun,
-            wfo: 0,
-            dinas_luar: 0,
-            undangan: 0,
-            sakit: 0,
-            ijin: 0,
-            cuti: 0,
-            tidak_absen: 0,
-            total: 0
-        };
-        
-        // Step 3: Baca data dari baris setelah header
+        // Baca data dari baris setelah header
         const labelMap = [
             { patterns: ['WFO'], key: 'wfo' },
             { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar' },
@@ -150,7 +272,7 @@
             { patterns: ['SAKIT'], key: 'sakit' },
             { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin' },
             { patterns: ['CUTI'], key: 'cuti' },
-            { patterns: ['ISOMAN'], key: 'ijin' }, // ISOMAN ditambahkan ke IJIN
+            { patterns: ['ISOMAN'], key: 'ijin' },
             { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA', 'TANPA KETERANGAN'], key: 'tidak_absen' },
             { patterns: ['TOTAL'], key: 'total' }
         ];
@@ -162,7 +284,6 @@
             const label = String(row[labelCol] || '').toUpperCase().trim();
             if (!label) continue;
             
-            // Cek apakah label cocok dengan pattern
             for (const { patterns, key } of labelMap) {
                 let matched = false;
                 for (const pattern of patterns) {
@@ -175,7 +296,6 @@
                 if (matched) {
                     const value = parseInt(row[valueCol]);
                     if (!isNaN(value)) {
-                        // Jika ISOMAN, tambahkan ke IJIN
                         if (label.includes('ISOMAN')) {
                             rekapData.ijin += value;
                             console.log(`  ✅ ISOMAN: ${value} (added to IJIN, total IJIN now: ${rekapData.ijin})`);
@@ -194,7 +314,27 @@
             return null;
         }
         
-        console.log('📊 Rekapitulasi parsed successfully:', rekapData);
+        console.log('\n📊 Rekapitulasi parsed successfully:');
+        console.log('   Angka mentah:', {
+            wfo: rekapData.wfo,
+            dinas_luar: rekapData.dinas_luar,
+            undangan: rekapData.undangan,
+            sakit: rekapData.sakit,
+            ijin: rekapData.ijin,
+            cuti: rekapData.cuti,
+            tidak_absen: rekapData.tidak_absen,
+            total: rekapData.total
+        });
+        console.log('   Persentase:', {
+            wfo_pct: rekapData.wfo_pct,
+            dinas_luar_pct: rekapData.dinas_luar_pct,
+            undangan_pct: rekapData.undangan_pct,
+            sakit_pct: rekapData.sakit_pct,
+            ijin_pct: rekapData.ijin_pct,
+            cuti_pct: rekapData.cuti_pct,
+            tidak_absen_pct: rekapData.tidak_absen_pct
+        });
+        
         return rekapData;
     }
     
