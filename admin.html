@@ -17,6 +17,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="admin_rekapitulasi_parser.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -1536,6 +1537,35 @@
                     console.log('⚠️ PENTING: Bandingkan angka di atas dengan Excel!');
                     console.log('⚠️ Jika ada yang tidak sesuai, gunakan query SQL untuk memperbaiki.');
                 }
+                
+                // ============================================
+                // PARSE & UPLOAD REKAPITULASI (OPTIONAL)
+                // ============================================
+                console.log('\n' + '═'.repeat(80));
+                console.log('📊 PARSING REKAPITULASI (OPTIONAL)');
+                console.log('═'.repeat(80));
+                
+                try {
+                    const rekapData = parseRekapitulasi(workbook, bulan, tahun);
+                    
+                    if (rekapData) {
+                        console.log('✅ Rekapitulasi data found, uploading to Supabase...');
+                        const rekapSuccess = await uploadRekapitulasi(supabaseClient, rekapData);
+                        
+                        if (rekapSuccess) {
+                            console.log('✅ Rekapitulasi uploaded successfully!');
+                        } else {
+                            console.log('⚠️ Rekapitulasi upload failed (non-critical)');
+                        }
+                    } else {
+                        console.log('ℹ️ No rekapitulasi data found (this is OK, using calculated data)');
+                    }
+                } catch (rekapError) {
+                    console.log('⚠️ Rekapitulasi parsing error (non-critical):', rekapError.message);
+                    console.log('   System will use calculated data from absensi table');
+                }
+                
+                console.log('═'.repeat(80));
                 
                 showProgress(100, 'Selesai!');
                 
