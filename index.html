@@ -309,17 +309,20 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             text-align: center;
-            padding: 12px;
+            padding: 8px;
             position: relative;
             overflow: hidden;
+            line-height: 1.2;
         }
         
         .treemap-item-label {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             margin-bottom: 4px;
-            opacity: 0.9;
+            opacity: 0.95;
+            word-wrap: break-word;
+            max-width: 100%;
         }
         
         .treemap-item-value {
@@ -638,9 +641,9 @@
                         <option value="semua">Semua Bidang</option>
                         <option value="PEMBINAAN">Pembinaan</option>
                         <option value="INTELIJEN">Intelijen</option>
-                        <option value="PIDUM">Pidum</option>
-                        <option value="PIDSUS">Pidsus</option>
-                        <option value="DATUN">Datun</option>
+                        <option value="PIDUM">Pidana Umum</option>
+                        <option value="PIDSUS">Pidana Khusus</option>
+                        <option value="DATUN">Perdata dan Tata Usaha Negara</option>
                         <option value="PENGAWASAN">Pengawasan</option>
                         <option value="TATA USAHA">Tata Usaha</option>
                         <option value="KOORDINATOR">Koordinator</option>
@@ -840,6 +843,19 @@
             November: 'NOVEMBER',
             Desember: 'DESEMBER'
         };
+        
+        // Mapping nama bidang lengkap
+        const bidangNamaLengkap = {
+            'PEMBINAAN': 'Pembinaan',
+            'INTELIJEN': 'Intelijen',
+            'PIDUM': 'Pidana Umum',
+            'PIDSUS': 'Pidana Khusus',
+            'DATUN': 'Perdata dan Tata Usaha Negara',
+            'PENGAWASAN': 'Pengawasan',
+            'TATA USAHA': 'Tata Usaha',
+            'KOORDINATOR': 'Koordinator',
+            'PEMULIHAN ASET': 'Pemulihan Aset'
+        };
 
         // Get selected data with Supabase fallback
         async function getSelectedData() {
@@ -1031,7 +1047,7 @@
             const container = document.getElementById('treemapContainer');
             container.innerHTML = bidangData.map(item => `
                 <div class="treemap-item" style="background: ${item.color};">
-                    <div class="treemap-item-label">${item.name}</div>
+                    <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                     <div class="treemap-item-value">${item.value}</div>
                 </div>
             `).join('');
@@ -1194,7 +1210,7 @@
                     
                     const cardHTML = `
                         <div class="bidang-card" id="${cardId}">
-                            <div class="bidang-card-header">${bidang}</div>
+                            <div class="bidang-card-header">${bidangNamaLengkap[bidang] || bidang}</div>
                             <div class="bidang-stats">
                                 <div class="bidang-stat-item">
                                     <span class="bidang-stat-label">TIDAK ABSEN</span>
