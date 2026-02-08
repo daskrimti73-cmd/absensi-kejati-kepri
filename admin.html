@@ -21,24 +21,37 @@
     <!-- REKAPITULASI PARSER - EMBEDDED -->
     <script>
     // ============================================
-    // REKAPITULASI PARSER v1.0.1 - EMBEDDED
+    // REKAPITULASI PARSER v1.0.2 - EMBEDDED
     // ============================================
     
     function parseRekapitulasi(workbook, bulan, tahun) {
         console.log('📊 Parsing REKAPITULASI sheet...');
         
         const sheetNames = workbook.SheetNames;
-        const rekapSheet = sheetNames.find(name => {
+        
+        // PRIORITAS: Cari "REKAPITULASI 2" dulu, baru "REKAPITULASI"
+        let rekapSheet = sheetNames.find(name => {
             const nameUpper = name.toUpperCase().trim();
-            return nameUpper.includes('REKAPITULASI') || nameUpper.includes('REKAP');
+            return nameUpper.includes('REKAPITULASI 2') || 
+                   nameUpper.includes('REKAPITULASI2') ||
+                   nameUpper.includes('REKAP 2') ||
+                   nameUpper.includes('REKAP2');
         });
+        
+        // Jika tidak ada REKAPITULASI 2, cari REKAPITULASI biasa
+        if (!rekapSheet) {
+            rekapSheet = sheetNames.find(name => {
+                const nameUpper = name.toUpperCase().trim();
+                return nameUpper.includes('REKAPITULASI') || nameUpper.includes('REKAP');
+            });
+        }
         
         if (!rekapSheet) {
             console.log('⚠️ Sheet REKAPITULASI tidak ditemukan');
             return null;
         }
         
-        console.log(`✅ Found sheet: "${rekapSheet}"`);
+        console.log(`✅ Found sheet: "${rekapSheet}" (prioritized)`);
         
         const sheet = workbook.Sheets[rekapSheet];
         const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
@@ -49,7 +62,9 @@
             const row = data[i];
             for (let j = 0; j < row.length; j++) {
                 const cell = String(row[j] || '').toUpperCase().trim();
-                if ((cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN')) || cell === 'WFO' || cell === 'JENIS KEHADIRAN') {
+                if ((cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN')) || 
+                    cell === 'WFO' || 
+                    cell === 'JENIS KEHADIRAN') {
                     startRow = i;
                     console.log(`✅ Found data starting at row ${i}`);
                     break;
@@ -76,13 +91,15 @@
             total: 0
         };
         
+        // Mapping label dengan berbagai variasi dan typo
         const labelMap = [
             { patterns: ['WFO'], key: 'wfo' },
             { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar' },
             { patterns: ['UNDANGAN'], key: 'undangan' },
             { patterns: ['SAKIT'], key: 'sakit' },
-            { patterns: ['IJIN', 'IZIN'], key: 'ijin' },
+            { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin' }, // Tambah IIJN dan IJN
             { patterns: ['CUTI'], key: 'cuti' },
+            { patterns: ['ISOMAN'], key: 'ijin' }, // ISOMAN di-map ke IJIN
             { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA', 'TANPA KETERANGAN'], key: 'tidak_absen' },
             { patterns: ['TOTAL'], key: 'total' }
         ];
@@ -114,8 +131,14 @@
                             }
                         }
                         
-                        rekapData[key] = value;
-                        console.log(`  ✅ ${patterns[0]}: ${value}`);
+                        // Jika key sudah ada nilai, tambahkan (untuk ISOMAN + IJIN)
+                        if (rekapData[key] > 0 && label.includes('ISOMAN')) {
+                            rekapData[key] += value;
+                            console.log(`  ✅ ${patterns[0]}: ${value} (added to existing ${key})`);
+                        } else {
+                            rekapData[key] = value;
+                            console.log(`  ✅ ${patterns[0]}: ${value}`);
+                        }
                         break;
                     }
                 }
