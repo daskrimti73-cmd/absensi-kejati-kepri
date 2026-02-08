@@ -17,7 +17,166 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="admin_rekapitulasi_parser.js"></script>
+    
+    <!-- REKAPITULASI PARSER - EMBEDDED -->
+    <script>
+    // ============================================
+    // REKAPITULASI PARSER v1.0.1 - EMBEDDED
+    // ============================================
+    
+    function parseRekapitulasi(workbook, bulan, tahun) {
+        console.log('📊 Parsing REKAPITULASI sheet...');
+        
+        const sheetNames = workbook.SheetNames;
+        const rekapSheet = sheetNames.find(name => {
+            const nameUpper = name.toUpperCase().trim();
+            return nameUpper.includes('REKAPITULASI') || nameUpper.includes('REKAP');
+        });
+        
+        if (!rekapSheet) {
+            console.log('⚠️ Sheet REKAPITULASI tidak ditemukan');
+            return null;
+        }
+        
+        console.log(`✅ Found sheet: "${rekapSheet}"`);
+        
+        const sheet = workbook.Sheets[rekapSheet];
+        const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+        
+        let startRow = -1;
+        
+        for (let i = 0; i < data.length; i++) {
+            const row = data[i];
+            for (let j = 0; j < row.length; j++) {
+                const cell = String(row[j] || '').toUpperCase().trim();
+                if ((cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN')) || cell === 'WFO' || cell === 'JENIS KEHADIRAN') {
+                    startRow = i;
+                    console.log(`✅ Found data starting at row ${i}`);
+                    break;
+                }
+            }
+            if (startRow !== -1) break;
+        }
+        
+        if (startRow === -1) {
+            console.log('❌ Tidak dapat menemukan data kehadiran');
+            return null;
+        }
+        
+        const rekapData = {
+            bulan: bulan,
+            tahun: tahun,
+            wfo: 0,
+            dinas_luar: 0,
+            undangan: 0,
+            sakit: 0,
+            ijin: 0,
+            cuti: 0,
+            tidak_absen: 0,
+            total: 0
+        };
+        
+        const labelMap = [
+            { patterns: ['WFO'], key: 'wfo' },
+            { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar' },
+            { patterns: ['UNDANGAN'], key: 'undangan' },
+            { patterns: ['SAKIT'], key: 'sakit' },
+            { patterns: ['IJIN', 'IZIN'], key: 'ijin' },
+            { patterns: ['CUTI'], key: 'cuti' },
+            { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA', 'TANPA KETERANGAN'], key: 'tidak_absen' },
+            { patterns: ['TOTAL'], key: 'total' }
+        ];
+        
+        for (let i = startRow; i < Math.min(startRow + 50, data.length); i++) {
+            const row = data[i];
+            if (!row || row.length === 0) continue;
+            
+            for (let colIdx = 0; colIdx < row.length; colIdx++) {
+                const label = String(row[colIdx] || '').toUpperCase().trim();
+                if (!label) continue;
+                
+                for (const { patterns, key } of labelMap) {
+                    let matched = false;
+                    for (const pattern of patterns) {
+                        if (label === pattern || label.includes(pattern)) {
+                            matched = true;
+                            break;
+                        }
+                    }
+                    
+                    if (matched) {
+                        let value = 0;
+                        for (let valueCol = colIdx + 1; valueCol < row.length; valueCol++) {
+                            const numValue = parseInt(row[valueCol]);
+                            if (!isNaN(numValue)) {
+                                value = numValue;
+                                break;
+                            }
+                        }
+                        
+                        rekapData[key] = value;
+                        console.log(`  ✅ ${patterns[0]}: ${value}`);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (rekapData.wfo === 0 && rekapData.total === 0) {
+            console.log('⚠️ Data rekapitulasi tidak valid');
+            return null;
+        }
+        
+        console.log('📊 Rekapitulasi parsed:', rekapData);
+        return rekapData;
+    }
+    
+    async function uploadRekapitulasi(supabaseClient, rekapData) {
+        console.log('📤 Uploading rekapitulasi...');
+        
+        try {
+            const { data: existing, error: checkError } = await supabaseClient
+                .from('rekapitulasi')
+                .select('*')
+                .eq('tahun', rekapData.tahun)
+                .eq('bulan', rekapData.bulan);
+            
+            if (checkError) {
+                console.error('❌ Error checking:', checkError);
+                return false;
+            }
+            
+            if (existing && existing.length > 0) {
+                const { error: updateError } = await supabaseClient
+                    .from('rekapitulasi')
+                    .update(rekapData)
+                    .eq('tahun', rekapData.tahun)
+                    .eq('bulan', rekapData.bulan);
+                
+                if (updateError) {
+                    console.error('❌ Error updating:', updateError);
+                    return false;
+                }
+                console.log('✅ Rekapitulasi updated');
+            } else {
+                const { error: insertError } = await supabaseClient
+                    .from('rekapitulasi')
+                    .insert([rekapData]);
+                
+                if (insertError) {
+                    console.error('❌ Error inserting:', insertError);
+                    return false;
+                }
+                console.log('✅ Rekapitulasi inserted');
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Error:', error);
+            return false;
+        }
+    }
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
