@@ -1649,7 +1649,7 @@
             
             let bidangData = [];
             let totalWfoAll = 0, totalDinasAll = 0, totalUndanganAll = 0;
-            let totalSakitAll = 0, totalIjinAll = 0, totalCutiAll = 0, totalAlphaAll = 0;
+            let totalSakitAll = 0, totalIjinAll = 0, totalCutiAll = 0, totalIsomanAll = 0, totalAlphaAll = 0;
             let uniqueDates = new Set();
             
             // Build treemap with static employee count
@@ -1673,6 +1673,7 @@
                     const totalSakit = sum(data.sakit);
                     const totalIjin = sum(data.ijin);
                     const totalCuti = sum(data.cuti);
+                    const totalIsoman = sum(data.isoman || []); // ✅ ISOMAN support
                     const totalAlpha = sum(data.tidakAbsen);
                     
                     totalWfoAll += totalWfo;
@@ -1681,6 +1682,7 @@
                     totalSakitAll += totalSakit;
                     totalIjinAll += totalIjin;
                     totalCutiAll += totalCuti;
+                    totalIsomanAll += totalIsoman; // ✅ ISOMAN support
                     totalAlphaAll += totalAlpha;
                     
                     // Collect unique dates
@@ -1691,10 +1693,10 @@
             // Update Info Cards
             const hariKerja = uniqueDates.size;
             
-            // ✅ Total = WFO + Dinas Luar + Undangan + Sakit + Ijin + Cuti + Tidak Absen
-            const totalKeseluruhan = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalAlphaAll;
+            // ✅ Total = WFO + Dinas Luar + Undangan + Sakit + Ijin + Cuti + Isoman + Tidak Absen
+            const totalKeseluruhan = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalIsomanAll + totalAlphaAll;
             
-            // ✅ Check In = Total - Tidak Absen
+            // ✅ Check In = Total - Tidak Absen (includes ISOMAN)
             const totalCheckIn = totalKeseluruhan - totalAlphaAll;
             
             document.getElementById('infoHariKerja').textContent = hariKerja;
@@ -2369,8 +2371,9 @@
                 sakit: acc.sakit + row.sakit,
                 ijin: acc.ijin + row.ijin,
                 cuti: acc.cuti + row.cuti,
+                isoman: acc.isoman + (row.isoman || 0), // ✅ ISOMAN support
                 tidak_absen: acc.tidak_absen + row.tidak_absen
-            }), { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, tidak_absen: 0 });
+            }), { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, isoman: 0, tidak_absen: 0 });
         }
         
         function renderComparisonStats(periods) {
@@ -2384,6 +2387,7 @@
                 { label: 'Sakit', key: 'sakit' },
                 { label: 'Ijin', key: 'ijin' },
                 { label: 'Cuti', key: 'cuti' },
+                { label: 'Isoman', key: 'isoman' }, // ✅ ISOMAN support
                 { label: 'Tidak Absen', key: 'tidak_absen' }
             ];
             
