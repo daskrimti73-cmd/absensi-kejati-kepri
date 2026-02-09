@@ -2559,7 +2559,7 @@
                 }
             });
             
-            // Trend Chart - Single Line with Triangle Markers (like reference)
+            // Trend Chart - Single Line with Triangle Markers (Enhanced)
             const ctx3 = document.getElementById('comparisonTrendChart').getContext('2d');
             if (comparisonCharts.trend) comparisonCharts.trend.destroy();
             
@@ -2575,20 +2575,27 @@
                 attendancePercentages.push(percentage);
             });
             
+            // Calculate dynamic Y-axis range
+            const minValue = Math.min(...attendancePercentages);
+            const maxValue = Math.max(...attendancePercentages);
+            const range = maxValue - minValue;
+            const yMin = Math.max(0, Math.floor(minValue - range * 0.2));
+            const yMax = Math.min(100, Math.ceil(maxValue + range * 0.2));
+            
             const datasets3 = [
                 {
                     label: 'Persentase Kehadiran',
                     data: attendancePercentages,
-                    borderColor: '#5b9bd5',
+                    borderColor: '#6ba3d0',
                     backgroundColor: 'transparent',
-                    tension: 0.3,
+                    tension: 0.35,
                     fill: false,
-                    borderWidth: 3,
+                    borderWidth: 2.5,
                     pointStyle: 'triangle',
-                    pointRadius: 8,
-                    pointHoverRadius: 10,
-                    pointBackgroundColor: '#5b9bd5',
-                    pointBorderColor: '#5b9bd5',
+                    pointRadius: 10,
+                    pointHoverRadius: 12,
+                    pointBackgroundColor: '#6ba3d0',
+                    pointBorderColor: '#6ba3d0',
                     pointBorderWidth: 0,
                     pointHoverBackgroundColor: '#5b9bd5',
                     pointHoverBorderColor: '#5b9bd5',
@@ -2609,13 +2616,13 @@
                             const meta = chart.getDatasetMeta(i);
                             if (!meta.hidden) {
                                 meta.data.forEach(function(element, index) {
-                                    ctx.fillStyle = '#5b9bd5';
-                                    ctx.font = 'bold 13px Inter';
+                                    ctx.fillStyle = '#6ba3d0';
+                                    ctx.font = 'bold 12px Arial';
                                     ctx.textAlign = 'center';
                                     ctx.textBaseline = 'bottom';
                                     
                                     const dataString = dataset.data[index].toFixed(1) + '%';
-                                    ctx.fillText(dataString, element.x, element.y - 12);
+                                    ctx.fillText(dataString, element.x, element.y - 15);
                                 });
                             }
                         });
@@ -2624,6 +2631,14 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
+                    layout: {
+                        padding: {
+                            top: 30,
+                            right: 20,
+                            bottom: 10,
+                            left: 10
+                        }
+                    },
                     plugins: {
                         legend: {
                             display: false
@@ -2631,12 +2646,19 @@
                         tooltip: {
                             enabled: true,
                             backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            titleColor: '#1f2937',
-                            bodyColor: '#5b9bd5',
-                            borderColor: '#5b9bd5',
+                            titleColor: '#374151',
+                            bodyColor: '#6ba3d0',
+                            borderColor: '#d1d5db',
                             borderWidth: 1,
-                            padding: 12,
+                            padding: 10,
                             displayColors: false,
+                            titleFont: {
+                                size: 12
+                            },
+                            bodyFont: {
+                                size: 13,
+                                weight: 'bold'
+                            },
                             callbacks: {
                                 label: function(context) {
                                     return 'Kehadiran: ' + context.parsed.y.toFixed(1) + '%';
@@ -2647,17 +2669,18 @@
                     scales: {
                         y: { 
                             beginAtZero: false,
-                            min: 70,
-                            max: 100,
+                            min: yMin,
+                            max: yMax,
                             ticks: { 
                                 font: { 
-                                    size: 11
+                                    size: 10,
+                                    family: 'Arial'
                                 },
                                 color: '#9ca3af',
-                                stepSize: 5
+                                padding: 8
                             },
                             grid: {
-                                color: '#e5e7eb',
+                                color: '#f3f4f6',
                                 lineWidth: 1,
                                 drawBorder: false
                             },
@@ -2668,16 +2691,19 @@
                         x: { 
                             ticks: { 
                                 font: { 
-                                    size: 11
+                                    size: 10,
+                                    family: 'Arial'
                                 },
-                                color: '#6b7280'
+                                color: '#6b7280',
+                                padding: 5
                             },
                             grid: {
                                 display: false
                             },
                             border: {
                                 display: true,
-                                color: '#e5e7eb'
+                                color: '#e5e7eb',
+                                width: 1
                             }
                         }
                     }
