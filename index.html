@@ -2559,58 +2559,40 @@
                 }
             });
             
-            // Trend Chart - 2 Lines with Absolute Values (like reference)
+            // Trend Chart - Single Line with Triangle Markers (like reference)
             const ctx3 = document.getElementById('comparisonTrendChart').getContext('2d');
             if (comparisonCharts.trend) comparisonCharts.trend.destroy();
             
-            // Use absolute values instead of percentages for better visualization
-            const checkInValues = [];
-            const tidakHadirValues = [];
+            // Calculate attendance percentage for visualization
+            const attendancePercentages = [];
             
             periods.forEach(period => {
                 const total = period.totals.wfo + period.totals.dinas_luar + period.totals.undangan + 
                              period.totals.sakit + period.totals.ijin + period.totals.cuti + 
                              period.totals.isoman + period.totals.tidak_absen;
                 const checkIn = total - period.totals.tidak_absen;
-                
-                checkInValues.push(checkIn);
-                tidakHadirValues.push(period.totals.tidak_absen);
+                const percentage = total > 0 ? ((checkIn / total) * 100) : 0;
+                attendancePercentages.push(percentage);
             });
             
             const datasets3 = [
                 {
-                    label: 'Check In (Hadir)',
-                    data: checkInValues,
-                    borderColor: '#059669',
+                    label: 'Persentase Kehadiran',
+                    data: attendancePercentages,
+                    borderColor: '#5b9bd5',
                     backgroundColor: 'transparent',
-                    tension: 0.4,
+                    tension: 0.3,
                     fill: false,
                     borderWidth: 3,
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#059669',
-                    pointBorderWidth: 2,
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#059669',
-                    pointHoverBorderWidth: 3
-                },
-                {
-                    label: 'Tidak Hadir',
-                    data: tidakHadirValues,
-                    borderColor: '#f59e0b',
-                    backgroundColor: 'transparent',
-                    tension: 0.4,
-                    fill: false,
-                    borderWidth: 3,
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#f59e0b',
-                    pointBorderWidth: 2,
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: '#f59e0b',
-                    pointHoverBorderWidth: 3
+                    pointStyle: 'triangle',
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    pointBackgroundColor: '#5b9bd5',
+                    pointBorderColor: '#5b9bd5',
+                    pointBorderWidth: 0,
+                    pointHoverBackgroundColor: '#5b9bd5',
+                    pointHoverBorderColor: '#5b9bd5',
+                    pointRotation: 0
                 }
             ];
             
@@ -2627,14 +2609,13 @@
                             const meta = chart.getDatasetMeta(i);
                             if (!meta.hidden) {
                                 meta.data.forEach(function(element, index) {
-                                    // Set color based on dataset
-                                    ctx.fillStyle = dataset.borderColor;
-                                    ctx.font = 'bold 12px Inter';
+                                    ctx.fillStyle = '#5b9bd5';
+                                    ctx.font = 'bold 13px Inter';
                                     ctx.textAlign = 'center';
                                     ctx.textBaseline = 'bottom';
                                     
-                                    const dataString = Math.round(dataset.data[index]).toString();
-                                    ctx.fillText(dataString, element.x, element.y - 8);
+                                    const dataString = dataset.data[index].toFixed(1) + '%';
+                                    ctx.fillText(dataString, element.x, element.y - 12);
                                 });
                             }
                         });
@@ -2645,47 +2626,40 @@
                     maintainAspectRatio: true,
                     plugins: {
                         legend: {
-                            display: true,
-                            position: 'bottom',
-                            labels: {
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                                padding: 20,
-                                font: {
-                                    size: 13,
-                                    weight: '600'
-                                },
-                                color: '#6b7280'
-                            }
+                            display: false
                         },
                         tooltip: {
                             enabled: true,
                             backgroundColor: 'rgba(255, 255, 255, 0.95)',
                             titleColor: '#1f2937',
-                            bodyColor: '#6b7280',
-                            borderColor: '#e5e7eb',
+                            bodyColor: '#5b9bd5',
+                            borderColor: '#5b9bd5',
                             borderWidth: 1,
                             padding: 12,
-                            displayColors: true,
+                            displayColors: false,
                             callbacks: {
                                 label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '%';
+                                    return 'Kehadiran: ' + context.parsed.y.toFixed(1) + '%';
                                 }
                             }
                         }
                     },
                     scales: {
                         y: { 
-                            beginAtZero: true,
+                            beginAtZero: false,
+                            min: 70,
+                            max: 100,
                             ticks: { 
                                 font: { 
                                     size: 11
                                 },
-                                color: '#9ca3af'
+                                color: '#9ca3af',
+                                stepSize: 5
                             },
                             grid: {
-                                color: '#f3f4f6',
-                                lineWidth: 1
+                                color: '#e5e7eb',
+                                lineWidth: 1,
+                                drawBorder: false
                             },
                             border: {
                                 display: false
@@ -2696,13 +2670,14 @@
                                 font: { 
                                     size: 11
                                 },
-                                color: '#9ca3af'
+                                color: '#6b7280'
                             },
                             grid: {
                                 display: false
                             },
                             border: {
-                                display: false
+                                display: true,
+                                color: '#e5e7eb'
                             }
                         }
                     }
