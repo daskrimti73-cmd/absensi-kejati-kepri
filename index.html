@@ -2575,13 +2575,6 @@
                 attendancePercentages.push(percentage);
             });
             
-            // Calculate dynamic Y-axis range
-            const minValue = Math.min(...attendancePercentages);
-            const maxValue = Math.max(...attendancePercentages);
-            const range = maxValue - minValue;
-            const yMin = Math.max(0, Math.floor(minValue - range * 0.2));
-            const yMax = Math.min(100, Math.ceil(maxValue + range * 0.2));
-            
             const datasets3 = [
                 {
                     label: 'Persentase Kehadiran',
@@ -2669,15 +2662,20 @@
                     scales: {
                         y: { 
                             beginAtZero: false,
-                            min: yMin,
-                            max: yMax,
+                            min: 80,
+                            max: 100,
                             ticks: { 
                                 font: { 
-                                    size: 10,
-                                    family: 'Arial'
+                                    size: 11,
+                                    family: 'Arial',
+                                    weight: '500'
                                 },
-                                color: '#9ca3af',
-                                padding: 8
+                                color: '#6b7280',
+                                padding: 8,
+                                stepSize: 5,
+                                callback: function(value) {
+                                    return value + '%';
+                                }
                             },
                             grid: {
                                 color: '#f3f4f6',
@@ -2686,6 +2684,19 @@
                             },
                             border: {
                                 display: false
+                            },
+                            title: {
+                                display: true,
+                                text: 'Persentase Kehadiran',
+                                color: '#374151',
+                                font: {
+                                    size: 12,
+                                    weight: 'bold',
+                                    family: 'Arial'
+                                },
+                                padding: {
+                                    bottom: 10
+                                }
                             }
                         },
                         x: { 
