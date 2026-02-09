@@ -1274,6 +1274,7 @@
             
             // IMPORTANT: Scan from BOTTOM to TOP (summary rows usually at bottom)
             // This way we find the real summary rows first, not data rows
+            // ✅ CRITICAL: Must scan ALL rows to find WFO (don't stop early!)
             for (let rowIdx = data.length - 1; rowIdx >= 0; rowIdx--) {
                 const row = data[rowIdx];
                 
@@ -1302,12 +1303,14 @@
                     }
                 }
                 
-                // Stop scanning if we found all REQUIRED labels (must include WFO!)
+                // Stop scanning if we found all REQUIRED labels (MUST include WFO!)
                 const requiredKeys = ['wfo', 'dinas_luar', 'undangan', 'ijin', 'cuti', 'tidak_absen'];
                 const foundRequired = requiredKeys.filter(key => foundLabels[key]);
                 
-                if (foundRequired.length >= 6) {
-                    console.log(`  ✅ Found all 6 required summary rows, stopping scan at row ${rowIdx}`);
+                // ✅ CRITICAL FIX: Must find WFO before stopping!
+                // Without WFO, the data is invalid and will cause validation error
+                if (foundRequired.length >= 6 && foundLabels['wfo']) {
+                    console.log(`  ✅ Found all 6 required summary rows (including WFO), stopping scan at row ${rowIdx}`);
                     break;
                 }
             }

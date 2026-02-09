@@ -1664,33 +1664,42 @@
                 });
             }
             
-            // Fetch data for all bidang for donut charts
-            for (let i = 0; i < bidangList.length; i++) {
-                const data = await fetchFromSupabase(tahun, bulan, bidangList[i]);
+            // ✅ FIXED: Read from GABUNGAN sheet instead of summing all bidang manually
+            // This ensures data matches the Excel "ALL CLEAN/CLEAN/GABUNGAN" sheet
+            console.log(`🔍 Fetching GABUNGAN data for ${bulan} ${tahun}...`);
+            console.log(`⚠️ IMPORTANT: Dashboard will read from GABUNGAN, NOT sum all bidang manually!`);
+            const gabunganData = await fetchFromSupabase(tahun, bulan, 'GABUNGAN');
+            
+            if (gabunganData && gabunganData.labels.length > 0) {
+                const sum = arr => arr.reduce((a, b) => a + b, 0);
+                totalWfoAll = sum(gabunganData.wfo);
+                totalDinasAll = sum(gabunganData.dinasLuar);
+                totalUndanganAll = sum(gabunganData.undangan);
+                totalSakitAll = sum(gabunganData.sakit);
+                totalIjinAll = sum(gabunganData.ijin);
+                totalCutiAll = sum(gabunganData.cuti);
+                totalIsomanAll = sum(gabunganData.isoman || []); // ✅ ISOMAN support
+                totalAlphaAll = sum(gabunganData.tidakAbsen);
                 
-                if (data && data.labels.length > 0) {
-                    const sum = arr => arr.reduce((a, b) => a + b, 0);
-                    const totalWfo = sum(data.wfo);
-                    const totalDinas = sum(data.dinasLuar);
-                    const totalUndangan = sum(data.undangan);
-                    const totalSakit = sum(data.sakit);
-                    const totalIjin = sum(data.ijin);
-                    const totalCuti = sum(data.cuti);
-                    const totalIsoman = sum(data.isoman || []); // ✅ ISOMAN support
-                    const totalAlpha = sum(data.tidakAbsen);
-                    
-                    totalWfoAll += totalWfo;
-                    totalDinasAll += totalDinas;
-                    totalUndanganAll += totalUndangan;
-                    totalSakitAll += totalSakit;
-                    totalIjinAll += totalIjin;
-                    totalCutiAll += totalCuti;
-                    totalIsomanAll += totalIsoman; // ✅ ISOMAN support
-                    totalAlphaAll += totalAlpha;
-                    
-                    // Collect unique dates
-                    data.labels.forEach(date => uniqueDates.add(date));
-                }
+                console.log(`✅ GABUNGAN data loaded:`, {
+                    rows: gabunganData.labels.length,
+                    WFO: totalWfoAll,
+                    'Dinas Luar': totalDinasAll,
+                    Undangan: totalUndanganAll,
+                    Sakit: totalSakitAll,
+                    Ijin: totalIjinAll,
+                    Cuti: totalCutiAll,
+                    Isoman: totalIsomanAll,
+                    'Tidak Absen': totalAlphaAll,
+                    Total: totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalIsomanAll + totalAlphaAll
+                });
+                
+                // Collect unique dates from GABUNGAN
+                gabunganData.labels.forEach(date => uniqueDates.add(date));
+            } else {
+                console.error(`❌ GABUNGAN data NOT FOUND for ${bulan} ${tahun}!`);
+                console.error('This means the parser did not upload GABUNGAN sheet correctly.');
+                console.error('Dashboard will show 0/0 for CHECK IN.');
             }
             
             // Update Info Cards
@@ -2239,6 +2248,9 @@
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('📊 Dashboard Version: 4.0.0 - GABUNGAN MODE');
+            console.log('✅ Dashboard now reads from GABUNGAN sheet (not sum of all bidang)');
+            console.log('✅ CHECK IN calculation: Total - Tidak Absen (includes ISOMAN)');
             updateBidangDashboard();
         });
         
