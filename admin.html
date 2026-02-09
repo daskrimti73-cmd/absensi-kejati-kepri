@@ -1302,9 +1302,9 @@
                     }
                 }
                 
-                // Stop scanning if we found all required labels
-                if (Object.keys(foundLabels).length >= 7) {
-                    console.log(`  ✅ Found all 7 summary rows, stopping scan at row ${rowIdx}`);
+                // Stop scanning if we found all required labels (6 minimum: wfo, dinas_luar, undangan, ijin, cuti, tidak_absen)
+                if (Object.keys(foundLabels).length >= 6) {
+                    console.log(`  ✅ Found minimum 6 summary rows, stopping scan at row ${rowIdx}`);
                     break;
                 }
             }
@@ -1328,7 +1328,7 @@
             }
             
             // Check summary rows
-            const required = ['wfo', 'dinas_luar', 'undangan', 'sakit', 'ijin', 'cuti', 'tidak_absen'];
+            const required = ['wfo', 'dinas_luar', 'undangan', 'ijin', 'cuti', 'tidak_absen']; // ✅ SAKIT & ISOMAN optional
             const missing = [];
             
             for (const key of required) {
