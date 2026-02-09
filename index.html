@@ -2559,7 +2559,7 @@
                 }
             });
             
-            // Trend Chart - Overall Attendance Percentage
+            // Trend Chart - Overall Attendance Percentage (UNIQUE DESIGN)
             const ctx3 = document.getElementById('comparisonTrendChart').getContext('2d');
             if (comparisonCharts.trend) comparisonCharts.trend.destroy();
             
@@ -2572,20 +2572,33 @@
                 return total > 0 ? ((checkIn / total) * 100) : 0;
             });
             
+            // Create gradient
+            const gradient = ctx3.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+            gradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.15)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.02)');
+            
             const datasets3 = [
                 {
                     label: 'Persentase Kehadiran',
                     data: attendancePercentages,
                     borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                    backgroundColor: gradient,
                     tension: 0.4,
                     fill: true,
-                    borderWidth: 3,
-                    pointRadius: 7,
-                    pointHoverRadius: 9,
+                    borderWidth: 4,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
                     pointBackgroundColor: '#10b981',
                     pointBorderColor: '#fff',
-                    pointBorderWidth: 2
+                    pointBorderWidth: 3,
+                    pointHoverBackgroundColor: '#059669',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 4,
+                    shadowOffsetX: 3,
+                    shadowOffsetY: 3,
+                    shadowBlur: 10,
+                    shadowColor: 'rgba(16, 185, 129, 0.3)'
                 }
             ];
             
@@ -2602,12 +2615,59 @@
                             const meta = chart.getDatasetMeta(i);
                             if (!meta.hidden) {
                                 meta.data.forEach(function(element, index) {
-                                    ctx.fillStyle = '#10b981';
-                                    ctx.font = 'bold 13px Inter';
-                                    ctx.textAlign = 'center';
-                                    ctx.textBaseline = 'bottom';
                                     const dataString = dataset.data[index].toFixed(1) + '%';
-                                    ctx.fillText(dataString, element.x, element.y - 8);
+                                    
+                                    // Measure text width
+                                    ctx.font = 'bold 14px Inter';
+                                    const textWidth = ctx.measureText(dataString).width;
+                                    const textHeight = 14;
+                                    
+                                    // Draw background box with rounded corners
+                                    const padding = 6;
+                                    const boxX = element.x - (textWidth / 2) - padding;
+                                    const boxY = element.y - textHeight - padding - 12;
+                                    const boxWidth = textWidth + (padding * 2);
+                                    const boxHeight = textHeight + (padding * 2);
+                                    const radius = 6;
+                                    
+                                    // Shadow for box
+                                    ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+                                    ctx.shadowBlur = 8;
+                                    ctx.shadowOffsetX = 0;
+                                    ctx.shadowOffsetY = 2;
+                                    
+                                    // Draw rounded rectangle
+                                    ctx.fillStyle = '#ffffff';
+                                    ctx.beginPath();
+                                    ctx.moveTo(boxX + radius, boxY);
+                                    ctx.lineTo(boxX + boxWidth - radius, boxY);
+                                    ctx.quadraticCurveTo(boxX + boxWidth, boxY, boxX + boxWidth, boxY + radius);
+                                    ctx.lineTo(boxX + boxWidth, boxY + boxHeight - radius);
+                                    ctx.quadraticCurveTo(boxX + boxWidth, boxY + boxHeight, boxX + boxWidth - radius, boxY + boxHeight);
+                                    ctx.lineTo(boxX + radius, boxY + boxHeight);
+                                    ctx.quadraticCurveTo(boxX, boxY + boxHeight, boxX, boxY + boxHeight - radius);
+                                    ctx.lineTo(boxX, boxY + radius);
+                                    ctx.quadraticCurveTo(boxX, boxY, boxX + radius, boxY);
+                                    ctx.closePath();
+                                    ctx.fill();
+                                    
+                                    // Border for box
+                                    ctx.strokeStyle = '#10b981';
+                                    ctx.lineWidth = 2;
+                                    ctx.stroke();
+                                    
+                                    // Reset shadow
+                                    ctx.shadowColor = 'transparent';
+                                    ctx.shadowBlur = 0;
+                                    ctx.shadowOffsetX = 0;
+                                    ctx.shadowOffsetY = 0;
+                                    
+                                    // Draw text
+                                    ctx.fillStyle = '#10b981';
+                                    ctx.font = 'bold 14px Inter';
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'middle';
+                                    ctx.fillText(dataString, element.x, boxY + (boxHeight / 2));
                                 });
                             }
                         });
@@ -2616,14 +2676,34 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
                     plugins: {
                         legend: {
                             display: false
                         },
                         tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#1f2937',
+                            bodyColor: '#10b981',
+                            borderColor: '#10b981',
+                            borderWidth: 2,
+                            padding: 12,
+                            displayColors: false,
+                            titleFont: {
+                                size: 13,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
                             callbacks: {
                                 label: function(context) {
-                                    return 'Kehadiran: ' + context.parsed.y.toFixed(1) + '%';
+                                    return '📊 Kehadiran: ' + context.parsed.y.toFixed(1) + '%';
                                 }
                             }
                         }
@@ -2634,19 +2714,44 @@
                             min: 65,
                             max: 100,
                             ticks: { 
-                                font: { size: 12 },
-                                stepSize: 5
+                                font: { 
+                                    size: 12,
+                                    weight: '600'
+                                },
+                                color: '#6b7280',
+                                stepSize: 5,
+                                callback: function(value) {
+                                    return value + '%';
+                                }
                             },
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
+                                color: 'rgba(16, 185, 129, 0.08)',
+                                lineWidth: 1,
+                                drawBorder: false
+                            },
+                            border: {
+                                display: false
                             }
                         },
                         x: { 
-                            ticks: { font: { size: 12 } },
+                            ticks: { 
+                                font: { 
+                                    size: 12,
+                                    weight: '600'
+                                },
+                                color: '#6b7280'
+                            },
                             grid: {
+                                display: false
+                            },
+                            border: {
                                 display: false
                             }
                         }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeInOutQuart'
                     }
                 }
             });
