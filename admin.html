@@ -1490,10 +1490,11 @@
                 const sakit = parseValue(summaryRows['sakit'], colIndex);
                 const ijin = parseValue(summaryRows['ijin'], colIndex);
                 const cuti = parseValue(summaryRows['cuti'], colIndex);
+                const isoman = parseValue(summaryRows['isoman'], colIndex); // ✅ ISOMAN support (optional)
                 const tidakAbsen = parseValue(summaryRows['tidak_absen'], colIndex);
                 
                 // Skip if no data (weekend/holiday)
-                const total = wfo + dinasLuar + undangan + sakit + ijin + cuti + tidakAbsen;
+                const total = wfo + dinasLuar + undangan + sakit + ijin + cuti + isoman + tidakAbsen;
                 if (total === 0) {
                     continue;
                 }
@@ -1515,6 +1516,7 @@
                     sakit: sakit,
                     ijin: ijin,
                     cuti: cuti,
+                    isoman: isoman, // ✅ ISOMAN support
                     tidak_absen: tidakAbsen
                 });
             }
@@ -1733,6 +1735,7 @@
                                 sakit: 0,
                                 ijin: 0,
                                 cuti: 0,
+                                isoman: 0, // ✅ ISOMAN support
                                 tidak_absen: 0
                             };
                         }
@@ -1742,6 +1745,7 @@
                         dateMap[key].sakit += row.sakit;
                         dateMap[key].ijin += row.ijin;
                         dateMap[key].cuti += row.cuti;
+                        dateMap[key].isoman += (row.isoman || 0); // ✅ ISOMAN support
                         dateMap[key].tidak_absen += row.tidak_absen;
                     });
                     
