@@ -1258,7 +1258,7 @@
                 { label: 'JUMLAH SAKIT', key: 'sakit' },
                 { label: 'JUMLAH IJIN', key: 'ijin' },
                 { label: 'JUMLAH CUTI', key: 'cuti' },
-                { label: 'JUMLAH ISOMAN', key: 'tidak_absen' }, // Fallback
+                { label: 'JUMLAH ISOMAN', key: 'isoman' }, // ✅ ISOMAN support
                 // Fallback without "JUMLAH" prefix
                 { label: 'TIDAK ABSEN', key: 'tidak_absen' },
                 { label: 'WFO', key: 'wfo' },
@@ -1267,7 +1267,7 @@
                 { label: 'SAKIT', key: 'sakit' },
                 { label: 'IJIN', key: 'ijin' },
                 { label: 'CUTI', key: 'cuti' },
-                { label: 'ISOMAN', key: 'tidak_absen' }
+                { label: 'ISOMAN', key: 'isoman' } // ✅ ISOMAN support
             ];
             
             console.log(`  🔍 Scanning ${data.length} rows from BOTTOM to TOP for summary rows...`);
