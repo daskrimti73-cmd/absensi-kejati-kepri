@@ -1303,11 +1303,6 @@
                 </div>
                 
                 <div style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 1px solid var(--gray-200);">
-                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-800); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700;">📋 Perbandingan Per Bidang - WFO</h2>
-                    <canvas id="comparisonBidangChart"></canvas>
-                </div>
-                
-                <div style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 1px solid var(--gray-200);">
                     <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-800); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700;">📈 Trend Kehadiran</h2>
                     <canvas id="comparisonTrendChart"></canvas>
                 </div>
@@ -2482,49 +2477,6 @@
                     scales: {
                         y: { beginAtZero: true, ticks: { font: { size: 12 } } },
                         x: { ticks: { font: { size: 12 } } }
-                    }
-                }
-            });
-            
-            // Bidang Chart
-            const ctx2 = document.getElementById('comparisonBidangChart').getContext('2d');
-            if (comparisonCharts.bidang) comparisonCharts.bidang.destroy();
-            
-            const allBidangs = [...new Set(periods.flatMap(p => p.data.map(r => r.bidang)))].filter(b => b !== 'GABUNGAN');
-            
-            const datasets2 = periods.map((period, idx) => {
-                const data = allBidangs.map(bidang => {
-                    const rows = period.data.filter(r => r.bidang === bidang);
-                    return rows.reduce((sum, r) => sum + r.wfo, 0);
-                });
-                
-                return {
-                    label: period.label,
-                    data,
-                    backgroundColor: COMPARE_COLORS[idx],
-                    borderColor: COMPARE_COLORS[idx],
-                    borderWidth: 2
-                };
-            });
-            
-            comparisonCharts.bidang = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: allBidangs,
-                    datasets: datasets2
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: { font: { size: 14, weight: 'bold' }, padding: 15 }
-                        }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { font: { size: 12 } } },
-                        x: { ticks: { font: { size: 11 } } }
                     }
                 }
             });
