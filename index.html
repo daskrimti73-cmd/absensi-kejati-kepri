@@ -1690,11 +1690,15 @@
             
             // Update Info Cards
             const hariKerja = uniqueDates.size;
-            const totalExpected = 142 * hariKerja; // Total pegawai * hari kerja
-            const totalCheckIn = totalExpected - totalAlphaAll; // ✅ Total - Tidak Absen
+            
+            // ✅ Total = WFO + Dinas Luar + Undangan + Sakit + Ijin + Cuti + Tidak Absen
+            const totalKeseluruhan = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalAlphaAll;
+            
+            // ✅ Check In = Total - Tidak Absen
+            const totalCheckIn = totalKeseluruhan - totalAlphaAll;
             
             document.getElementById('infoHariKerja').textContent = hariKerja;
-            document.getElementById('infoCheckIn').textContent = `${totalCheckIn}/${totalExpected}`;
+            document.getElementById('infoCheckIn').textContent = `${totalCheckIn}/${totalKeseluruhan}`;
             
             // Generate Treemap
             generateTreemap(bidangData);
