@@ -1690,8 +1690,8 @@
             
             // Update Info Cards
             const hariKerja = uniqueDates.size;
-            const totalCheckIn = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll;
             const totalExpected = 142 * hariKerja; // Total pegawai * hari kerja
+            const totalCheckIn = totalExpected - totalAlphaAll; // ✅ Total - Tidak Absen
             
             document.getElementById('infoHariKerja').textContent = hariKerja;
             document.getElementById('infoCheckIn').textContent = `${totalCheckIn}/${totalExpected}`;
