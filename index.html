@@ -2559,13 +2559,13 @@
                 }
             });
             
-            // Trend Chart - 2 Lines Comparison (Check In vs Tidak Hadir)
+            // Trend Chart - 2 Lines with Absolute Values (like reference)
             const ctx3 = document.getElementById('comparisonTrendChart').getContext('2d');
             if (comparisonCharts.trend) comparisonCharts.trend.destroy();
             
-            // Calculate percentages for each period
-            const checkInPercentages = [];
-            const tidakHadirPercentages = [];
+            // Use absolute values instead of percentages for better visualization
+            const checkInValues = [];
+            const tidakHadirValues = [];
             
             periods.forEach(period => {
                 const total = period.totals.wfo + period.totals.dinas_luar + period.totals.undangan + 
@@ -2573,49 +2573,44 @@
                              period.totals.isoman + period.totals.tidak_absen;
                 const checkIn = total - period.totals.tidak_absen;
                 
-                if (total > 0) {
-                    checkInPercentages.push(((checkIn / total) * 100).toFixed(1));
-                    tidakHadirPercentages.push(((period.totals.tidak_absen / total) * 100).toFixed(1));
-                } else {
-                    checkInPercentages.push(0);
-                    tidakHadirPercentages.push(0);
-                }
+                checkInValues.push(checkIn);
+                tidakHadirValues.push(period.totals.tidak_absen);
             });
             
             const datasets3 = [
                 {
                     label: 'Check In (Hadir)',
-                    data: checkInPercentages.map(v => parseFloat(v)),
+                    data: checkInValues,
                     borderColor: '#059669',
                     backgroundColor: 'transparent',
                     tension: 0.4,
                     fill: false,
-                    borderWidth: 4,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
                     pointBackgroundColor: '#fff',
                     pointBorderColor: '#059669',
-                    pointBorderWidth: 3,
+                    pointBorderWidth: 2,
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: '#059669',
-                    pointHoverBorderWidth: 4
+                    pointHoverBorderWidth: 3
                 },
                 {
                     label: 'Tidak Hadir',
-                    data: tidakHadirPercentages.map(v => parseFloat(v)),
+                    data: tidakHadirValues,
                     borderColor: '#f59e0b',
                     backgroundColor: 'transparent',
                     tension: 0.4,
                     fill: false,
-                    borderWidth: 4,
-                    pointRadius: 6,
-                    pointHoverRadius: 8,
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
                     pointBackgroundColor: '#fff',
                     pointBorderColor: '#f59e0b',
-                    pointBorderWidth: 3,
+                    pointBorderWidth: 2,
                     pointHoverBackgroundColor: '#fff',
                     pointHoverBorderColor: '#f59e0b',
-                    pointHoverBorderWidth: 4
+                    pointHoverBorderWidth: 3
                 }
             ];
             
@@ -2634,12 +2629,12 @@
                                 meta.data.forEach(function(element, index) {
                                     // Set color based on dataset
                                     ctx.fillStyle = dataset.borderColor;
-                                    ctx.font = 'bold 13px Inter';
+                                    ctx.font = 'bold 12px Inter';
                                     ctx.textAlign = 'center';
                                     ctx.textBaseline = 'bottom';
                                     
-                                    const dataString = dataset.data[index].toFixed(1) + '%';
-                                    ctx.fillText(dataString, element.x, element.y - 10);
+                                    const dataString = Math.round(dataset.data[index]).toString();
+                                    ctx.fillText(dataString, element.x, element.y - 8);
                                 });
                             }
                         });
@@ -2682,13 +2677,11 @@
                     scales: {
                         y: { 
                             beginAtZero: true,
-                            max: 100,
                             ticks: { 
                                 font: { 
                                     size: 11
                                 },
-                                color: '#9ca3af',
-                                stepSize: 20
+                                color: '#9ca3af'
                             },
                             grid: {
                                 color: '#f3f4f6',
