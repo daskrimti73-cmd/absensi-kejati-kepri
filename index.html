@@ -296,7 +296,7 @@
         .treemap-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 4px;
             height: 280px;
             width: 100%;
             align-content: flex-start;
@@ -1780,19 +1780,17 @@
             // Calculate total for percentage
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Generate HTML with special handling for largest item
+            // Generate HTML with proper treemap algorithm
             const html = sortedData.map((item, index) => {
                 const percentage = (item.value / total) * 100;
                 
-                // First item (largest) gets special treatment - full height
+                // First item (Pembinaan 33) - takes left column, full height
                 if (index === 0) {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 0 0 calc(${percentage}% - 8px);
-                            min-width: 200px;
+                            flex: 0 0 calc(${percentage * 0.8}% - 4px);
                             height: 100%;
-                            align-self: stretch;
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                             <div class="treemap-item-value">${item.value}</div>
@@ -1800,18 +1798,42 @@
                     `;
                 }
                 
-                // Other items - normal sizing
-                const flexBasis = `calc(${percentage}% - 8px)`;
-                const minWidth = percentage > 15 ? '160px' : percentage > 10 ? '120px' : percentage > 5 ? '100px' : '80px';
-                const minHeight = percentage > 15 ? '120px' : percentage > 10 ? '100px' : '80px';
+                // Second item (Tata Usaha 22) - top right, half height
+                if (index === 1) {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 1 1 calc(${percentage * 1.2}% - 4px);
+                            height: calc(50% - 2px);
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
                 
+                // Items 3-5 (Pidsus 20, Pidum 19, Pengawasan 16) - medium boxes
+                if (index >= 2 && index <= 4) {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 1 1 calc(${percentage * 1.3}% - 4px);
+                            min-width: calc(33% - 4px);
+                            height: calc(50% - 2px);
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                // Items 6-9 (Intelijen 15, Datun 8, Pemulihan Aset 5, Koordinator 4) - small boxes
                 return `
                     <div class="treemap-item" style="
                         background: ${item.color};
-                        flex: 1 1 ${flexBasis};
-                        min-width: ${minWidth};
-                        min-height: ${minHeight};
-                        max-height: 140px;
+                        flex: 1 1 calc(${percentage * 1.5}% - 4px);
+                        min-width: calc(25% - 4px);
+                        height: calc(50% - 2px);
                     ">
                         <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                         <div class="treemap-item-value">${item.value}</div>
