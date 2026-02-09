@@ -1401,6 +1401,7 @@
                             sakit: 0,
                             ijin: 0,
                             cuti: 0,
+                            isoman: 0, // ✅ ISOMAN support
                             tidak_absen: 0
                         };
                     }
@@ -1410,6 +1411,7 @@
                     groupedData[tanggal].sakit += row.sakit || 0;
                     groupedData[tanggal].ijin += row.ijin || 0;
                     groupedData[tanggal].cuti += row.cuti || 0;
+                    groupedData[tanggal].isoman += row.isoman || 0; // ✅ ISOMAN support
                     groupedData[tanggal].tidak_absen += row.tidak_absen || 0;
                 });
                 
@@ -1431,6 +1433,7 @@
                     sakit: sortedData.map(d => d.sakit),
                     ijin: sortedData.map(d => d.ijin),
                     cuti: sortedData.map(d => d.cuti),
+                    isoman: sortedData.map(d => d.isoman), // ✅ ISOMAN support
                     tidakAbsen: sortedData.map(d => d.tidak_absen)
                 };
             } catch (error) {
