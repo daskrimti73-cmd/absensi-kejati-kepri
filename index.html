@@ -294,12 +294,12 @@
         
         /* Treemap Styling */
         .treemap-container {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 23% 28% 30% 19%;
+            grid-template-rows: 50% 50%;
             gap: 4px;
             height: 280px;
             width: 100%;
-            align-content: flex-start;
         }
         
         .treemap-item {
@@ -1781,20 +1781,22 @@
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
             // Create treemap with exact layout from reference
-            // Layout: Pembinaan (left, full height) | Right side (2 rows)
-            // Row 1: Tata Usaha, Pidum, Pengawasan
-            // Row 2: Pidsus, Intelijen, Datun+Pemulihan Aset, Koordinator
+            // Total width must be 100% including gaps
             
             const html = sortedData.map((item, index) => {
                 const percentage = (item.value / total) * 100;
                 
-                // Pembinaan (33) - Left column, full height, ~23% width
+                // Layout menggunakan CSS Grid:
+                // Row 1: Pembinaan (full height) | Tata Usaha | Pidum | Pengawasan
+                // Row 2: Pembinaan (full height) | Pidsus | Intelijen | (Datun + Pemulihan + Koordinator stacked)
+                
+                // Pembinaan (33) - Grid: row 1-3, column 1
                 if (index === 0) {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 0 0 23%;
-                            height: 100%;
+                            grid-row: 1 / 3;
+                            grid-column: 1;
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                             <div class="treemap-item-value">${item.value}</div>
@@ -1802,13 +1804,13 @@
                     `;
                 }
                 
-                // Tata Usaha (22) - Top row, ~28% width
+                // Tata Usaha (22) - Grid: row 1, column 2
                 if (index === 1) {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 0 0 calc(28% - 4px);
-                            height: calc(50% - 2px);
+                            grid-row: 1;
+                            grid-column: 2;
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                             <div class="treemap-item-value">${item.value}</div>
@@ -1816,27 +1818,13 @@
                     `;
                 }
                 
-                // Pidsus (20) - Bottom row left, ~28% width
-                if (item.name === 'PIDSUS') {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            flex: 0 0 calc(28% - 4px);
-                            height: calc(50% - 2px);
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
-                        </div>
-                    `;
-                }
-                
-                // Pidum (19) - Top row middle, ~30% width
+                // Pidum (19) - Grid: row 1, column 3
                 if (item.name === 'PIDUM') {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 0 0 calc(30% - 4px);
-                            height: calc(50% - 2px);
+                            grid-row: 1;
+                            grid-column: 3;
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                             <div class="treemap-item-value">${item.value}</div>
@@ -1844,13 +1832,13 @@
                     `;
                 }
                 
-                // Pengawasan (16) - Top row right, ~19% width
-                if (item.name === 'PENGAWASAN') {
+                // Pidsus (20) - Grid: row 2, column 2
+                if (item.name === 'PIDSUS') {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 0 0 calc(19% - 4px);
-                            height: calc(50% - 2px);
+                            grid-row: 2;
+                            grid-column: 2;
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                             <div class="treemap-item-value">${item.value}</div>
@@ -1858,13 +1846,13 @@
                     `;
                 }
                 
-                // Intelijen (15) - Bottom row middle, ~30% width
+                // Intelijen (15) - Grid: row 2, column 3
                 if (item.name === 'INTELIJEN') {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 0 0 calc(30% - 4px);
-                            height: calc(50% - 2px);
+                            grid-row: 2;
+                            grid-column: 3;
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                             <div class="treemap-item-value">${item.value}</div>
@@ -1872,46 +1860,54 @@
                     `;
                 }
                 
-                // Datun (8) - Bottom row right top, ~9.5% width
+                // Pengawasan (16) - Grid: row 1, column 4 (nested grid untuk 3 box kecil)
+                if (item.name === 'PENGAWASAN') {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            grid-row: 1;
+                            grid-column: 4;
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                // Column 4 Row 2 akan berisi nested grid untuk 3 box kecil
+                // Datun (8), Pemulihan Aset (5), Koordinator (4)
                 if (item.name === 'DATUN') {
                     return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            flex: 0 0 calc(9.5% - 4px);
-                            height: calc(25% - 2px);
+                        <div style="
+                            grid-row: 2;
+                            grid-column: 4;
+                            display: grid;
+                            grid-template-rows: 1fr 1fr 1fr;
+                            gap: 4px;
                         ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
+                            <div class="treemap-item" style="background: ${item.color};">
+                                <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                                <div class="treemap-item-value">${item.value}</div>
+                            </div>
+                            ${sortedData.find(d => d.name === 'PEMULIHAN ASET') ? `
+                            <div class="treemap-item" style="background: ${sortedData.find(d => d.name === 'PEMULIHAN ASET').color};">
+                                <div class="treemap-item-label">${bidangNamaLengkap['PEMULIHAN ASET']}</div>
+                                <div class="treemap-item-value">${sortedData.find(d => d.name === 'PEMULIHAN ASET').value}</div>
+                            </div>
+                            ` : ''}
+                            ${sortedData.find(d => d.name === 'KOORDINATOR') ? `
+                            <div class="treemap-item" style="background: ${sortedData.find(d => d.name === 'KOORDINATOR').color};">
+                                <div class="treemap-item-label">${bidangNamaLengkap['KOORDINATOR']}</div>
+                                <div class="treemap-item-value">${sortedData.find(d => d.name === 'KOORDINATOR').value}</div>
+                            </div>
+                            ` : ''}
                         </div>
                     `;
                 }
                 
-                // Pemulihan Aset (5) - Bottom row right middle, ~9.5% width
-                if (item.name === 'PEMULIHAN ASET') {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            flex: 0 0 calc(9.5% - 4px);
-                            height: calc(25% - 2px);
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
-                        </div>
-                    `;
-                }
-                
-                // Koordinator (4) - Bottom row right bottom, ~9.5% width, full remaining height
-                if (item.name === 'KOORDINATOR') {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            flex: 0 0 calc(9.5% - 4px);
-                            height: calc(50% - 2px);
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
-                        </div>
-                    `;
+                // Skip Pemulihan Aset dan Koordinator karena sudah di-render dalam nested grid
+                if (item.name === 'PEMULIHAN ASET' || item.name === 'KOORDINATOR') {
+                    return '';
                 }
                 
                 return '';
