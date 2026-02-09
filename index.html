@@ -1780,19 +1780,38 @@
             // Calculate total for percentage
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Calculate flex-basis based on value (proportional sizing)
-            const html = sortedData.map(item => {
+            // Generate HTML with special handling for largest item
+            const html = sortedData.map((item, index) => {
                 const percentage = (item.value / total) * 100;
-                // Calculate width: minimum 80px, maximum based on percentage
+                
+                // First item (largest) gets special treatment - full height
+                if (index === 0) {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 0 0 calc(${percentage}% - 8px);
+                            min-width: 200px;
+                            height: 100%;
+                            align-self: stretch;
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                // Other items - normal sizing
                 const flexBasis = `calc(${percentage}% - 8px)`;
-                const minWidth = percentage > 15 ? '180px' : percentage > 10 ? '120px' : '80px';
+                const minWidth = percentage > 15 ? '160px' : percentage > 10 ? '120px' : percentage > 5 ? '100px' : '80px';
+                const minHeight = percentage > 15 ? '120px' : percentage > 10 ? '100px' : '80px';
                 
                 return `
                     <div class="treemap-item" style="
                         background: ${item.color};
                         flex: 1 1 ${flexBasis};
                         min-width: ${minWidth};
-                        min-height: ${percentage > 20 ? '140px' : percentage > 10 ? '100px' : '80px'};
+                        min-height: ${minHeight};
+                        max-height: 140px;
                     ">
                         <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
                         <div class="treemap-item-value">${item.value}</div>
