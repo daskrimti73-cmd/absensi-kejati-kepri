@@ -1875,7 +1875,7 @@
                 
                 const { data: uploadedData, error: validateError } = await sbClient
                     .from('absensi')
-                    .select('bidang, wfo, dinas_luar, undangan, sakit, ijin, cuti, tidak_absen')
+                    .select('bidang, wfo, dinas_luar, undangan, sakit, ijin, cuti, isoman, tidak_absen') // ✅ Include isoman
                     .eq('tahun', tahun)
                     .eq('bulan', bulan);
                 
@@ -1886,7 +1886,7 @@
                     const totals = {};
                     uploadedData.forEach(row => {
                         if (!totals[row.bidang]) {
-                            totals[row.bidang] = { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, tidak_absen: 0, total: 0 };
+                            totals[row.bidang] = { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, isoman: 0, tidak_absen: 0, total: 0 };
                         }
                         totals[row.bidang].wfo += row.wfo;
                         totals[row.bidang].dinas_luar += row.dinas_luar;
@@ -1894,8 +1894,9 @@
                         totals[row.bidang].sakit += row.sakit;
                         totals[row.bidang].ijin += row.ijin;
                         totals[row.bidang].cuti += row.cuti;
+                        totals[row.bidang].isoman += (row.isoman || 0); // ✅ Include isoman
                         totals[row.bidang].tidak_absen += row.tidak_absen;
-                        totals[row.bidang].total += row.wfo + row.dinas_luar + row.undangan + row.sakit + row.ijin + row.cuti + row.tidak_absen;
+                        totals[row.bidang].total += row.wfo + row.dinas_luar + row.undangan + row.sakit + row.ijin + row.cuti + (row.isoman || 0) + row.tidak_absen;
                     });
                     
                     console.log('\n📊 VALIDASI HASIL UPLOAD:');
@@ -1903,7 +1904,7 @@
                     Object.keys(totals).sort().forEach(bidang => {
                         const t = totals[bidang];
                         console.log(`${bidang}:`);
-                        console.log(`  WFO=${t.wfo}, DL=${t.dinas_luar}, U=${t.undangan}, S=${t.sakit}, I=${t.ijin}, C=${t.cuti}, TA=${t.tidak_absen}`);
+                        console.log(`  WFO=${t.wfo}, DL=${t.dinas_luar}, U=${t.undangan}, S=${t.sakit}, I=${t.ijin}, C=${t.cuti}, ISO=${t.isoman}, TA=${t.tidak_absen}`); // ✅ Show isoman
                         console.log(`  TOTAL = ${t.total}`);
                     });
                     console.log('═'.repeat(80));
