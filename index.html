@@ -1780,16 +1780,20 @@
             // Calculate total for percentage
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Generate HTML with proper treemap algorithm
+            // Create treemap with exact layout from reference
+            // Layout: Pembinaan (left, full height) | Right side (2 rows)
+            // Row 1: Tata Usaha, Pidum, Pengawasan
+            // Row 2: Pidsus, Intelijen, Datun+Pemulihan Aset, Koordinator
+            
             const html = sortedData.map((item, index) => {
                 const percentage = (item.value / total) * 100;
                 
-                // First item (Pembinaan 33) - takes left column, full height
+                // Pembinaan (33) - Left column, full height, ~23% width
                 if (index === 0) {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 0 0 calc(${percentage * 0.8}% - 4px);
+                            flex: 0 0 23%;
                             height: 100%;
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
@@ -1798,12 +1802,12 @@
                     `;
                 }
                 
-                // Second item (Tata Usaha 22) - top right, half height
+                // Tata Usaha (22) - Top row, ~28% width
                 if (index === 1) {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 1 1 calc(${percentage * 1.2}% - 4px);
+                            flex: 0 0 calc(28% - 4px);
                             height: calc(50% - 2px);
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
@@ -1812,13 +1816,12 @@
                     `;
                 }
                 
-                // Items 3-5 (Pidsus 20, Pidum 19, Pengawasan 16) - medium boxes
-                if (index >= 2 && index <= 4) {
+                // Pidsus (20) - Bottom row left, ~28% width
+                if (item.name === 'PIDSUS') {
                     return `
                         <div class="treemap-item" style="
                             background: ${item.color};
-                            flex: 1 1 calc(${percentage * 1.3}% - 4px);
-                            min-width: calc(33% - 4px);
+                            flex: 0 0 calc(28% - 4px);
                             height: calc(50% - 2px);
                         ">
                             <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
@@ -1827,18 +1830,91 @@
                     `;
                 }
                 
-                // Items 6-9 (Intelijen 15, Datun 8, Pemulihan Aset 5, Koordinator 4) - small boxes
-                return `
-                    <div class="treemap-item" style="
-                        background: ${item.color};
-                        flex: 1 1 calc(${percentage * 1.5}% - 4px);
-                        min-width: calc(25% - 4px);
-                        height: calc(50% - 2px);
-                    ">
-                        <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                        <div class="treemap-item-value">${item.value}</div>
-                    </div>
-                `;
+                // Pidum (19) - Top row middle, ~30% width
+                if (item.name === 'PIDUM') {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 0 0 calc(30% - 4px);
+                            height: calc(50% - 2px);
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                // Pengawasan (16) - Top row right, ~19% width
+                if (item.name === 'PENGAWASAN') {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 0 0 calc(19% - 4px);
+                            height: calc(50% - 2px);
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                // Intelijen (15) - Bottom row middle, ~30% width
+                if (item.name === 'INTELIJEN') {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 0 0 calc(30% - 4px);
+                            height: calc(50% - 2px);
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                // Datun (8) - Bottom row right top, ~9.5% width
+                if (item.name === 'DATUN') {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 0 0 calc(9.5% - 4px);
+                            height: calc(25% - 2px);
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                // Pemulihan Aset (5) - Bottom row right middle, ~9.5% width
+                if (item.name === 'PEMULIHAN ASET') {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 0 0 calc(9.5% - 4px);
+                            height: calc(25% - 2px);
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                // Koordinator (4) - Bottom row right bottom, ~9.5% width, full remaining height
+                if (item.name === 'KOORDINATOR') {
+                    return `
+                        <div class="treemap-item" style="
+                            background: ${item.color};
+                            flex: 0 0 calc(9.5% - 4px);
+                            height: calc(50% - 2px);
+                        ">
+                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
+                            <div class="treemap-item-value">${item.value}</div>
+                        </div>
+                    `;
+                }
+                
+                return '';
             }).join('');
             
             container.innerHTML = html;
