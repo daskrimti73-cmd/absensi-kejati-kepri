@@ -1250,24 +1250,62 @@
             const foundLabels = {}; // Track which labels we've found
             
             // Define labels with priority (longer strings first to avoid partial matches)
+            // ✅ ROBUST: Multiple fallback patterns for each field
             const labelPriority = [
+                // TIDAK ABSEN variations
                 { label: 'JUMLAH TIDAK ABSEN', key: 'tidak_absen' },
-                { label: 'JUMLAH WFO', key: 'wfo' },
-                { label: 'JUMLAH DINAS LUAR', key: 'dinas_luar' },
-                { label: 'JUMLAH UNDANGAN', key: 'undangan' },
-                { label: 'JUMLAH SAKIT', key: 'sakit' },
-                { label: 'JUMLAH IJIN', key: 'ijin' },
-                { label: 'JUMLAH CUTI', key: 'cuti' },
-                { label: 'JUMLAH ISOMAN', key: 'isoman' }, // ✅ ISOMAN support
-                // Fallback without "JUMLAH" prefix
+                { label: 'TOTAL TIDAK ABSEN', key: 'tidak_absen' },
+                { label: 'JML TIDAK ABSEN', key: 'tidak_absen' },
                 { label: 'TIDAK ABSEN', key: 'tidak_absen' },
+                { label: 'ALPHA', key: 'tidak_absen' },
+                { label: 'JUMLAH ALPHA', key: 'tidak_absen' },
+                
+                // WFO variations
+                { label: 'JUMLAH WFO', key: 'wfo' },
+                { label: 'TOTAL WFO', key: 'wfo' },
+                { label: 'JML WFO', key: 'wfo' },
                 { label: 'WFO', key: 'wfo' },
+                
+                // DINAS LUAR variations
+                { label: 'JUMLAH DINAS LUAR', key: 'dinas_luar' },
+                { label: 'TOTAL DINAS LUAR', key: 'dinas_luar' },
+                { label: 'JML DINAS LUAR', key: 'dinas_luar' },
                 { label: 'DINAS LUAR', key: 'dinas_luar' },
+                
+                // UNDANGAN variations
+                { label: 'JUMLAH UNDANGAN', key: 'undangan' },
+                { label: 'TOTAL UNDANGAN', key: 'undangan' },
+                { label: 'JML UNDANGAN', key: 'undangan' },
                 { label: 'UNDANGAN', key: 'undangan' },
+                
+                // SAKIT variations
+                { label: 'JUMLAH SAKIT', key: 'sakit' },
+                { label: 'TOTAL SAKIT', key: 'sakit' },
+                { label: 'JML SAKIT', key: 'sakit' },
                 { label: 'SAKIT', key: 'sakit' },
+                
+                // IJIN variations
+                { label: 'JUMLAH IJIN', key: 'ijin' },
+                { label: 'JUMLAH IZIN', key: 'ijin' },
+                { label: 'TOTAL IJIN', key: 'ijin' },
+                { label: 'TOTAL IZIN', key: 'ijin' },
+                { label: 'JML IJIN', key: 'ijin' },
+                { label: 'JML IZIN', key: 'ijin' },
                 { label: 'IJIN', key: 'ijin' },
+                { label: 'IZIN', key: 'ijin' },
+                
+                // CUTI variations
+                { label: 'JUMLAH CUTI', key: 'cuti' },
+                { label: 'TOTAL CUTI', key: 'cuti' },
+                { label: 'JML CUTI', key: 'cuti' },
                 { label: 'CUTI', key: 'cuti' },
-                { label: 'ISOMAN', key: 'isoman' } // ✅ ISOMAN support
+                
+                // ISOMAN variations (optional)
+                { label: 'JUMLAH ISOMAN', key: 'isoman' },
+                { label: 'TOTAL ISOMAN', key: 'isoman' },
+                { label: 'JML ISOMAN', key: 'isoman' },
+                { label: 'ISOMAN', key: 'isoman' },
+                { label: 'ISOLASI MANDIRI', key: 'isoman' }
             ];
             
             console.log(`  🔍 Scanning ${data.length} rows from BOTTOM to TOP for summary rows...`);
