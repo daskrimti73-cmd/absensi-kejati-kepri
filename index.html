@@ -1825,6 +1825,17 @@
                 item.color = treemapColors[i] || item.color;
             });
             
+            // Abbreviation map for small boxes
+            const shortNames = {
+                'Perdata dan Tata Usaha Negara': 'DATUN',
+                'Pemulihan Aset': 'P. Aset',
+                'Koordinator': 'Koord.',
+                'Pengawasan': 'Pwasan',
+                'Intelijen': 'Intelijen',
+                'Pidana Khusus': 'Pidsus',
+                'Pidana Umum': 'Pidum'
+            };
+            
             treemapChart = new Chart(ctx, {
                 type: 'treemap',
                 data: {
@@ -1835,17 +1846,34 @@
                             display: true,
                             align: 'left',
                             position: 'bottom',
-                            font: {
-                                size: 12,
-                                weight: 'normal',
-                                family: 'Inter, sans-serif'
+                            font: (ctx) => {
+                                if (ctx.type !== 'data') return { size: 10 };
+                                const item = ctx.raw;
+                                const w = item.w || 0;
+                                const h = item.h || 0;
+                                const area = w * h;
+                                if (area > 8000) return { size: 13, weight: 'normal', family: 'Inter, sans-serif' };
+                                if (area > 3000) return { size: 11, weight: 'normal', family: 'Inter, sans-serif' };
+                                return { size: 9, weight: 'normal', family: 'Inter, sans-serif' };
                             },
                             color: 'rgba(255, 255, 255, 0.9)',
                             formatter: (ctx) => {
                                 if (ctx.type !== 'data') return '';
                                 const item = ctx.raw;
-                                return item._data ? `${item._data.name}, ${item._data.value}` : '';
-                            }
+                                if (!item._data) return '';
+                                const w = item.w || 0;
+                                const h = item.h || 0;
+                                const area = w * h;
+                                const name = item._data.name;
+                                const val = item._data.value;
+                                // Use short name for small boxes
+                                if (area < 3000) {
+                                    const short = shortNames[name] || name;
+                                    return `${short}, ${val}`;
+                                }
+                                return `${name}, ${val}`;
+                            },
+                            overflow: 'fit'
                         },
                         backgroundColor: (ctx) => {
                             if (ctx.type !== 'data') return 'transparent';
