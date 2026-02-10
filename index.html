@@ -1796,48 +1796,18 @@
             const sortedData = [...bidangData].sort((a, b) => b.value - a.value);
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Squarified Treemap Algorithm
-            // Produces rectangles with area proportional to value
-            function worstAspect(row, w) {
-                const rowSum = row.reduce((s, r) => s + r.value, 0);
+            // Improved Squarified Treemap Algorithm
+            function worstRatio(row, rowTotal, shortSide, totalArea) {
                 let worst = 0;
+                const rowArea = (rowTotal / total) * totalArea;
+                const rowDim = rowArea / shortSide; // the "long" dimension of the row strip
                 row.forEach(r => {
-                    const area = (r.value / total) * 10000; // normalized area
-                    const rowArea = (rowSum / total) * 10000;
-                    const h = rowArea / w;
-                    const itemW = area / h;
-                    const aspect = Math.max(itemW / h, h / itemW);
-                    if (aspect > worst) worst = aspect;
+                    const itemArea = (r.value / total) * totalArea;
+                    const itemDim = itemArea / rowDim; // the "short" dimension of this item
+                    const ratio = Math.max(rowDim / itemDim, itemDim / rowDim);
+                    if (ratio > worst) worst = ratio;
                 });
                 return worst;
-            }
-            
-            function layoutRow(row, x, y, w, h, isHorizontal) {
-                const rowSum = row.reduce((s, r) => s + r.value, 0);
-                const rects = [];
-                
-                if (isHorizontal) {
-                    // Row laid out horizontally, items stack vertically
-                    const rowW = (rowSum / total) * w * 100 / w; // fraction of width
-                    const actualW = (rowSum / total) * w;
-                    let posY = y;
-                    row.forEach(r => {
-                        const itemH = (r.value / rowSum) * h;
-                        rects.push({ ...r, x: x, y: posY, w: actualW, h: itemH });
-                        posY += itemH;
-                    });
-                    return { rects, remainX: x + actualW, remainY: y, remainW: w - actualW, remainH: h };
-                } else {
-                    // Row laid out vertically, items stack horizontally
-                    const actualH = (rowSum / total) * h;
-                    let posX = x;
-                    row.forEach(r => {
-                        const itemW = (r.value / rowSum) * w;
-                        rects.push({ ...r, x: posX, y: y, w: itemW, h: actualH });
-                        posX += itemW;
-                    });
-                    return { rects, remainX: x, remainY: y + actualH, remainW: w, remainH: h - actualH };
-                }
             }
             
             function squarify(items, x, y, w, h) {
@@ -1846,61 +1816,80 @@
                     return [{ ...items[0], x, y, w, h }];
                 }
                 
-                const isHorizontal = w >= h;
-                const side = isHorizontal ? h : w;
+                const totalArea = w * h;
+                const shortSide = Math.min(w, h);
+                const isWide = w >= h;
                 
                 let currentRow = [items[0]];
+                let currentTotal = items[0].value;
                 let remaining = items.slice(1);
                 
-                // Greedily add items to current row while aspect ratio improves
                 while (remaining.length > 0) {
-                    const candidate = [...currentRow, remaining[0]];
+                    const nextItem = remaining[0];
+                    const candidateTotal = currentTotal + nextItem.value;
+                    const candidateRow = [...currentRow, nextItem];
                     
-                    const currentSum = currentRow.reduce((s, r) => s + r.value, 0);
-                    const candidateSum = candidate.reduce((s, r) => s + r.value, 0);
+                    const currentWR = worstRatio(currentRow, currentTotal, shortSide, totalArea);
+                    const candidateWR = worstRatio(candidateRow, candidateTotal, shortSide, totalArea);
                     
-                    // Calculate worst aspect ratio for current vs candidate
-                    const currentDim = (currentSum / total) * (isHorizontal ? w : h);
-                    const candidateDim = (candidateSum / total) * (isHorizontal ? w : h);
-                    
-                    let currentWorst = 0;
-                    currentRow.forEach(r => {
-                        const itemDim = (r.value / currentSum) * side;
-                        const aspect = Math.max(currentDim / itemDim, itemDim / currentDim);
-                        currentWorst = Math.max(currentWorst, aspect);
-                    });
-                    
-                    let candidateWorst = 0;
-                    candidate.forEach(r => {
-                        const itemDim = (r.value / candidateSum) * side;
-                        const aspect = Math.max(candidateDim / itemDim, itemDim / candidateDim);
-                        candidateWorst = Math.max(candidateWorst, aspect);
-                    });
-                    
-                    if (candidateWorst <= currentWorst) {
-                        currentRow.push(remaining[0]);
+                    if (candidateWR <= currentWR) {
+                        currentRow.push(nextItem);
+                        currentTotal = candidateTotal;
                         remaining = remaining.slice(1);
                     } else {
                         break;
                     }
                 }
                 
-                // Layout current row
-                const { rects, remainX, remainY, remainW, remainH } = layoutRow(currentRow, x, y, w, h, isHorizontal);
+                // Layout the current row
+                const rects = [];
+                const rowFraction = currentTotal / total;
                 
-                // Recursively layout remaining
-                return rects.concat(squarify(remaining, remainX, remainY, remainW, remainH));
+                if (isWide) {
+                    // Slice off from the left
+                    const rowW = rowFraction * w;
+                    let posY = y;
+                    currentRow.forEach(r => {
+                        const itemH = (r.value / currentTotal) * h;
+                        rects.push({ ...r, x, y: posY, w: rowW, h: itemH });
+                        posY += itemH;
+                    });
+                    return rects.concat(squarify(remaining, x + rowW, y, w - rowW, h));
+                } else {
+                    // Slice off from the top
+                    const rowH = rowFraction * h;
+                    let posX = x;
+                    currentRow.forEach(r => {
+                        const itemW = (r.value / currentTotal) * w;
+                        rects.push({ ...r, x: posX, y, w: itemW, h: rowH });
+                        posX += itemW;
+                    });
+                    return rects.concat(squarify(remaining, x, y + rowH, w, h - rowH));
+                }
             }
             
             const rects = squarify(sortedData, 0, 0, 100, 100);
-            const gap = 2; // gap in px
+            const gap = 3;
             
             let html = '<div style="position: relative; width: 100%; height: 100%;">';
             rects.forEach(rect => {
-                // Determine font sizes based on area
-                const area = rect.w * rect.h / 100;
-                const valueFontSize = area > 8 ? '1.75rem' : area > 4 ? '1.25rem' : area > 2 ? '1rem' : '0.75rem';
-                const labelFontSize = area > 8 ? '0.7rem' : area > 4 ? '0.6rem' : '0.5rem';
+                // Determine font sizes based on area percentage
+                const areaPct = (rect.w * rect.h) / 100;
+                let valueFontSize, labelFontSize;
+                if (areaPct > 12) {
+                    valueFontSize = '1.75rem'; labelFontSize = '0.7rem';
+                } else if (areaPct > 6) {
+                    valueFontSize = '1.5rem'; labelFontSize = '0.65rem';
+                } else if (areaPct > 3) {
+                    valueFontSize = '1.125rem'; labelFontSize = '0.6rem';
+                } else {
+                    valueFontSize = '0.875rem'; labelFontSize = '0.5rem';
+                }
+                
+                // For very narrow or short boxes, use horizontal layout
+                const isNarrow = rect.w < 12;
+                const flexDir = isNarrow ? 'row' : 'column';
+                const gapStyle = isNarrow ? 'gap: 0.25rem;' : '';
                 
                 html += `
                     <div class="treemap-item" style="
@@ -1912,17 +1901,18 @@
                         background: ${rect.color};
                         border-radius: var(--radius-md);
                         display: flex;
-                        flex-direction: column;
+                        flex-direction: ${flexDir};
                         align-items: center;
                         justify-content: center;
-                        padding: 0.5rem;
+                        padding: 0.375rem;
                         box-shadow: var(--shadow-sm);
                         transition: var(--transition);
                         cursor: default;
                         overflow: hidden;
+                        ${gapStyle}
                     ">
-                        <div style="font-size: ${labelFontSize}; opacity: 0.95; font-weight: 600; text-align: center; line-height: 1.2; margin-bottom: 0.25rem; word-break: break-word;">${bidangNamaLengkap[rect.name] || rect.name}</div>
-                        <div style="font-size: ${valueFontSize}; font-weight: 800; font-family: 'Poppins', sans-serif;">${rect.value}</div>
+                        <div style="font-size: ${labelFontSize}; color: white; opacity: 0.95; font-weight: 600; text-align: center; line-height: 1.2; margin-bottom: ${isNarrow ? '0' : '0.2rem'}; word-break: break-word; max-width: 100%;">${bidangNamaLengkap[rect.name] || rect.name}</div>
+                        <div style="font-size: ${valueFontSize}; color: white; font-weight: 800; font-family: 'Poppins', sans-serif;">${rect.value}</div>
                     </div>
                 `;
             });
