@@ -1221,7 +1221,34 @@
                             <option value="4">4 Periode</option>
                             <option value="5">5 Periode</option>
                             <option value="6">6 Periode</option>
+                            <option value="7">7 Periode</option>
+                            <option value="8">8 Periode</option>
+                            <option value="9">9 Periode</option>
+                            <option value="10">10 Periode</option>
+                            <option value="11">11 Periode</option>
+                            <option value="12">12 Periode</option>
                         </select>
+                        
+                        <!-- Global Year Filter -->
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--gray-300);">
+                            <label style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.5rem;">📅</span>
+                                Tahun:
+                            </label>
+                            <select id="globalYearSelect" style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 120px; transition: all 0.3s;">
+                                <option value="2020">2020</option>
+                                <option value="2021">2021</option>
+                                <option value="2022">2022</option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                                <option value="2025" selected>2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                                <option value="2029">2029</option>
+                                <option value="2030">2030</option>
+                            </select>
+                        </div>
                         
                         <div style="flex: 1; text-align: right;">
                             <span style="font-size: 0.875rem; color: var(--gray-600); font-weight: 500;">
@@ -2229,7 +2256,7 @@
         let currentViewMode = 'normal';
         let compareCount = 2;
         let comparisonCharts = {};
-        const COMPARE_COLORS = ['#10b981', '#3b82f6', '#f97316'];
+        const COMPARE_COLORS = ['#10b981', '#3b82f6', '#f97316', '#7c3aed', '#dc2626', '#0891b2', '#d97706', '#be185d', '#0d9488', '#6366f1', '#065f46', '#ea580c'];
         
         function setViewMode(mode) {
             currentViewMode = mode;
@@ -2275,8 +2302,8 @@
             container.innerHTML = '';
             
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const colors = ['#1a5f2a', '#2d8f4e', '#0891b2', '#7c3aed', '#dc2626', '#ea580c'];
-            const icons = ['', '', '', '', '', ''];
+            const colors = ['#1a5f2a', '#2d8f4e', '#0891b2', '#7c3aed', '#dc2626', '#ea580c', '#0d9488', '#6366f1', '#d97706', '#be185d', '#065f46', '#7e22ce'];
+            const icons = ['📅', '📆', '🗓️', '📋', '📊', '📈', '📉', '📌', '📎', '🔖', '📇', '🗂️'];
 
             
             for (let i = 1; i <= count; i++) {
@@ -2336,7 +2363,7 @@
                 const periods = [];
                 
                 for (let i = 1; i <= compareCount; i++) {
-                    const tahun = 2025;
+                    const tahun = parseInt(document.getElementById('globalYearSelect').value);
                     const bulan = document.getElementById(`bulanCompare${i}`).value;
                     
                     // Fetch GABUNGAN data only (not all bidang)
