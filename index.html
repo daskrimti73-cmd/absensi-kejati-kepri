@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -1076,7 +1076,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 DASHBOARD ABSENSI MOBILE</h1>
+            <h1>ðŸ“Š DASHBOARD ABSENSI MOBILE</h1>
             <p>Kejaksaan Tinggi Kepulauan Riau</p>
         </div>
         
@@ -1087,7 +1087,7 @@
                     <div class="info-card-label">Total Pegawai</div>
                     <div class="info-card-value" id="infoTotalPegawai">142</div>
                 </div>
-                <div class="info-card-icon">👥</div>
+                <div class="info-card-icon">ðŸ‘¥</div>
             </div>
             
             <div class="info-card purple">
@@ -1095,7 +1095,7 @@
                     <div class="info-card-label">Hari Kerja</div>
                     <div class="info-card-value" id="infoHariKerja">21</div>
                 </div>
-                <div class="info-card-icon">📅</div>
+                <div class="info-card-icon">ðŸ“…</div>
             </div>
             
             <div class="info-card red">
@@ -1103,7 +1103,7 @@
                     <div class="info-card-label">Check In</div>
                     <div class="info-card-value" id="infoCheckIn">2965/2982</div>
                 </div>
-                <div class="info-card-icon">📊</div>
+                <div class="info-card-icon">ðŸ“Š</div>
             </div>
             
             <div class="info-card orange">
@@ -1111,7 +1111,7 @@
                     <div class="info-card-label">Total Bidang</div>
                     <div class="info-card-value" id="infoTotalBidang">9</div>
                 </div>
-                <div class="info-card-icon">🏢</div>
+                <div class="info-card-icon">ðŸ¢</div>
             </div>
         </div>
         
@@ -1145,7 +1145,7 @@
         <!-- Filter Section -->
         <div class="filter-section">
             <div class="filter-title">
-                <span>🔍</span>
+                <span>ðŸ”</span>
                 <span>FILTER DATA ABSENSI</span>
             </div>
             
@@ -1153,10 +1153,10 @@
             <div style="padding: 1.5rem 2rem 0 2rem;">
                 <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1rem;">
                     <button id="btnModeNormal" onclick="setViewMode('normal')" style="padding: 0.75rem 1.5rem; background: var(--primary-600); color: white; border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.875rem;">
-                        📊 Tampilan Standar
+                        ðŸ“Š Tampilan Standar
                     </button>
                     <button id="btnModeCompare" onclick="setViewMode('compare')" style="padding: 0.75rem 1.5rem; background: var(--gray-300); color: var(--gray-700); border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.875rem;">
-                        ⚖️ Analisis Perbandingan
+                        âš–ï¸ Analisis Perbandingan
                     </button>
                 </div>
             </div>
@@ -1164,7 +1164,7 @@
             <!-- Normal Mode Filters -->
             <div id="normalFilters" class="filter-controls">
                 <div class="filter-group">
-                    <label for="bulanFilter">📅 Pilih Bulan</label>
+                    <label for="bulanFilter">ðŸ“… Pilih Bulan</label>
                     <select id="bulanFilter" onchange="updateBidangDashboard()">
                         <option value="semua">Semua Bulan</option>
                         <option value="Januari">Januari</option>
@@ -1182,14 +1182,14 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label for="tahunFilter">📆 Pilih Tahun</label>
+                    <label for="tahunFilter">ðŸ“† Pilih Tahun</label>
                     <select id="tahunFilter" onchange="updateBidangDashboard()">
                         <option value="2025" selected>2025</option>
                         <option value="2026">2026</option>
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label for="bidangFilter">🏢 Pilih Bidang</label>
+                    <label for="bidangFilter">ðŸ¢ Pilih Bidang</label>
                     <select id="bidangFilter" onchange="updateBidangDashboard()">
                         <option value="semua">Semua Bidang</option>
                         <option value="PEMBINAAN">Pembinaan</option>
@@ -1204,7 +1204,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label for="kategoriFilter">📋 Kategori Data</label>
+                    <label for="kategoriFilter">ðŸ“‹ Kategori Data</label>
                     <select id="kategoriFilter" onchange="updateBidangDashboard()">
                         <option value="semua">Semua Kategori</option>
                         <option value="wfo">WFO (Hadir)</option>
@@ -1224,7 +1224,7 @@
                 <div style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 2px solid var(--primary-200);">
                     <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
                         <label style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="font-size: 1.5rem;">📊</span>
+                            <span style="font-size: 1.5rem;">ðŸ“Š</span>
                             Jumlah Periode:
                         </label>
                         <select id="periodCountSelect" onchange="updatePeriodCards()" style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 150px; transition: all 0.3s;">
@@ -1238,7 +1238,7 @@
                         <!-- Global Year Filter -->
                         <div style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--gray-300);">
                             <label style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 1.5rem;">📅</span>
+                                <span style="font-size: 1.5rem;">ðŸ“…</span>
                                 Tahun:
                             </label>
                             <select id="globalYearSelect" style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 120px; transition: all 0.3s;">
@@ -1255,13 +1255,13 @@
                                 <option value="2030">2030</option>
                             </select>
                             <button onclick="applyGlobalYear()" style="padding: 0.875rem 1.75rem; background: linear-gradient(135deg, var(--primary-600), var(--primary-700)); color: white; border: none; border-radius: var(--radius-lg); font-weight: 700; font-size: 0.9375rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px var(--primary-200); font-family: 'Poppins', sans-serif; white-space: nowrap;">
-                                ✨ Set Semua Tahun
+                                âœ¨ Set Semua Tahun
                             </button>
                         </div>
                         
                         <div style="flex: 1; text-align: right;">
                             <span style="font-size: 0.875rem; color: var(--gray-600); font-weight: 500;">
-                                💡 Pilih berapa bulan yang ingin dibandingkan
+                                ðŸ’¡ Pilih berapa bulan yang ingin dibandingkan
                             </span>
                         </div>
                     </div>
@@ -1274,7 +1274,7 @@
                 
                 <!-- Compare Button -->
                 <button onclick="loadComparisonData()" style="width: 100%; padding: 1.5rem; background: linear-gradient(135deg, var(--primary-600), var(--primary-700)); color: white; border: none; border-radius: var(--radius-xl); font-size: 1.25rem; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 8px 24px rgba(26,95,42,0.3); transition: all 0.3s; font-family: 'Poppins', sans-serif;">
-                    <span style="font-size: 1.5rem; margin-right: 0.5rem;">⚖️</span>
+                    <span style="font-size: 1.5rem; margin-right: 0.5rem;">âš–ï¸</span>
                     Bandingkan Data
                 </button>
             </div>
@@ -1284,7 +1284,7 @@
         <div id="normalDashboard">
         <!-- Dashboard Per Bidang -->
         <div class="bidang-dashboard" id="bidangDashboard">
-            <h2 class="bidang-dashboard-title">📊 DASHBOARD PER BIDANG</h2>
+            <h2 class="bidang-dashboard-title">ðŸ“Š DASHBOARD PER BIDANG</h2>
             <div class="bidang-grid" id="bidangGrid">
                 <!-- Cards will be generated dynamically -->
             </div>
@@ -1294,7 +1294,7 @@
         <!-- Comparison Dashboard (new) -->
         <div id="comparisonDashboard" style="display: none;">
             <div id="comparisonLoading" style="text-align: center; padding: 4rem 2rem; color: var(--gray-500); font-size: 1.125rem; font-weight: 600; display: none;">
-                ⏳ Memuat data perbandingan...
+                â³ Memuat data perbandingan...
             </div>
             
             <div id="comparisonContent" style="display: none;">
@@ -1303,19 +1303,19 @@
                 
                 <!-- Charts -->
                 <div style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 1px solid var(--gray-200);">
-                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-800); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700;">📊 Perbandingan Visual - Keseluruhan</h2>
+                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-800); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700;">ðŸ“Š Perbandingan Visual - Keseluruhan</h2>
                     <canvas id="comparisonOverallChart"></canvas>
                 </div>
                 
                 <div style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 1px solid var(--gray-200);">
-                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-800); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700;">📈 Trend Kehadiran</h2>
+                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-800); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700;">ðŸ“ˆ Trend Kehadiran</h2>
                     <canvas id="comparisonTrendChart"></canvas>
                 </div>
             </div>
         </div>
         
         <div class="footer">
-            <p class="copyright">© 2025 Kejaksaan Tinggi Kepulauan Riau - Sistem Absensi Mobile</p>
+            <p class="copyright">Â© 2025 Kejaksaan Tinggi Kepulauan Riau - Sistem Absensi Mobile</p>
         </div>
     </div>
 
@@ -1339,22 +1339,22 @@
         if (USE_SUPABASE && typeof window.supabase !== 'undefined') {
             try {
                 supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Supabase initialized successfully');
+                console.log('âœ… Supabase initialized successfully');
             } catch (error) {
-                console.error('❌ Supabase initialization failed:', error);
+                console.error('âŒ Supabase initialization failed:', error);
             }
         } else {
-            console.log('ℹ️ Supabase disabled or library not loaded');
+            console.log('â„¹ï¸ Supabase disabled or library not loaded');
         }
         
         // Fetch data from Supabase
         async function fetchFromSupabase(tahun, bulan, bidang = null) {
             if (!supabaseClient) {
-                console.log('❌ Supabase client not initialized');
+                console.log('âŒ Supabase client not initialized');
                 return null;
             }
             
-            console.log(`🔍 Fetching from Supabase: tahun=${tahun} (type: ${typeof tahun}), bulan="${bulan}" (type: ${typeof bulan}), bidang=${bidang || 'semua'}`);
+            console.log(`ðŸ” Fetching from Supabase: tahun=${tahun} (type: ${typeof tahun}), bulan="${bulan}" (type: ${typeof bulan}), bidang=${bidang || 'semua'}`);
             
             try {
                 let query = supabaseClient
@@ -1368,23 +1368,23 @@
                     query = query.eq('bidang', bidang);
                 }
                 
-                console.log(`📋 Query: tahun=${parseInt(tahun)}, bulan="${bulan}"${bidang && bidang !== 'semua' ? `, bidang="${bidang}"` : ''}`);
+                console.log(`ðŸ“‹ Query: tahun=${parseInt(tahun)}, bulan="${bulan}"${bidang && bidang !== 'semua' ? `, bidang="${bidang}"` : ''}`);
                 
                 const { data, error } = await query.order('tanggal', { ascending: true });
                 
                 if (error) {
-                    console.error('❌ Supabase query error:', error);
+                    console.error('âŒ Supabase query error:', error);
                     return null;
                 }
                 
                 if (!data || data.length === 0) {
-                    console.log(`⚠️ No Supabase data for ${bulan} ${tahun}${bidang && bidang !== 'semua' ? ` - ${bidang}` : ''}`);
-                    console.log('💡 TIP: Cek data di Supabase Table Editor dengan query:');
+                    console.log(`âš ï¸ No Supabase data for ${bulan} ${tahun}${bidang && bidang !== 'semua' ? ` - ${bidang}` : ''}`);
+                    console.log('ðŸ’¡ TIP: Cek data di Supabase Table Editor dengan query:');
                     console.log(`   SELECT tahun, bulan, bidang, COUNT(*) FROM absensi WHERE bulan LIKE '%${bulan.substring(0, 3)}%' GROUP BY tahun, bulan, bidang;`);
                     return null;
                 }
                 
-                console.log(`✅ Loaded ${data.length} rows from Supabase for ${bulan} ${tahun}${bidang && bidang !== 'semua' ? ` - ${bidang}` : ''}`);
+                console.log(`âœ… Loaded ${data.length} rows from Supabase for ${bulan} ${tahun}${bidang && bidang !== 'semua' ? ` - ${bidang}` : ''}`);
                 console.log('First 3 rows:', data.slice(0, 3));
                 
                 // Group by tanggal and sum values if multiple bidang
@@ -1401,7 +1401,7 @@
                             sakit: 0,
                             ijin: 0,
                             cuti: 0,
-                            isoman: 0, // ✅ ISOMAN support
+                            isoman: 0, // âœ… ISOMAN support
                             tidak_absen: 0
                         };
                     }
@@ -1411,7 +1411,7 @@
                     groupedData[tanggal].sakit += row.sakit || 0;
                     groupedData[tanggal].ijin += row.ijin || 0;
                     groupedData[tanggal].cuti += row.cuti || 0;
-                    groupedData[tanggal].isoman += row.isoman || 0; // ✅ ISOMAN support
+                    groupedData[tanggal].isoman += row.isoman || 0; // âœ… ISOMAN support
                     groupedData[tanggal].tidak_absen += row.tidak_absen || 0;
                 });
                 
@@ -1433,11 +1433,11 @@
                     sakit: sortedData.map(d => d.sakit),
                     ijin: sortedData.map(d => d.ijin),
                     cuti: sortedData.map(d => d.cuti),
-                    isoman: sortedData.map(d => d.isoman), // ✅ ISOMAN support
+                    isoman: sortedData.map(d => d.isoman), // âœ… ISOMAN support
                     tidakAbsen: sortedData.map(d => d.tidak_absen)
                 };
             } catch (error) {
-                console.error('❌ Supabase fetch error:', error);
+                console.error('âŒ Supabase fetch error:', error);
                 return null;
             }
         }
@@ -1490,7 +1490,7 @@
             const tahun = document.getElementById('tahunFilter').value;
             const bidang = document.getElementById('bidangFilter').value;
             
-            console.log(`📊 getSelectedData called: bulan=${bulan}, tahun=${tahun}, bidang=${bidang}`);
+            console.log(`ðŸ“Š getSelectedData called: bulan=${bulan}, tahun=${tahun}, bidang=${bidang}`);
             
             // Special case: "semua bulan" always uses hardcoded
             if (bulan === 'semua') {
@@ -1503,7 +1503,7 @@
             let bidangToFetch = bidang;
             if (bidang === 'semua') {
                 bidangToFetch = 'GABUNGAN';
-                console.log('📊 Main chart: Using GABUNGAN bidang for "Semua Bidang" filter');
+                console.log('ðŸ“Š Main chart: Using GABUNGAN bidang for "Semua Bidang" filter');
             }
             
             // Try Supabase first if enabled
@@ -1512,23 +1512,23 @@
                 try {
                     const supabaseData = await fetchFromSupabase(tahun, bulan, bidangToFetch);
                     if (supabaseData) {
-                        console.log('✅ Using Supabase data');
+                        console.log('âœ… Using Supabase data');
                         return supabaseData;
                     }
                 } catch (error) {
-                    console.error('❌ Error fetching from Supabase:', error);
+                    console.error('âŒ Error fetching from Supabase:', error);
                 }
             } else {
-                console.log('⚠️ Supabase disabled or not initialized');
+                console.log('âš ï¸ Supabase disabled or not initialized');
             }
             
             // Fallback to hardcoded data
-            console.log(`📁 Using hardcoded data for ${bulan} ${tahun}`);
+            console.log(`ðŸ“ Using hardcoded data for ${bulan} ${tahun}`);
             if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) {
                 return dataAbsensi[tahun][bulan];
             }
             
-            console.log(`❌ No data found for ${bulan} ${tahun}`);
+            console.log(`âŒ No data found for ${bulan} ${tahun}`);
             return null;
         }
 
@@ -1608,7 +1608,7 @@
             if (!supabaseClient) return null;
             
             try {
-                console.log(`🔍 Checking for rekapitulasi data: ${bulan} ${tahun}`);
+                console.log(`ðŸ” Checking for rekapitulasi data: ${bulan} ${tahun}`);
                 
                 const { data, error } = await supabaseClient
                     .from('rekapitulasi')
@@ -1620,21 +1620,21 @@
                 if (error) {
                     if (error.code === 'PGRST116') {
                         // No rows found - this is OK
-                        console.log('ℹ️ No rekapitulasi data found, will use calculated data');
+                        console.log('â„¹ï¸ No rekapitulasi data found, will use calculated data');
                         return null;
                     }
-                    console.error('⚠️ Error fetching rekapitulasi:', error);
+                    console.error('âš ï¸ Error fetching rekapitulasi:', error);
                     return null;
                 }
                 
                 if (data) {
-                    console.log('✅ Using rekapitulasi data from database:', data);
+                    console.log('âœ… Using rekapitulasi data from database:', data);
                     return data;
                 }
                 
                 return null;
             } catch (error) {
-                console.error('⚠️ Error in fetchRekapitulasi:', error);
+                console.error('âš ï¸ Error in fetchRekapitulasi:', error);
                 return null;
             }
         }
@@ -1664,10 +1664,10 @@
                 });
             }
             
-            // ✅ FIXED: Read from GABUNGAN sheet instead of summing all bidang manually
+            // âœ… FIXED: Read from GABUNGAN sheet instead of summing all bidang manually
             // This ensures data matches the Excel "ALL CLEAN/CLEAN/GABUNGAN" sheet
-            console.log(`🔍 Fetching GABUNGAN data for ${bulan} ${tahun}...`);
-            console.log(`⚠️ IMPORTANT: Dashboard will read from GABUNGAN, NOT sum all bidang manually!`);
+            console.log(`ðŸ” Fetching GABUNGAN data for ${bulan} ${tahun}...`);
+            console.log(`âš ï¸ IMPORTANT: Dashboard will read from GABUNGAN, NOT sum all bidang manually!`);
             const gabunganData = await fetchFromSupabase(tahun, bulan, 'GABUNGAN');
             
             if (gabunganData && gabunganData.labels.length > 0) {
@@ -1678,10 +1678,10 @@
                 totalSakitAll = sum(gabunganData.sakit);
                 totalIjinAll = sum(gabunganData.ijin);
                 totalCutiAll = sum(gabunganData.cuti);
-                totalIsomanAll = sum(gabunganData.isoman || []); // ✅ ISOMAN support
+                totalIsomanAll = sum(gabunganData.isoman || []); // âœ… ISOMAN support
                 totalAlphaAll = sum(gabunganData.tidakAbsen);
                 
-                console.log(`✅ GABUNGAN data loaded:`, {
+                console.log(`âœ… GABUNGAN data loaded:`, {
                     rows: gabunganData.labels.length,
                     WFO: totalWfoAll,
                     'Dinas Luar': totalDinasAll,
@@ -1697,7 +1697,7 @@
                 // Collect unique dates from GABUNGAN
                 gabunganData.labels.forEach(date => uniqueDates.add(date));
             } else {
-                console.error(`❌ GABUNGAN data NOT FOUND for ${bulan} ${tahun}!`);
+                console.error(`âŒ GABUNGAN data NOT FOUND for ${bulan} ${tahun}!`);
                 console.error('This means the parser did not upload GABUNGAN sheet correctly.');
                 console.error('Dashboard will show 0/0 for CHECK IN.');
             }
@@ -1705,10 +1705,10 @@
             // Update Info Cards
             const hariKerja = uniqueDates.size;
             
-            // ✅ Total = WFO + Dinas Luar + Undangan + Sakit + Ijin + Cuti + Isoman + Tidak Absen
+            // âœ… Total = WFO + Dinas Luar + Undangan + Sakit + Ijin + Cuti + Isoman + Tidak Absen
             const totalKeseluruhan = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalIsomanAll + totalAlphaAll;
             
-            // ✅ Check In = Total - Tidak Absen (includes ISOMAN)
+            // âœ… Check In = Total - Tidak Absen (includes ISOMAN)
             const totalCheckIn = totalKeseluruhan - totalAlphaAll;
             
             document.getElementById('infoHariKerja').textContent = hariKerja;
@@ -1728,7 +1728,7 @@
             
             if (rekapData && rekapData.total > 0) {
                 // Use rekapitulasi data from database
-                console.log('✅ Using REKAPITULASI data for donut chart');
+                console.log('âœ… Using REKAPITULASI data for donut chart');
                 finalWfo = rekapData.wfo;
                 finalDinas = rekapData.dinas_luar;
                 finalUndangan = rekapData.undangan;
@@ -1740,7 +1740,7 @@
                 
                 // PRIORITAS: Gunakan persentase dari Excel jika ada
                 if (rekapData.wfo_pct !== null) {
-                    console.log('✅ Using PERCENTAGE from Excel (not calculated)');
+                    console.log('âœ… Using PERCENTAGE from Excel (not calculated)');
                     pctWfo = rekapData.wfo_pct.toFixed(1);
                     pctDinas = (rekapData.dinas_luar_pct || 0).toFixed(1);
                     pctUndangan = (rekapData.undangan_pct || 0).toFixed(1);
@@ -1750,7 +1750,7 @@
                     pctAlpha = (rekapData.tidak_absen_pct || 0).toFixed(1);
                 } else {
                     // Fallback: Hitung dari angka mentah
-                    console.log('ℹ️ Calculating percentage from raw numbers');
+                    console.log('â„¹ï¸ Calculating percentage from raw numbers');
                     pctWfo = ((finalWfo / finalTotal) * 100).toFixed(1);
                     pctDinas = ((finalDinas / finalTotal) * 100).toFixed(1);
                     pctUndangan = ((finalUndangan / finalTotal) * 100).toFixed(1);
@@ -1761,7 +1761,7 @@
                 }
             } else {
                 // Use calculated data from absensi table (existing logic)
-                console.log('ℹ️ Using CALCULATED data for donut chart');
+                console.log('â„¹ï¸ Using CALCULATED data for donut chart');
                 finalWfo = totalWfoAll;
                 finalDinas = totalDinasAll;
                 finalUndangan = totalUndanganAll;
@@ -1952,7 +1952,7 @@
                     labels: ['Tanpa Keterangan', 'Absen'],
                     datasets: [{
                         data: [alpha, hadir],
-                        backgroundColor: ['#1e3a8a', '#e5e7eb'],
+                        backgroundColor: ['#1e3a8a', '#86efac'],
                         borderWidth: 2,
                         borderColor: '#fff'
                     }]
@@ -1994,14 +1994,14 @@
             
             // Skip if "semua bulan" selected
             if (bulan === 'semua') {
-                bidangGrid.innerHTML = '<div class="bidang-no-data">📊 Dashboard per bidang tersedia untuk bulan tertentu. Silahkan pilih bulan spesifik.</div>';
+                bidangGrid.innerHTML = '<div class="bidang-no-data">ðŸ“Š Dashboard per bidang tersedia untuk bulan tertentu. Silahkan pilih bulan spesifik.</div>';
                 return;
             }
             
             // List of bidang
             const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR', 'PEMULIHAN ASET'];
             
-            bidangGrid.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">⏳ Memuat data per bidang...</div>';
+            bidangGrid.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">â³ Memuat data per bidang...</div>';
             
             try {
                 const cards = [];
@@ -2109,7 +2109,7 @@
                             <table class="bidang-table">
                                 <thead>
                                     <tr>
-                                        <th>📊 Jumlah</th>
+                                        <th>ðŸ“Š Jumlah</th>
                                         <th>WFO</th>
                                         <th>DINAS LUAR</th>
                                         <th>UNDANGAN</th>
@@ -2142,7 +2142,7 @@
                 }
                 
                 if (cards.length === 0) {
-                    bidangGrid.innerHTML = '<div class="bidang-no-data">📊 Data per bidang belum tersedia untuk bulan ini.</div>';
+                    bidangGrid.innerHTML = '<div class="bidang-no-data">ðŸ“Š Data per bidang belum tersedia untuk bulan ini.</div>';
                     return;
                 }
                 
@@ -2187,15 +2187,15 @@
                 
             } catch (error) {
                 console.error('Error updating bidang dashboard:', error);
-                bidangGrid.innerHTML = '<div class="bidang-no-data">⚠️ Terjadi kesalahan saat memuat data. Silahkan refresh halaman.</div>';
+                bidangGrid.innerHTML = '<div class="bidang-no-data">âš ï¸ Terjadi kesalahan saat memuat data. Silahkan refresh halaman.</div>';
             }
         }
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('📊 Dashboard Version: 4.0.0 - GABUNGAN MODE');
-            console.log('✅ Dashboard now reads from GABUNGAN sheet (not sum of all bidang)');
-            console.log('✅ CHECK IN calculation: Total - Tidak Absen (includes ISOMAN)');
+            console.log('ðŸ“Š Dashboard Version: 4.0.0 - GABUNGAN MODE');
+            console.log('âœ… Dashboard now reads from GABUNGAN sheet (not sum of all bidang)');
+            console.log('âœ… CHECK IN calculation: Total - Tidak Absen (includes ISOMAN)');
             updateBidangDashboard();
         });
         
@@ -2252,7 +2252,7 @@
             
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             const colors = ['#1a5f2a', '#2d8f4e', '#0891b2', '#7c3aed', '#dc2626', '#ea580c'];
-            const icons = ['📅', '📆', '🗓️', '📋', '📊', '📈'];
+            const icons = ['ðŸ“…', 'ðŸ“†', 'ðŸ—“ï¸', 'ðŸ“‹', 'ðŸ“Š', 'ðŸ“ˆ'];
             const years = [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
             
             for (let i = 1; i <= count; i++) {
@@ -2320,7 +2320,7 @@
             // Show success feedback
             const btn = event.target;
             const originalText = btn.innerHTML;
-            btn.innerHTML = '✅ Berhasil!';
+            btn.innerHTML = 'âœ… Berhasil!';
             btn.style.background = 'linear-gradient(135deg, #059669, #047857)';
             
             setTimeout(() => {
@@ -2357,7 +2357,7 @@
                         .select('*')
                         .eq('tahun', tahun)
                         .eq('bulan', bulan)
-                        .eq('bidang', 'GABUNGAN');  // ✅ Only fetch GABUNGAN bidang
+                        .eq('bidang', 'GABUNGAN');  // âœ… Only fetch GABUNGAN bidang
                     
                     if (error) {
                         console.error('Error fetching data:', error);
@@ -2402,7 +2402,7 @@
                 sakit: acc.sakit + row.sakit,
                 ijin: acc.ijin + row.ijin,
                 cuti: acc.cuti + row.cuti,
-                isoman: acc.isoman + (row.isoman || 0), // ✅ ISOMAN support
+                isoman: acc.isoman + (row.isoman || 0), // âœ… ISOMAN support
                 tidak_absen: acc.tidak_absen + row.tidak_absen
             }), { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, isoman: 0, tidak_absen: 0 });
         }
@@ -2418,7 +2418,7 @@
                 { label: 'Sakit', key: 'sakit' },
                 { label: 'Ijin', key: 'ijin' },
                 { label: 'Cuti', key: 'cuti' },
-                { label: 'Isoman', key: 'isoman' }, // ✅ ISOMAN support
+                { label: 'Isoman', key: 'isoman' }, // âœ… ISOMAN support
                 { label: 'Tidak Absen', key: 'tidak_absen' }
             ];
             
@@ -2438,11 +2438,11 @@
                         const diffPercent = prevValue > 0 ? ((diff / prevValue) * 100).toFixed(1) : 0;
                         
                         if (diff > 0) {
-                            trendHTML = `<span style="display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; background: #d1fae5; color: #065f46;">↗ +${diffPercent}%</span>`;
+                            trendHTML = `<span style="display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; background: #d1fae5; color: #065f46;">â†— +${diffPercent}%</span>`;
                         } else if (diff < 0) {
-                            trendHTML = `<span style="display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; background: #fee2e2; color: #991b1b;">↘ ${diffPercent}%</span>`;
+                            trendHTML = `<span style="display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; background: #fee2e2; color: #991b1b;">â†˜ ${diffPercent}%</span>`;
                         } else {
-                            trendHTML = `<span style="display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; background: var(--gray-200); color: var(--gray-700);">→ 0%</span>`;
+                            trendHTML = `<span style="display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; background: var(--gray-200); color: var(--gray-700);">â†’ 0%</span>`;
                         }
                     }
                     
