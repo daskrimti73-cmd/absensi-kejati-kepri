@@ -1995,12 +1995,24 @@
             const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
             const pctHadir = total > 0 ? ((hadir / total) * 100).toFixed(1) : 0;
             
+            // Minimum visual size: jika Tanpa Keterangan > 0 tapi terlalu kecil, 
+            // beri minimum 5% dari total agar terlihat di donut
+            let visualAlpha = alpha;
+            let visualHadir = hadir;
+            if (alpha > 0 && total > 0) {
+                const minSlice = total * 0.05; // minimum 5% visual
+                if (alpha < minSlice) {
+                    visualAlpha = minSlice;
+                    visualHadir = total - minSlice;
+                }
+            }
+            
             absenceDonutChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Tanpa Keterangan', 'Absen'],
                     datasets: [{
-                        data: [alpha, hadir],
+                        data: [visualAlpha, visualHadir],
                         backgroundColor: ['#ef4444', '#86efac'],
                         borderWidth: 2,
                         borderColor: '#fff'
