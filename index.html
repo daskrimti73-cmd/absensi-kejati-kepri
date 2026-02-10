@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* ============================================
@@ -1120,8 +1121,8 @@
             <!-- Treemap: Bidang Pegawai -->
             <div class="summary-chart-card">
                 <h3 class="summary-chart-title">Bidang Pegawai</h3>
-                <div class="treemap-container" id="treemapContainer">
-                    <!-- Will be generated dynamically -->
+                <div class="summary-chart-container">
+                    <canvas id="treemapChart"></canvas>
                 </div>
             </div>
             
@@ -1641,7 +1642,7 @@
         
         async function updateSummaryCharts(bulan, tahun) {
             if (bulan === 'semua') {
-                document.getElementById('treemapContainer').innerHTML = '<div style="text-align:center; padding:40px; color:#666;">Pilih bulan spesifik</div>';
+                if (treemapChart) { treemapChart.destroy(); treemapChart = null; }
                 document.getElementById('infoHariKerja').textContent = '-';
                 document.getElementById('infoCheckIn').textContent = '-';
                 return;
@@ -1789,77 +1790,95 @@
             generateAbsenceDonut(finalAlpha, finalTotal - finalAlpha);
         }
         
+        let treemapChart = null;
+        
         function generateTreemap(bidangData) {
-            const container = document.getElementById('treemapContainer');
+            const ctx = document.getElementById('treemapChart').getContext('2d');
             
-            // Sort by value descending
-            const sortedData = [...bidangData].sort((a, b) => b.value - a.value);
-            const total = sortedData.reduce((sum, item) => sum + item.value, 0);
-            
-            // Row-based proportional treemap
-            // Group items into rows, each row has items side-by-side
-            // Row 1 (big):    Pembinaan(33), Tata Usaha(22), Pidsus(20)
-            // Row 2 (medium): Pidum(19), Pengawasan(16), Intelijen(15)
-            // Row 3 (small):  DATUN(8), Pemulihan Aset(5), Koordinator(4)
-            
-            const rows = [];
-            const itemsPerRow = 3;
-            for (let i = 0; i < sortedData.length; i += itemsPerRow) {
-                rows.push(sortedData.slice(i, i + itemsPerRow));
+            if (treemapChart) {
+                treemapChart.destroy();
             }
             
-            // Calculate row sums for proportional heights
-            const rowSums = rows.map(row => row.reduce((s, r) => s + r.value, 0));
-            const totalSum = rowSums.reduce((s, v) => s + v, 0);
+            // Prepare data for chartjs-chart-treemap
+            const treeData = bidangData.map(item => ({
+                name: bidangNamaLengkap[item.name] || item.name,
+                value: item.value,
+                color: item.color
+            }));
             
-            let html = '<div style="display: flex; flex-direction: column; gap: 4px; height: 100%; width: 100%;">';
+            // Color palette matching reference
+            const treemapColors = [
+                '#1a3a5c', // Pembinaan - dark navy
+                '#5b4a8a', // Tata Usaha - dark purple
+                '#9b6b9e', // Pidsus - mauve
+                '#7b5ea7', // Pidum - purple
+                '#c75b7a', // Pengawasan - pink/magenta
+                '#e8845a', // Intelijen - coral/salmon
+                '#d4894e', // DATUN - orange
+                '#e8a84e', // Pemulihan Aset - light orange
+                '#f0c27a'  // Koordinator - pale orange
+            ];
             
-            rows.forEach((row, rowIdx) => {
-                // Row height proportional to sum of values in the row
-                const rowFlex = rowSums[rowIdx];
-                const rowSum = rowSums[rowIdx];
-                
-                // Determine font sizes based on row (bigger row = bigger font)
-                let valueFontSize, labelFontSize;
-                if (rowIdx === 0) {
-                    valueFontSize = '1.75rem'; labelFontSize = '0.7rem';
-                } else if (rowIdx === 1) {
-                    valueFontSize = '1.5rem'; labelFontSize = '0.65rem';
-                } else {
-                    valueFontSize = '1.125rem'; labelFontSize = '0.6rem';
-                }
-                
-                html += `<div style="display: flex; gap: 4px; flex: ${rowFlex};">`;
-                
-                row.forEach(item => {
-                    // Width proportional to value within the row
-                    html += `
-                        <div class="treemap-item" style="
-                            flex: ${item.value};
-                            background: ${item.color};
-                            display: flex;
-                            flex-direction: column;
-                            align-items: center;
-                            justify-content: center;
-                            padding: 0.5rem;
-                            border-radius: var(--radius-md);
-                            box-shadow: var(--shadow-sm);
-                            transition: var(--transition);
-                            overflow: hidden;
-                            min-width: 0;
-                        ">
-                            <div style="font-size: ${labelFontSize}; color: white; opacity: 0.95; font-weight: 600; text-align: center; line-height: 1.2; margin-bottom: 0.25rem; word-break: break-word;">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div style="font-size: ${valueFontSize}; color: white; font-weight: 800; font-family: 'Poppins', sans-serif;">${item.value}</div>
-                        </div>
-                    `;
-                });
-                
-                html += '</div>';
+            // Sort by value descending and assign colors
+            const sortedData = [...treeData].sort((a, b) => b.value - a.value);
+            sortedData.forEach((item, i) => {
+                item.color = treemapColors[i] || item.color;
             });
             
-            html += '</div>';
-            
-            container.innerHTML = html;
+            treemapChart = new Chart(ctx, {
+                type: 'treemap',
+                data: {
+                    datasets: [{
+                        tree: sortedData,
+                        key: 'value',
+                        labels: {
+                            display: true,
+                            align: 'left',
+                            position: 'bottom',
+                            font: {
+                                size: 12,
+                                weight: 'normal',
+                                family: 'Inter, sans-serif'
+                            },
+                            color: 'rgba(255, 255, 255, 0.9)',
+                            formatter: (ctx) => {
+                                if (ctx.type !== 'data') return '';
+                                const item = ctx.raw;
+                                return item._data ? `${item._data.name}, ${item._data.value}` : '';
+                            }
+                        },
+                        backgroundColor: (ctx) => {
+                            if (ctx.type !== 'data') return 'transparent';
+                            const item = ctx.raw;
+                            return item._data ? item._data.color : '#999';
+                        },
+                        borderColor: 'rgba(255, 255, 255, 0.4)',
+                        borderWidth: 2,
+                        spacing: 2,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => {
+                                    if (items.length === 0) return '';
+                                    const item = items[0].raw;
+                                    return item._data ? item._data.name : '';
+                                },
+                                label: (item) => {
+                                    const data = item.raw._data;
+                                    return data ? `Jumlah: ${data.value} pegawai` : '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
         
         function generateAttendanceDonut(wfo, dinas, undangan, sakit, ijin, cuti, alpha, total, 
