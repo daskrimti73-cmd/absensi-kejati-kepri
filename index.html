@@ -1800,9 +1800,32 @@
             // Calculate total for percentage
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Create treemap with exact layout from reference
-            // Total width must be 100% including gaps
+            // Calculate proportional widths for columns based on data
+            // Column 1: Pembinaan (largest)
+            // Column 2: Tata Usaha + Pidsus
+            // Column 3: Pidum + Intelijen  
+            // Column 4: Pengawasan + (Datun + Pemulihan + Koordinator)
             
+            const col1Value = sortedData[0]?.value || 0; // Pembinaan
+            const col2Value = (sortedData.find(d => d.name === 'TATA USAHA')?.value || 0) + 
+                             (sortedData.find(d => d.name === 'PIDSUS')?.value || 0);
+            const col3Value = (sortedData.find(d => d.name === 'PIDUM')?.value || 0) + 
+                             (sortedData.find(d => d.name === 'INTELIJEN')?.value || 0);
+            const col4Value = (sortedData.find(d => d.name === 'PENGAWASAN')?.value || 0) +
+                             (sortedData.find(d => d.name === 'DATUN')?.value || 0) +
+                             (sortedData.find(d => d.name === 'PEMULIHAN ASET')?.value || 0) +
+                             (sortedData.find(d => d.name === 'KOORDINATOR')?.value || 0);
+            
+            const colTotal = col1Value + col2Value + col3Value + col4Value;
+            const col1Pct = ((col1Value / colTotal) * 100).toFixed(1);
+            const col2Pct = ((col2Value / colTotal) * 100).toFixed(1);
+            const col3Pct = ((col3Value / colTotal) * 100).toFixed(1);
+            const col4Pct = ((col4Value / colTotal) * 100).toFixed(1);
+            
+            // Update grid template dynamically
+            container.style.gridTemplateColumns = `${col1Pct}% ${col2Pct}% ${col3Pct}% ${col4Pct}%`;
+            
+            // Create treemap with proportional layout
             const html = sortedData.map((item, index) => {
                 const percentage = (item.value / total) * 100;
                 
