@@ -1794,87 +1794,139 @@
             
             // Sort by value descending
             const sortedData = [...bidangData].sort((a, b) => b.value - a.value);
-            
-            // Calculate total for percentage
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Calculate proportional sizes for each box
-            // Use flexbox approach with flex-grow based on values
+            // Squarified Treemap Algorithm
+            // Produces rectangles with area proportional to value
+            function worstAspect(row, w) {
+                const rowSum = row.reduce((s, r) => s + r.value, 0);
+                let worst = 0;
+                row.forEach(r => {
+                    const area = (r.value / total) * 10000; // normalized area
+                    const rowArea = (rowSum / total) * 10000;
+                    const h = rowArea / w;
+                    const itemW = area / h;
+                    const aspect = Math.max(itemW / h, h / itemW);
+                    if (aspect > worst) worst = aspect;
+                });
+                return worst;
+            }
             
-            // Group boxes by columns for better layout
-            const pembinaan = sortedData[0]; // Column 1 (full height)
-            const tataUsaha = sortedData.find(d => d.name === 'TATA USAHA');
-            const pidsus = sortedData.find(d => d.name === 'PIDSUS');
-            const pidum = sortedData.find(d => d.name === 'PIDUM');
-            const intelijen = sortedData.find(d => d.name === 'INTELIJEN');
-            const pengawasan = sortedData.find(d => d.name === 'PENGAWASAN');
-            const datun = sortedData.find(d => d.name === 'DATUN');
-            const pemulihan = sortedData.find(d => d.name === 'PEMULIHAN ASET');
-            const koordinator = sortedData.find(d => d.name === 'KOORDINATOR');
+            function layoutRow(row, x, y, w, h, isHorizontal) {
+                const rowSum = row.reduce((s, r) => s + r.value, 0);
+                const rects = [];
+                
+                if (isHorizontal) {
+                    // Row laid out horizontally, items stack vertically
+                    const rowW = (rowSum / total) * w * 100 / w; // fraction of width
+                    const actualW = (rowSum / total) * w;
+                    let posY = y;
+                    row.forEach(r => {
+                        const itemH = (r.value / rowSum) * h;
+                        rects.push({ ...r, x: x, y: posY, w: actualW, h: itemH });
+                        posY += itemH;
+                    });
+                    return { rects, remainX: x + actualW, remainY: y, remainW: w - actualW, remainH: h };
+                } else {
+                    // Row laid out vertically, items stack horizontally
+                    const actualH = (rowSum / total) * h;
+                    let posX = x;
+                    row.forEach(r => {
+                        const itemW = (r.value / rowSum) * w;
+                        rects.push({ ...r, x: posX, y: y, w: itemW, h: actualH });
+                        posX += itemW;
+                    });
+                    return { rects, remainX: x, remainY: y + actualH, remainW: w, remainH: h - actualH };
+                }
+            }
             
-            // Calculate column totals for width
-            const col1Total = pembinaan?.value || 0;
-            const col2Total = (tataUsaha?.value || 0) + (pidsus?.value || 0);
-            const col3Total = (pidum?.value || 0) + (intelijen?.value || 0);
-            const col4Total = (pengawasan?.value || 0) + (datun?.value || 0) + (pemulihan?.value || 0) + (koordinator?.value || 0);
-            
-            const grandTotal = col1Total + col2Total + col3Total + col4Total;
-            
-            const html = `
-                <div style="display: flex; gap: 4px; height: 100%; width: 100%;">
-                    <!-- Column 1: Pembinaan -->
-                    <div style="flex: ${col1Total}; display: flex;">
-                        <div class="treemap-item" style="background: ${pembinaan.color}; flex: 1;">
-                            <div class="treemap-item-label">${bidangNamaLengkap[pembinaan.name] || pembinaan.name}</div>
-                            <div class="treemap-item-value">${pembinaan.value}</div>
-                        </div>
-                    </div>
+            function squarify(items, x, y, w, h) {
+                if (items.length === 0) return [];
+                if (items.length === 1) {
+                    return [{ ...items[0], x, y, w, h }];
+                }
+                
+                const isHorizontal = w >= h;
+                const side = isHorizontal ? h : w;
+                
+                let currentRow = [items[0]];
+                let remaining = items.slice(1);
+                
+                // Greedily add items to current row while aspect ratio improves
+                while (remaining.length > 0) {
+                    const candidate = [...currentRow, remaining[0]];
                     
-                    <!-- Column 2: Tata Usaha + Pidsus -->
-                    <div style="flex: ${col2Total}; display: flex; flex-direction: column; gap: 4px;">
-                        <div class="treemap-item" style="background: ${tataUsaha.color}; flex: ${tataUsaha.value};">
-                            <div class="treemap-item-label">${bidangNamaLengkap[tataUsaha.name] || tataUsaha.name}</div>
-                            <div class="treemap-item-value">${tataUsaha.value}</div>
-                        </div>
-                        <div class="treemap-item" style="background: ${pidsus.color}; flex: ${pidsus.value};">
-                            <div class="treemap-item-label">${bidangNamaLengkap[pidsus.name] || pidsus.name}</div>
-                            <div class="treemap-item-value">${pidsus.value}</div>
-                        </div>
-                    </div>
+                    const currentSum = currentRow.reduce((s, r) => s + r.value, 0);
+                    const candidateSum = candidate.reduce((s, r) => s + r.value, 0);
                     
-                    <!-- Column 3: Pidum + Intelijen -->
-                    <div style="flex: ${col3Total}; display: flex; flex-direction: column; gap: 4px;">
-                        <div class="treemap-item" style="background: ${pidum.color}; flex: ${pidum.value};">
-                            <div class="treemap-item-label">${bidangNamaLengkap[pidum.name] || pidum.name}</div>
-                            <div class="treemap-item-value">${pidum.value}</div>
-                        </div>
-                        <div class="treemap-item" style="background: ${intelijen.color}; flex: ${intelijen.value};">
-                            <div class="treemap-item-label">${bidangNamaLengkap[intelijen.name] || intelijen.name}</div>
-                            <div class="treemap-item-value">${intelijen.value}</div>
-                        </div>
-                    </div>
+                    // Calculate worst aspect ratio for current vs candidate
+                    const currentDim = (currentSum / total) * (isHorizontal ? w : h);
+                    const candidateDim = (candidateSum / total) * (isHorizontal ? w : h);
                     
-                    <!-- Column 4: Pengawasan + Datun + Pemulihan + Koordinator -->
-                    <div style="flex: ${col4Total}; display: flex; flex-direction: column; gap: 4px;">
-                        <div class="treemap-item" style="background: ${pengawasan.color}; flex: ${pengawasan.value};">
-                            <div class="treemap-item-label">${bidangNamaLengkap[pengawasan.name] || pengawasan.name}</div>
-                            <div class="treemap-item-value">${pengawasan.value}</div>
-                        </div>
-                        <div class="treemap-item" style="background: ${datun.color}; flex: ${datun.value};">
-                            <div class="treemap-item-label">${bidangNamaLengkap[datun.name] || datun.name}</div>
-                            <div class="treemap-item-value">${datun.value}</div>
-                        </div>
-                        <div class="treemap-item" style="background: ${pemulihan.color}; flex: ${pemulihan.value};">
-                            <div class="treemap-item-label">${bidangNamaLengkap[pemulihan.name] || pemulihan.name}</div>
-                            <div class="treemap-item-value">${pemulihan.value}</div>
-                        </div>
-                        <div class="treemap-item" style="background: ${koordinator.color}; flex: ${koordinator.value};">
-                            <div class="treemap-item-label">${bidangNamaLengkap[koordinator.name] || koordinator.name}</div>
-                            <div class="treemap-item-value">${koordinator.value}</div>
-                        </div>
+                    let currentWorst = 0;
+                    currentRow.forEach(r => {
+                        const itemDim = (r.value / currentSum) * side;
+                        const aspect = Math.max(currentDim / itemDim, itemDim / currentDim);
+                        currentWorst = Math.max(currentWorst, aspect);
+                    });
+                    
+                    let candidateWorst = 0;
+                    candidate.forEach(r => {
+                        const itemDim = (r.value / candidateSum) * side;
+                        const aspect = Math.max(candidateDim / itemDim, itemDim / candidateDim);
+                        candidateWorst = Math.max(candidateWorst, aspect);
+                    });
+                    
+                    if (candidateWorst <= currentWorst) {
+                        currentRow.push(remaining[0]);
+                        remaining = remaining.slice(1);
+                    } else {
+                        break;
+                    }
+                }
+                
+                // Layout current row
+                const { rects, remainX, remainY, remainW, remainH } = layoutRow(currentRow, x, y, w, h, isHorizontal);
+                
+                // Recursively layout remaining
+                return rects.concat(squarify(remaining, remainX, remainY, remainW, remainH));
+            }
+            
+            const rects = squarify(sortedData, 0, 0, 100, 100);
+            const gap = 2; // gap in px
+            
+            let html = '<div style="position: relative; width: 100%; height: 100%;">';
+            rects.forEach(rect => {
+                // Determine font sizes based on area
+                const area = rect.w * rect.h / 100;
+                const valueFontSize = area > 8 ? '1.75rem' : area > 4 ? '1.25rem' : area > 2 ? '1rem' : '0.75rem';
+                const labelFontSize = area > 8 ? '0.7rem' : area > 4 ? '0.6rem' : '0.5rem';
+                
+                html += `
+                    <div class="treemap-item" style="
+                        position: absolute;
+                        left: calc(${rect.x}% + ${gap/2}px);
+                        top: calc(${rect.y}% + ${gap/2}px);
+                        width: calc(${rect.w}% - ${gap}px);
+                        height: calc(${rect.h}% - ${gap}px);
+                        background: ${rect.color};
+                        border-radius: var(--radius-md);
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 0.5rem;
+                        box-shadow: var(--shadow-sm);
+                        transition: var(--transition);
+                        cursor: default;
+                        overflow: hidden;
+                    ">
+                        <div style="font-size: ${labelFontSize}; opacity: 0.95; font-weight: 600; text-align: center; line-height: 1.2; margin-bottom: 0.25rem; word-break: break-word;">${bidangNamaLengkap[rect.name] || rect.name}</div>
+                        <div style="font-size: ${valueFontSize}; font-weight: 800; font-family: 'Poppins', sans-serif;">${rect.value}</div>
                     </div>
-                </div>
-            `;
+                `;
+            });
+            html += '</div>';
             
             container.innerHTML = html;
         }
