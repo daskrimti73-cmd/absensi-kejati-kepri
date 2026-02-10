@@ -294,9 +294,7 @@
         
         /* Treemap Styling */
         .treemap-container {
-            display: grid;
-            grid-template-columns: 23% 28% 30% 19%;
-            grid-template-rows: 50% 50%;
+            display: flex;
             gap: 4px;
             height: 280px;
             width: 100%;
@@ -1800,161 +1798,83 @@
             // Calculate total for percentage
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Calculate proportional widths for columns based on data
-            // Column 1: Pembinaan (largest)
-            // Column 2: Tata Usaha + Pidsus
-            // Column 3: Pidum + Intelijen  
-            // Column 4: Pengawasan + (Datun + Pemulihan + Koordinator)
+            // Calculate proportional sizes for each box
+            // Use flexbox approach with flex-grow based on values
             
-            const col1Value = sortedData[0]?.value || 0; // Pembinaan
-            const col2Value = (sortedData.find(d => d.name === 'TATA USAHA')?.value || 0) + 
-                             (sortedData.find(d => d.name === 'PIDSUS')?.value || 0);
-            const col3Value = (sortedData.find(d => d.name === 'PIDUM')?.value || 0) + 
-                             (sortedData.find(d => d.name === 'INTELIJEN')?.value || 0);
-            const col4Value = (sortedData.find(d => d.name === 'PENGAWASAN')?.value || 0) +
-                             (sortedData.find(d => d.name === 'DATUN')?.value || 0) +
-                             (sortedData.find(d => d.name === 'PEMULIHAN ASET')?.value || 0) +
-                             (sortedData.find(d => d.name === 'KOORDINATOR')?.value || 0);
+            // Group boxes by columns for better layout
+            const pembinaan = sortedData[0]; // Column 1 (full height)
+            const tataUsaha = sortedData.find(d => d.name === 'TATA USAHA');
+            const pidsus = sortedData.find(d => d.name === 'PIDSUS');
+            const pidum = sortedData.find(d => d.name === 'PIDUM');
+            const intelijen = sortedData.find(d => d.name === 'INTELIJEN');
+            const pengawasan = sortedData.find(d => d.name === 'PENGAWASAN');
+            const datun = sortedData.find(d => d.name === 'DATUN');
+            const pemulihan = sortedData.find(d => d.name === 'PEMULIHAN ASET');
+            const koordinator = sortedData.find(d => d.name === 'KOORDINATOR');
             
-            const colTotal = col1Value + col2Value + col3Value + col4Value;
-            const col1Pct = ((col1Value / colTotal) * 100).toFixed(1);
-            const col2Pct = ((col2Value / colTotal) * 100).toFixed(1);
-            const col3Pct = ((col3Value / colTotal) * 100).toFixed(1);
-            const col4Pct = ((col4Value / colTotal) * 100).toFixed(1);
+            // Calculate column totals for width
+            const col1Total = pembinaan?.value || 0;
+            const col2Total = (tataUsaha?.value || 0) + (pidsus?.value || 0);
+            const col3Total = (pidum?.value || 0) + (intelijen?.value || 0);
+            const col4Total = (pengawasan?.value || 0) + (datun?.value || 0) + (pemulihan?.value || 0) + (koordinator?.value || 0);
             
-            // Update grid template dynamically
-            container.style.gridTemplateColumns = `${col1Pct}% ${col2Pct}% ${col3Pct}% ${col4Pct}%`;
+            const grandTotal = col1Total + col2Total + col3Total + col4Total;
             
-            // Create treemap with proportional layout
-            const html = sortedData.map((item, index) => {
-                const percentage = (item.value / total) * 100;
-                
-                // Layout menggunakan CSS Grid:
-                // Row 1: Pembinaan (full height) | Tata Usaha | Pidum | Pengawasan
-                // Row 2: Pembinaan (full height) | Pidsus | Intelijen | (Datun + Pemulihan + Koordinator stacked)
-                
-                // Pembinaan (33) - Grid: row 1-3, column 1
-                if (index === 0) {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            grid-row: 1 / 3;
-                            grid-column: 1;
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
+            const html = `
+                <div style="display: flex; gap: 4px; height: 100%; width: 100%;">
+                    <!-- Column 1: Pembinaan -->
+                    <div style="flex: ${col1Total}; display: flex;">
+                        <div class="treemap-item" style="background: ${pembinaan.color}; flex: 1;">
+                            <div class="treemap-item-label">${bidangNamaLengkap[pembinaan.name] || pembinaan.name}</div>
+                            <div class="treemap-item-value">${pembinaan.value}</div>
                         </div>
-                    `;
-                }
-                
-                // Tata Usaha (22) - Grid: row 1, column 2
-                if (index === 1) {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            grid-row: 1;
-                            grid-column: 2;
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
+                    </div>
+                    
+                    <!-- Column 2: Tata Usaha + Pidsus -->
+                    <div style="flex: ${col2Total}; display: flex; flex-direction: column; gap: 4px;">
+                        <div class="treemap-item" style="background: ${tataUsaha.color}; flex: ${tataUsaha.value};">
+                            <div class="treemap-item-label">${bidangNamaLengkap[tataUsaha.name] || tataUsaha.name}</div>
+                            <div class="treemap-item-value">${tataUsaha.value}</div>
                         </div>
-                    `;
-                }
-                
-                // Pidum (19) - Grid: row 1, column 3
-                if (item.name === 'PIDUM') {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            grid-row: 1;
-                            grid-column: 3;
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
+                        <div class="treemap-item" style="background: ${pidsus.color}; flex: ${pidsus.value};">
+                            <div class="treemap-item-label">${bidangNamaLengkap[pidsus.name] || pidsus.name}</div>
+                            <div class="treemap-item-value">${pidsus.value}</div>
                         </div>
-                    `;
-                }
-                
-                // Pidsus (20) - Grid: row 2, column 2
-                if (item.name === 'PIDSUS') {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            grid-row: 2;
-                            grid-column: 2;
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
+                    </div>
+                    
+                    <!-- Column 3: Pidum + Intelijen -->
+                    <div style="flex: ${col3Total}; display: flex; flex-direction: column; gap: 4px;">
+                        <div class="treemap-item" style="background: ${pidum.color}; flex: ${pidum.value};">
+                            <div class="treemap-item-label">${bidangNamaLengkap[pidum.name] || pidum.name}</div>
+                            <div class="treemap-item-value">${pidum.value}</div>
                         </div>
-                    `;
-                }
-                
-                // Intelijen (15) - Grid: row 2, column 3
-                if (item.name === 'INTELIJEN') {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            grid-row: 2;
-                            grid-column: 3;
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
+                        <div class="treemap-item" style="background: ${intelijen.color}; flex: ${intelijen.value};">
+                            <div class="treemap-item-label">${bidangNamaLengkap[intelijen.name] || intelijen.name}</div>
+                            <div class="treemap-item-value">${intelijen.value}</div>
                         </div>
-                    `;
-                }
-                
-                // Pengawasan (16) - Grid: row 1, column 4 (nested grid untuk 3 box kecil)
-                if (item.name === 'PENGAWASAN') {
-                    return `
-                        <div class="treemap-item" style="
-                            background: ${item.color};
-                            grid-row: 1;
-                            grid-column: 4;
-                        ">
-                            <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                            <div class="treemap-item-value">${item.value}</div>
+                    </div>
+                    
+                    <!-- Column 4: Pengawasan + Datun + Pemulihan + Koordinator -->
+                    <div style="flex: ${col4Total}; display: flex; flex-direction: column; gap: 4px;">
+                        <div class="treemap-item" style="background: ${pengawasan.color}; flex: ${pengawasan.value};">
+                            <div class="treemap-item-label">${bidangNamaLengkap[pengawasan.name] || pengawasan.name}</div>
+                            <div class="treemap-item-value">${pengawasan.value}</div>
                         </div>
-                    `;
-                }
-                
-                // Column 4 Row 2 akan berisi nested grid untuk 3 box kecil
-                // Datun (8), Pemulihan Aset (5), Koordinator (4)
-                if (item.name === 'DATUN') {
-                    return `
-                        <div style="
-                            grid-row: 2;
-                            grid-column: 4;
-                            display: grid;
-                            grid-template-rows: 1fr 1fr 1fr;
-                            gap: 4px;
-                        ">
-                            <div class="treemap-item" style="background: ${item.color};">
-                                <div class="treemap-item-label">${bidangNamaLengkap[item.name] || item.name}</div>
-                                <div class="treemap-item-value">${item.value}</div>
-                            </div>
-                            ${sortedData.find(d => d.name === 'PEMULIHAN ASET') ? `
-                            <div class="treemap-item" style="background: ${sortedData.find(d => d.name === 'PEMULIHAN ASET').color};">
-                                <div class="treemap-item-label">${bidangNamaLengkap['PEMULIHAN ASET']}</div>
-                                <div class="treemap-item-value">${sortedData.find(d => d.name === 'PEMULIHAN ASET').value}</div>
-                            </div>
-                            ` : ''}
-                            ${sortedData.find(d => d.name === 'KOORDINATOR') ? `
-                            <div class="treemap-item" style="background: ${sortedData.find(d => d.name === 'KOORDINATOR').color};">
-                                <div class="treemap-item-label">${bidangNamaLengkap['KOORDINATOR']}</div>
-                                <div class="treemap-item-value">${sortedData.find(d => d.name === 'KOORDINATOR').value}</div>
-                            </div>
-                            ` : ''}
+                        <div class="treemap-item" style="background: ${datun.color}; flex: ${datun.value};">
+                            <div class="treemap-item-label">${bidangNamaLengkap[datun.name] || datun.name}</div>
+                            <div class="treemap-item-value">${datun.value}</div>
                         </div>
-                    `;
-                }
-                
-                // Skip Pemulihan Aset dan Koordinator karena sudah di-render dalam nested grid
-                if (item.name === 'PEMULIHAN ASET' || item.name === 'KOORDINATOR') {
-                    return '';
-                }
-                
-                return '';
-            }).join('');
+                        <div class="treemap-item" style="background: ${pemulihan.color}; flex: ${pemulihan.value};">
+                            <div class="treemap-item-label">${bidangNamaLengkap[pemulihan.name] || pemulihan.name}</div>
+                            <div class="treemap-item-value">${pemulihan.value}</div>
+                        </div>
+                        <div class="treemap-item" style="background: ${koordinator.color}; flex: ${koordinator.value};">
+                            <div class="treemap-item-label">${bidangNamaLengkap[koordinator.name] || koordinator.name}</div>
+                            <div class="treemap-item-value">${koordinator.value}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
             
             container.innerHTML = html;
         }
