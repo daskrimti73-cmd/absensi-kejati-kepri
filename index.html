@@ -2587,26 +2587,34 @@
             const insightText = document.getElementById('trendInsightText');
             if (insightEl && checkInTotals.length >= 2) {
                 const lastRate = attendanceRates[attendanceRates.length - 1];
-                const prevRate = attendanceRates[attendanceRates.length - 2];
-                const diff = lastRate - prevRate;
+                const firstRate = attendanceRates[0];
+                const diff = lastRate - firstRate;
                 const lastMonth = trendLabels[trendLabels.length - 1];
-                const prevMonth = trendLabels[trendLabels.length - 2];
+                const firstMonth = trendLabels[0];
+                
+                // Build summary for all periods
+                let periodsSummary = '';
+                if (trendLabels.length === 2) {
+                    periodsSummary = `dari ${firstMonth} ke ${lastMonth}`;
+                } else {
+                    periodsSummary = `dari ${firstMonth} hingga ${lastMonth} (${trendLabels.length} periode)`;
+                }
                 
                 if (diff > 0) {
                     insightEl.querySelector('div').style.background = '#f0fdf4';
                     insightEl.querySelector('div').style.borderColor = '#bbf7d0';
                     insightText.style.color = '#166534';
-                    insightText.textContent = `Tingkat kehadiran naik ${diff.toFixed(1)}% dari ${prevMonth} ke ${lastMonth}. Terus pertahankan!`;
+                    insightText.textContent = `Tingkat kehadiran naik ${diff.toFixed(1)}% ${periodsSummary}. Terus pertahankan!`;
                 } else if (diff < 0) {
                     insightEl.querySelector('div').style.background = '#fef2f2';
                     insightEl.querySelector('div').style.borderColor = '#fecaca';
                     insightText.style.color = '#991b1b';
-                    insightText.textContent = `Tingkat kehadiran turun ${Math.abs(diff).toFixed(1)}% dari ${prevMonth} ke ${lastMonth}. Perlu perhatian lebih.`;
+                    insightText.textContent = `Tingkat kehadiran turun ${Math.abs(diff).toFixed(1)}% ${periodsSummary}. Perlu perhatian lebih.`;
                 } else {
                     insightEl.querySelector('div').style.background = '#f5f5f5';
                     insightEl.querySelector('div').style.borderColor = '#d4d4d4';
                     insightText.style.color = '#525252';
-                    insightText.textContent = `Tingkat kehadiran stabil dari ${prevMonth} ke ${lastMonth}.`;
+                    insightText.textContent = `Tingkat kehadiran stabil ${periodsSummary}.`;
                 }
                 insightEl.style.display = 'block';
             }
