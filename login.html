@@ -172,20 +172,20 @@
         }
 
         .avatar {
-            width: 180px;
-            height: 180px;
-            margin: 0 auto;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 25px;
             background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 
-                0 0 0 10px rgba(255, 255, 255, 0.15),
-                0 20px 40px rgba(0, 0, 0, 0.4);
+                0 0 0 12px rgba(255, 255, 255, 0.2),
+                0 25px 50px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: visible;
-            padding: 25px;
+            padding: 30px;
         }
 
         .avatar::before {
@@ -193,16 +193,17 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
         .avatar-logo {
-            width: 130px;
-            height: 130px;
+            width: 160px;
+            height: 160px;
             object-fit: contain;
             position: relative;
             z-index: 1;
-            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 3px 10px rgba(0,0,0,0.15));
         }
 
         /* Title */
@@ -400,14 +401,19 @@
             }
 
             .avatar {
-                width: 150px;
-                height: 150px;
-                padding: 20px;
+                width: 180px;
+                height: 180px;
+                padding: 25px;
+                margin-bottom: 20px;
             }
 
             .avatar-logo {
-                width: 110px;
-                height: 110px;
+                width: 130px;
+                height: 130px;
+            }
+
+            .login-title {
+                font-size: 36px;
             }
 
             .moon {
@@ -498,7 +504,7 @@
 
     <script>
         // Version check
-        console.log('🔄 Login Page Version: 4.0 - Logo HD dari Wikimedia');
+        console.log('🔄 Login Page Version: 5.0 - Logo Besar 220px');
         console.log('📅 Last Update:', new Date().toISOString());
         
         // Generate stars
