@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Admin Panel - Upload Data Absensi v4.3.0 Professional</title>
+    <title>Admin Panel - Upload Data Absensi v5.0.0 Professional</title>
     
     <!-- CACHE BUSTING: Prevent browser from caching old version -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -1501,7 +1501,7 @@
         // ============================================
         // VERSION & CACHE MANAGEMENT
         // ============================================
-        const APP_VERSION = '4.3.0'; // Update: Excel Preview from Database (No Table)
+        const APP_VERSION = '5.0.0'; // Major Update: Excel File Storage & Multi-Sheet Viewer
         
         // Clear old cache on load
         if ('caches' in window) {
@@ -1525,7 +1525,9 @@
         console.log('✅ Progress Bar: ENABLED');
         console.log('✅ Delete Data Feature: ENABLED → UPGRADED to Data Management');
         console.log('✅ Excel Preview on File Select: ENABLED');
-        console.log('✅ Excel Preview from Database: ENABLED (No HTML Table)');
+        console.log('✅ Excel File Storage: ENABLED');
+        console.log('✅ Multi-Sheet Excel Viewer: ENABLED');
+        console.log('✅ Original Excel File Preview: ENABLED');
         console.log('✅ Year Range: 1990-2100');
         console.log('═══════════════════════════════════════════════════');
         console.log('✅ Upload History: ENABLED');
@@ -2578,6 +2580,43 @@
             }
         });
         
+        // ============================================
+        // UPLOAD EXCEL FILE TO STORAGE
+        // ============================================
+        async function uploadExcelToStorage(file, bulan, tahun) {
+            if (!file) {
+                throw new Error('No file selected');
+            }
+            
+            const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            // Generate filename: Absensi_Mei_2025.xlsx
+            const filename = `Absensi_${bulan}_${tahun}.xlsx`;
+            const filepath = `${tahun}/${bulan}/${filename}`;
+            
+            // Delete old file if exists (for replace mode)
+            try {
+                await sbClient.storage
+                    .from('excel-files')
+                    .remove([filepath]);
+            } catch (e) {
+                // Ignore error if file doesn't exist
+            }
+            
+            // Upload new file
+            const { data, error } = await sbClient.storage
+                .from('excel-files')
+                .upload(filepath, file, {
+                    cacheControl: '3600',
+                    upsert: true
+                });
+            
+            if (error) throw error;
+            
+            console.log(`✅ Excel file uploaded: ${filepath}`);
+            return data;
+        }
+        
         async function performUpload(allTransformedData, bulan, tahun, uploadMode) {
             showProgress(70, 'Menyimpan ke database...');
             
@@ -2638,6 +2677,19 @@
             }
             
             showProgress(100, 'Selesai!');
+            
+            // ============================================
+            // UPLOAD EXCEL FILE TO STORAGE (NEW FEATURE)
+            // ============================================
+            try {
+                showProgress(95, 'Menyimpan file Excel...');
+                await uploadExcelToStorage(selectedFile, bulan, tahun);
+                console.log('✅ Excel file saved to storage');
+            } catch (storageError) {
+                console.warn('⚠️ Failed to save Excel file to storage:', storageError.message);
+                console.warn('   Data is still saved to database successfully');
+                // Don't throw error - data upload is still successful
+            }
             
             addToHistory(bulan, tahun, uploadMode, allTransformedData.length, 'success');
             
@@ -2719,8 +2771,8 @@
                     `;
                     document.getElementById('dataInfoSection').style.display = 'block';
                     
-                    // Generate and display Excel preview
-                    generateExcelPreview(data);
+                    // Download and display Excel file from storage
+                    await displayExcelFromStorage(tahun, bulan);
                 }
                 
             } catch (error) {
@@ -2733,6 +2785,157 @@
                 btnLoad.textContent = '🔍 Tampilkan Data';
             }
         });
+        
+        // ============================================
+        // DISPLAY EXCEL FROM STORAGE
+        // ============================================
+        async function displayExcelFromStorage(tahun, bulan) {
+            try {
+                const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                // Download file from storage
+                const filename = `Absensi_${bulan}_${tahun}.xlsx`;
+                const filepath = `${tahun}/${bulan}/${filename}`;
+                
+                const { data, error } = await sbClient.storage
+                    .from('excel-files')
+                    .download(filepath);
+                
+                if (error) {
+                    console.warn('⚠️ Excel file not found in storage, generating from database');
+                    // Fallback: generate from database
+                    generateExcelPreview(currentLoadedData.data);
+                    return;
+                }
+                
+                // Read Excel file
+                const arrayBuffer = await data.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer);
+                
+                // Display Excel with all sheets
+                displayExcelWithSheets(workbook, filename);
+                
+            } catch (error) {
+                console.error('Error displaying Excel:', error);
+                // Fallback: generate from database
+                generateExcelPreview(currentLoadedData.data);
+            }
+        }
+        
+        function displayExcelWithSheets(workbook, filename) {
+            const previewContent = document.getElementById('excelPreviewContent');
+            
+            // Create sheet tabs
+            const sheetTabs = workbook.SheetNames.map((name, idx) => `
+                <button class="sheet-tab ${idx === 0 ? 'active' : ''}" data-sheet="${idx}" 
+                        style="padding: 8px 16px; border: none; background: ${idx === 0 ? '#fff' : '#f3f4f6'}; 
+                               border-bottom: ${idx === 0 ? '2px solid #3b82f6' : '2px solid transparent'}; 
+                               cursor: pointer; font-weight: ${idx === 0 ? '600' : '400'}; 
+                               transition: all 0.2s;">
+                    ${name}
+                </button>
+            `).join('');
+            
+            // Create sheet contents
+            const sheetContents = workbook.SheetNames.map((name, idx) => {
+                const worksheet = workbook.Sheets[name];
+                const htmlTable = XLSX.utils.sheet_to_html(worksheet, {
+                    id: `sheet-table-${idx}`,
+                    editable: false
+                });
+                
+                return `
+                    <div class="sheet-content" data-sheet="${idx}" style="display: ${idx === 0 ? 'block' : 'none'};">
+                        ${htmlTable}
+                    </div>
+                `;
+            }).join('');
+            
+            previewContent.innerHTML = `
+                <div style="border-bottom: 1px solid #e5e7eb; background: #f9fafb; padding: 0 16px; display: flex; gap: 4px; overflow-x: auto;">
+                    ${sheetTabs}
+                </div>
+                <div style="padding: 16px; overflow: auto; max-height: 550px;">
+                    ${sheetContents}
+                </div>
+            `;
+            
+            // Add click handlers for sheet tabs
+            document.querySelectorAll('.sheet-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const sheetIndex = this.dataset.sheet;
+                    
+                    // Update active tab
+                    document.querySelectorAll('.sheet-tab').forEach(t => {
+                        t.style.background = '#f3f4f6';
+                        t.style.borderBottom = '2px solid transparent';
+                        t.style.fontWeight = '400';
+                    });
+                    this.style.background = '#fff';
+                    this.style.borderBottom = '2px solid #3b82f6';
+                    this.style.fontWeight = '600';
+                    
+                    // Show selected sheet content
+                    document.querySelectorAll('.sheet-content').forEach(content => {
+                        content.style.display = 'none';
+                    });
+                    document.querySelector(`.sheet-content[data-sheet="${sheetIndex}"]`).style.display = 'block';
+                });
+            });
+            
+            // Style all tables
+            document.querySelectorAll('[id^="sheet-table-"]').forEach(table => {
+                styleExcelTable(table);
+            });
+            
+            document.getElementById('excelPreviewSection').style.display = 'block';
+        }
+        
+        function styleExcelTable(table) {
+            if (!table) return;
+            
+            table.style.cssText = `
+                width: 100%;
+                border-collapse: collapse;
+                font-family: 'Calibri', 'Arial', sans-serif;
+                font-size: 11pt;
+                background: white;
+            `;
+            
+            const cells = table.querySelectorAll('td, th');
+            cells.forEach(cell => {
+                cell.style.cssText = `
+                    border: 1px solid #d0d0d0;
+                    padding: 4px 8px;
+                    min-width: 60px;
+                    text-align: left;
+                    background: white;
+                    color: #000;
+                `;
+            });
+            
+            const headers = table.querySelectorAll('th');
+            headers.forEach(header => {
+                header.style.cssText = `
+                    border: 1px solid #d0d0d0;
+                    padding: 6px 8px;
+                    background: #f2f2f2;
+                    font-weight: 600;
+                    color: #000;
+                    text-align: center;
+                `;
+            });
+            
+            const rows = table.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                if (index % 2 === 0 && index > 0) {
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        cell.style.background = '#f9f9f9';
+                    });
+                }
+            });
+        }
         
         // ============================================
         // GENERATE EXCEL PREVIEW FROM DATABASE
