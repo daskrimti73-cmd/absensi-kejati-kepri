@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Admin Panel - Upload Data Absensi v3.4.0 Professional</title>
+    <title>Admin Panel - Upload Data Absensi v4.0.0 Professional</title>
     
     <!-- CACHE BUSTING: Prevent browser from caching old version -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -1135,6 +1135,50 @@
             background: #f3f4f6;
         }
         
+        /* Data Table Styles */
+        #dataTable {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        #dataTable th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        #dataTable td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151;
+            white-space: nowrap;
+        }
+        
+        #dataTable tbody tr:hover {
+            background: #f0f9ff;
+        }
+        
+        #dataTable tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        #dataTable tbody tr:nth-child(even):hover {
+            background: #f0f9ff;
+        }
+        
+        #btnLoadData:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+        }
+        
+        #btnDeleteData:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+        
         /* Upload History */
         .upload-history {
             margin-top: 32px;
@@ -1364,54 +1408,95 @@
                 <div class="progress-text" id="progressText">0%</div>
             </div>
         </div>
-        
-        <!-- Delete Data Section -->
-        <div class="card" style="margin-top: 32px; border: 2px solid #ef4444;">
-            <h2 style="color: #dc2626; display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 28px;">🗑️</span>
-                Hapus Data Absensi
-            </h2>
-            <p style="color: #6b7280; margin-bottom: 24px;">
-                Gunakan fitur ini untuk menghapus data yang salah upload. Pilih tahun dan bulan yang ingin dihapus.
-            </p>
-            
-            <div class="form-group">
-                <label for="deleteTahun">📆 Pilih Tahun</label>
-                <input type="number" id="deleteTahun" min="1990" max="2100" value="2025" placeholder="Ketik tahun">
+    </div>
+    
+    <!-- Data Management Section (Outside main container for full width) -->
+    <div style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+        <div style="background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 24px 32px; color: white;">
+                <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 12px;">
+                    <span style="font-size: 28px;">📊</span>
+                    Kelola Data Absensi
+                </h2>
+                <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 0.9rem;">
+                    Filter, preview, dan kelola data yang sudah terupload
+                </p>
             </div>
             
-            <div class="form-group">
-                <label for="deleteBulan">📅 Pilih Bulan</label>
-                <select id="deleteBulan">
-                    <option value="Januari">Januari</option>
-                    <option value="Februari">Februari</option>
-                    <option value="Maret">Maret</option>
-                    <option value="April">April</option>
-                    <option value="Mei">Mei</option>
-                    <option value="Juni">Juni</option>
-                    <option value="Juli">Juli</option>
-                    <option value="Agustus">Agustus</option>
-                    <option value="September">September</option>
-                    <option value="Oktober">Oktober</option>
-                    <option value="November">November</option>
-                    <option value="Desember">Desember</option>
-                </select>
+            <!-- Filter Section -->
+            <div style="padding: 24px 32px; border-bottom: 1px solid #e5e7eb; background: #f9fafb;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: end;">
+                    <div>
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 0.875rem;">
+                            📆 TAHUN
+                        </label>
+                        <input type="number" id="filterTahun" min="1990" max="2100" value="2025" 
+                               style="width: 100%; padding: 12px 16px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; font-weight: 500;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 0.875rem;">
+                            📅 BULAN
+                        </label>
+                        <select id="filterBulan" style="width: 100%; padding: 12px 16px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; font-weight: 500; cursor: pointer;">
+                            <option value="Januari">Januari</option>
+                            <option value="Februari">Februari</option>
+                            <option value="Maret">Maret</option>
+                            <option value="April">April</option>
+                            <option value="Mei">Mei</option>
+                            <option value="Juni">Juni</option>
+                            <option value="Juli">Juli</option>
+                            <option value="Agustus">Agustus</option>
+                            <option value="September">September</option>
+                            <option value="Oktober">Oktober</option>
+                            <option value="November">November</option>
+                            <option value="Desember">Desember</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="button" id="btnLoadData" 
+                                style="padding: 12px 32px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(59,130,246,0.3); transition: all 0.3s;">
+                            🔍 Tampilkan Data
+                        </button>
+                    </div>
+                </div>
             </div>
             
-            <div style="display: flex; gap: 12px;">
-                <button type="button" class="btn-upload" id="btnCheckData" style="background: #3b82f6; flex: 1;">
-                    🔍 Cek Data
-                </button>
-                <button type="button" class="btn-upload" id="btnDeleteData" style="background: #ef4444; flex: 1;" disabled>
-                    🗑️ Hapus Data
-                </button>
+            <!-- Data Info & Actions -->
+            <div id="dataInfoSection" style="display: none; padding: 20px 32px; background: #eff6ff; border-bottom: 1px solid #bfdbfe;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div id="dataInfo" style="font-size: 0.9rem; color: #1e40af; font-weight: 600;"></div>
+                    <button type="button" id="btnDeleteData" 
+                            style="padding: 10px 24px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.875rem; transition: all 0.3s;">
+                        🗑️ Hapus Data Ini
+                    </button>
+                </div>
             </div>
             
-            <div id="deleteStatus" style="margin-top: 16px;"></div>
+            <!-- Data Table -->
+            <div id="dataTableSection" style="display: none; padding: 24px 32px;">
+                <div style="overflow-x: auto; max-height: 600px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <table id="dataTable" style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                        <thead id="dataTableHead" style="background: #1f2937; color: white; position: sticky; top: 0; z-index: 10;"></thead>
+                        <tbody id="dataTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyState" style="padding: 60px 32px; text-align: center; color: #9ca3af;">
+                <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">📋</div>
+                <p style="font-size: 1.1rem; font-weight: 600; color: #6b7280; margin-bottom: 8px;">
+                    Pilih tahun dan bulan untuk melihat data
+                </p>
+                <p style="font-size: 0.9rem;">
+                    Gunakan filter di atas untuk menampilkan data yang sudah terupload
+                </p>
+            </div>
         </div>
         
         <!-- Upload History -->
-        <div class="upload-history" id="uploadHistory">
+        <div class="upload-history" id="uploadHistory" style="margin-top: 32px;">
             <h3>📜 Riwayat Upload Terakhir</h3>
             <div id="historyList"></div>
         </div>
@@ -1421,7 +1506,7 @@
         // ============================================
         // VERSION & CACHE MANAGEMENT
         // ============================================
-        const APP_VERSION = '3.4.0'; // Update: Professional UI Proportions
+        const APP_VERSION = '4.0.0'; // Update: Professional Data Management UI
         
         // Clear old cache on load
         if ('caches' in window) {
@@ -1443,7 +1528,8 @@
         console.log('✅ Validation after upload: ENABLED');
         console.log('✅ Smart Excel Parser: ENABLED');
         console.log('✅ Progress Bar: ENABLED');
-        console.log('✅ Delete Data Feature: ENABLED');
+        console.log('✅ Delete Data Feature: ENABLED → UPGRADED to Data Management');
+        console.log('✅ Data Preview & Filter: ENABLED');
         console.log('✅ Year Range: 1990-2100');
         console.log('═══════════════════════════════════════════════════');
         console.log('✅ Upload History: ENABLED');
@@ -2287,10 +2373,6 @@
         }
         
         // ============================================
-        // DELETE DATA FUNCTIONALITY
-        // ============================================
-        let dataToDelete = null;
-        
         // ============================================
         // PREVIEW DATA FUNCTIONALITY
         // ============================================
@@ -2465,114 +2547,132 @@
             }
         }
         
-        document.getElementById('btnCheckData').addEventListener('click', async function() {
-            const tahun = parseInt(document.getElementById('deleteTahun').value);
-            const bulan = document.getElementById('deleteBulan').value;
-            const deleteStatusDiv = document.getElementById('deleteStatus');
-            const btnDelete = document.getElementById('btnDeleteData');
+        // ============================================
+        // DATA MANAGEMENT FUNCTIONALITY
+        // ============================================
+        let currentLoadedData = null;
+        
+        document.getElementById('btnLoadData').addEventListener('click', async function() {
+            const tahun = parseInt(document.getElementById('filterTahun').value);
+            const bulan = document.getElementById('filterBulan').value;
+            const btnLoad = document.getElementById('btnLoadData');
             
             if (!tahun || !bulan) {
-                deleteStatusDiv.innerHTML = `
-                    <div style="padding: 16px; background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; color: #991b1b;">
-                        ⚠️ Mohon pilih tahun dan bulan terlebih dahulu!
-                    </div>
-                `;
-                btnDelete.disabled = true;
+                alert('Mohon pilih tahun dan bulan terlebih dahulu!');
                 return;
             }
             
-            deleteStatusDiv.innerHTML = `
-                <div style="padding: 16px; background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px; color: #1e40af;">
-                    ⏳ Mengecek data...
-                </div>
-            `;
-            btnDelete.disabled = true;
+            // Show loading state
+            btnLoad.disabled = true;
+            btnLoad.textContent = '⏳ Memuat...';
+            
+            // Hide sections
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('dataInfoSection').style.display = 'none';
+            document.getElementById('dataTableSection').style.display = 'none';
             
             try {
-                // Check data count
-                const { data, error, count } = await sbClient
+                // Fetch data from database
+                const { data, error } = await sbClient
                     .from('absensi')
-                    .select('*', { count: 'exact', head: false })
+                    .select('*')
                     .eq('tahun', tahun)
-                    .eq('bulan', bulan);
+                    .eq('bulan', bulan)
+                    .order('tanggal', { ascending: true })
+                    .order('bidang', { ascending: true });
                 
                 if (error) throw error;
                 
                 if (!data || data.length === 0) {
-                    deleteStatusDiv.innerHTML = `
-                        <div style="padding: 16px; background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; color: #991b1b;">
-                            ❌ Tidak ada data untuk <strong>${bulan} ${tahun}</strong>
-                        </div>
+                    // Show empty state
+                    document.getElementById('emptyState').innerHTML = `
+                        <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">📭</div>
+                        <p style="font-size: 1.1rem; font-weight: 600; color: #6b7280; margin-bottom: 8px;">
+                            Tidak ada data untuk ${bulan} ${tahun}
+                        </p>
+                        <p style="font-size: 0.9rem; color: #9ca3af;">
+                            Silakan upload data terlebih dahulu atau pilih bulan/tahun lain
+                        </p>
                     `;
-                    btnDelete.disabled = true;
-                    dataToDelete = null;
+                    document.getElementById('emptyState').style.display = 'block';
+                    currentLoadedData = null;
                 } else {
-                    // Get bidang breakdown
+                    // Store loaded data
+                    currentLoadedData = { data, tahun, bulan };
+                    
+                    // Calculate statistics
                     const bidangCount = {};
                     data.forEach(row => {
-                        const bidang = row.bidang_pegawai || 'Unknown';
+                        const bidang = row.bidang || 'Unknown';
                         bidangCount[bidang] = (bidangCount[bidang] || 0) + 1;
                     });
                     
-                    const bidangList = Object.entries(bidangCount)
-                        .map(([bidang, count]) => `<li><strong>${bidang}</strong>: ${count} data</li>`)
-                        .join('');
+                    const bidangSummary = Object.entries(bidangCount)
+                        .map(([bidang, count]) => `<strong>${bidang}</strong>: ${count}`)
+                        .join(' | ');
                     
-                    deleteStatusDiv.innerHTML = `
-                        <div style="padding: 16px; background: #fef3c7; border: 2px solid #fde68a; border-radius: 12px; color: #92400e;">
-                            <div style="font-weight: 700; font-size: 16px; margin-bottom: 12px;">
-                                ⚠️ Ditemukan <strong>${data.length} data</strong> untuk ${bulan} ${tahun}
-                            </div>
-                            <div style="margin-bottom: 12px;">Rincian per bidang:</div>
-                            <ul style="margin: 0; padding-left: 24px;">
-                                ${bidangList}
-                            </ul>
-                            <div style="margin-top: 12px; padding-top: 12px; border-top: 2px solid #fde68a; font-weight: 600;">
-                                Klik tombol "Hapus Data" untuk menghapus semua data ini.
-                            </div>
-                        </div>
+                    // Show data info
+                    document.getElementById('dataInfo').innerHTML = `
+                        📊 <strong>${data.length} data</strong> untuk <strong>${bulan} ${tahun}</strong><br>
+                        <span style="font-size: 0.85rem; opacity: 0.9;">${bidangSummary}</span>
                     `;
-                    btnDelete.disabled = false;
-                    dataToDelete = { tahun, bulan, count: data.length };
+                    document.getElementById('dataInfoSection').style.display = 'block';
+                    
+                    // Build table
+                    if (data.length > 0) {
+                        const headers = Object.keys(data[0]);
+                        const dataTableHead = document.getElementById('dataTableHead');
+                        const dataTableBody = document.getElementById('dataTableBody');
+                        
+                        dataTableHead.innerHTML = `
+                            <tr>
+                                <th style="text-align: center;">#</th>
+                                ${headers.map(h => `<th>${h.toUpperCase()}</th>`).join('')}
+                            </tr>
+                        `;
+                        
+                        dataTableBody.innerHTML = data.map((row, idx) => `
+                            <tr>
+                                <td style="text-align: center; font-weight: 600; color: #6b7280;">${idx + 1}</td>
+                                ${headers.map(h => `<td>${row[h] !== null && row[h] !== undefined ? row[h] : '-'}</td>`).join('')}
+                            </tr>
+                        `).join('');
+                        
+                        document.getElementById('dataTableSection').style.display = 'block';
+                    }
                 }
+                
             } catch (error) {
-                console.error('Error checking data:', error);
-                deleteStatusDiv.innerHTML = `
-                    <div style="padding: 16px; background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; color: #991b1b;">
-                        ❌ Error: ${error.message}
-                    </div>
-                `;
-                btnDelete.disabled = true;
-                dataToDelete = null;
+                console.error('Error loading data:', error);
+                alert(`Error: ${error.message}`);
+                document.getElementById('emptyState').style.display = 'block';
+                currentLoadedData = null;
+            } finally {
+                btnLoad.disabled = false;
+                btnLoad.textContent = '🔍 Tampilkan Data';
             }
         });
         
         document.getElementById('btnDeleteData').addEventListener('click', async function() {
-            if (!dataToDelete) {
-                alert('Mohon cek data terlebih dahulu!');
+            if (!currentLoadedData) {
+                alert('Tidak ada data yang dimuat!');
                 return;
             }
             
-            const { tahun, bulan, count } = dataToDelete;
+            const { data, tahun, bulan } = currentLoadedData;
             
             const confirmation = confirm(
                 `⚠️ PERINGATAN!\n\n` +
-                `Anda akan menghapus ${count} data untuk ${bulan} ${tahun}.\n\n` +
+                `Anda akan menghapus ${data.length} data untuk ${bulan} ${tahun}.\n\n` +
                 `Tindakan ini TIDAK DAPAT DIBATALKAN!\n\n` +
                 `Apakah Anda yakin ingin melanjutkan?`
             );
             
             if (!confirmation) return;
             
-            const deleteStatusDiv = document.getElementById('deleteStatus');
             const btnDelete = document.getElementById('btnDeleteData');
-            
-            deleteStatusDiv.innerHTML = `
-                <div style="padding: 16px; background: #eff6ff; border: 2px solid #bfdbfe; border-radius: 12px; color: #1e40af;">
-                    ⏳ Menghapus data...
-                </div>
-            `;
             btnDelete.disabled = true;
+            btnDelete.textContent = '⏳ Menghapus...';
             
             try {
                 const { error } = await sbClient
@@ -2583,28 +2683,29 @@
                 
                 if (error) throw error;
                 
-                deleteStatusDiv.innerHTML = `
-                    <div style="padding: 16px; background: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; color: #166534;">
-                        ✅ Berhasil menghapus ${count} data untuk ${bulan} ${tahun}!
-                    </div>
+                alert(`✅ Berhasil menghapus ${data.length} data untuk ${bulan} ${tahun}!`);
+                
+                // Reset state
+                currentLoadedData = null;
+                document.getElementById('dataInfoSection').style.display = 'none';
+                document.getElementById('dataTableSection').style.display = 'none';
+                document.getElementById('emptyState').innerHTML = `
+                    <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">✅</div>
+                    <p style="font-size: 1.1rem; font-weight: 600; color: #16a34a; margin-bottom: 8px;">
+                        Data berhasil dihapus
+                    </p>
+                    <p style="font-size: 0.9rem; color: #9ca3af;">
+                        Pilih tahun dan bulan lain untuk melihat data
+                    </p>
                 `;
-                
-                dataToDelete = null;
-                
-                // Reset form
-                setTimeout(() => {
-                    deleteStatusDiv.innerHTML = '';
-                    btnDelete.disabled = true;
-                }, 5000);
+                document.getElementById('emptyState').style.display = 'block';
                 
             } catch (error) {
                 console.error('Error deleting data:', error);
-                deleteStatusDiv.innerHTML = `
-                    <div style="padding: 16px; background: #fef2f2; border: 2px solid #fecaca; border-radius: 12px; color: #991b1b;">
-                        ❌ Error: ${error.message}
-                    </div>
-                `;
+                alert(`❌ Error: ${error.message}`);
+            } finally {
                 btnDelete.disabled = false;
+                btnDelete.textContent = '🗑️ Hapus Data Ini';
             }
         });
     </script>
