@@ -435,10 +435,55 @@
         <!-- Avatar -->
         <div class="avatar-container">
             <div class="avatar">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Kejaksaan_Agung_Republik_Indonesia_logo.svg/1200px-Kejaksaan_Agung_Republik_Indonesia_logo.svg.png?v=2025" 
-                     alt="Logo Kejaksaan" 
-                     class="avatar-logo"
-                     onerror="this.style.display='none'; this.parentElement.innerHTML='<svg class=\'avatar-icon\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'#1e40af\' style=\'width:80px;height:80px\'><path d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z\'/></svg>'">
+                <!-- Logo Kejaksaan Satya Adhi Wicaksana - Inline SVG -->
+                <svg class="avatar-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Timbangan -->
+                    <g id="timbangan">
+                        <rect x="95" y="60" width="10" height="80" fill="#FFD700"/>
+                        <rect x="70" y="55" width="60" height="8" fill="#FFD700"/>
+                        <!-- Piringan kiri -->
+                        <path d="M 50 70 L 60 90 L 80 90 L 90 70 Z" fill="#FFD700" stroke="#B8860B" stroke-width="2"/>
+                        <!-- Piringan kanan -->
+                        <path d="M 110 70 L 120 90 L 140 90 L 150 70 Z" fill="#FFD700" stroke="#B8860B" stroke-width="2"/>
+                    </g>
+                    
+                    <!-- Pedang di tengah -->
+                    <g id="pedang">
+                        <rect x="97" y="80" width="6" height="60" fill="#C0C0C0"/>
+                        <polygon points="100,75 95,80 105,80" fill="#C0C0C0"/>
+                        <rect x="92" y="135" width="16" height="8" fill="#FFD700"/>
+                    </g>
+                    
+                    <!-- Padi kiri -->
+                    <g id="padi-kiri">
+                        <path d="M 30 100 Q 35 90, 40 100 Q 35 110, 30 100" fill="#FFD700"/>
+                        <path d="M 35 105 Q 40 95, 45 105 Q 40 115, 35 105" fill="#FFD700"/>
+                        <path d="M 40 110 Q 45 100, 50 110 Q 45 120, 40 110" fill="#FFD700"/>
+                        <line x1="35" y1="100" x2="35" y2="140" stroke="#8B4513" stroke-width="3"/>
+                    </g>
+                    
+                    <!-- Kapas kanan -->
+                    <g id="kapas-kanan">
+                        <circle cx="165" cy="100" r="8" fill="#228B22"/>
+                        <circle cx="170" cy="105" r="8" fill="#228B22"/>
+                        <circle cx="160" cy="105" r="8" fill="#228B22"/>
+                        <circle cx="165" cy="110" r="8" fill="#228B22"/>
+                        <circle cx="165" cy="115" r="8" fill="#228B22"/>
+                        <line x1="165" y1="115" x2="165" y2="140" stroke="#8B4513" stroke-width="3"/>
+                    </g>
+                    
+                    <!-- Pita Satya Adhi Wicaksana -->
+                    <g id="pita">
+                        <path d="M 40 160 Q 100 150, 160 160" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+                        <path d="M 40 160 Q 100 170, 160 160" fill="#228B22" stroke="#1a5f1a" stroke-width="2"/>
+                        <text x="100" y="168" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="white" text-anchor="middle">SATYA ADHI WICAKSANA</text>
+                    </g>
+                    
+                    <!-- Bintang atas -->
+                    <g id="bintang">
+                        <polygon points="100,20 105,35 120,35 108,45 113,60 100,50 87,60 92,45 80,35 95,35" fill="#FFD700" stroke="#B8860B" stroke-width="1"/>
+                    </g>
+                </svg>
             </div>
         </div>
 
@@ -493,7 +538,7 @@
 
     <script>
         // Version check
-        console.log('🔄 Login Page Version: 2.0 - Logo Kejaksaan');
+        console.log('🔄 Login Page Version: 3.0 - Logo Kejaksaan SVG Inline');
         console.log('📅 Last Update:', new Date().toISOString());
         
         // Generate stars
