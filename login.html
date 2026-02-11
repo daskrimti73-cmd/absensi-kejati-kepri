@@ -172,19 +172,20 @@
         }
 
         .avatar {
-            width: 140px;
-            height: 140px;
+            width: 160px;
+            height: 160px;
             margin: 0 auto;
-            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 
-                0 0 0 8px rgba(59, 130, 246, 0.2),
+                0 0 0 8px rgba(255, 255, 255, 0.15),
                 0 20px 40px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
+            padding: 20px;
         }
 
         .avatar::before {
@@ -192,13 +193,13 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.2) 100%);
+            background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
         }
 
-        .avatar-icon {
-            width: 70px;
-            height: 70px;
-            fill: white;
+        .avatar-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
             position: relative;
             z-index: 1;
         }
@@ -398,13 +399,9 @@
             }
 
             .avatar {
-                width: 120px;
-                height: 120px;
-            }
-
-            .avatar-icon {
-                width: 60px;
-                height: 60px;
+                width: 140px;
+                height: 140px;
+                padding: 15px;
             }
 
             .moon {
@@ -438,9 +435,10 @@
         <!-- Avatar -->
         <div class="avatar-container">
             <div class="avatar">
-                <svg class="avatar-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-                </svg>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Kejaksaan_Agung_Republik_Indonesia_logo.svg/1200px-Kejaksaan_Agung_Republik_Indonesia_logo.svg.png" 
+                     alt="Logo Kejaksaan" 
+                     class="avatar-logo"
+                     onerror="this.style.display='none'; this.parentElement.innerHTML='<svg class=\'avatar-icon\' xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'#1e40af\' style=\'width:80px;height:80px\'><path d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z\'/></svg>'">
             </div>
         </div>
 
