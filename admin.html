@@ -18,6 +18,44 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
+    <!-- LOGIN PROTECTION -->
+    <script>
+        // Check if user is logged in
+        (function() {
+            const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
+            const loginTime = sessionStorage.getItem('loginTime');
+            const currentTime = new Date().getTime();
+            
+            if (!isLoggedIn || isLoggedIn !== 'true') {
+                // Not logged in - redirect to login page
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Check session expiry (8 hours)
+            if (loginTime) {
+                const hoursPassed = (currentTime - loginTime) / (1000 * 60 * 60);
+                if (hoursPassed >= 8) {
+                    // Session expired
+                    sessionStorage.removeItem('adminLoggedIn');
+                    sessionStorage.removeItem('loginTime');
+                    alert('Sesi Anda telah berakhir. Silakan login kembali.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+            }
+        })();
+        
+        // Logout function
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin keluar?')) {
+                sessionStorage.removeItem('adminLoggedIn');
+                sessionStorage.removeItem('loginTime');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+    
     <!-- REKAPITULASI PARSER - EMBEDDED -->
     <script>
     // ============================================
@@ -974,8 +1012,27 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📤 UPLOAD DATA ABSENSI</h1>
-            <p>Kejaksaan Tinggi Kepulauan Riau</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h1>📤 UPLOAD DATA ABSENSI</h1>
+                    <p>Kejaksaan Tinggi Kepulauan Riau</p>
+                </div>
+                <button type="button" onclick="logout()" style="
+                    padding: 12px 24px;
+                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+                    transition: all 0.3s;
+                    font-family: 'Inter', sans-serif;
+                ">
+                    🚪 Logout
+                </button>
+            </div>
         </div>
         
         <form id="uploadForm">
