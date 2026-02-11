@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Admin Panel - Upload Data Absensi v3.3.0 Professional</title>
+    <title>Admin Panel - Upload Data Absensi v3.4.0 Professional</title>
     
     <!-- CACHE BUSTING: Prevent browser from caching old version -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -644,10 +644,10 @@
         
         /* Container */
         .container {
-            max-width: 700px;
+            max-width: 800px;
             width: 100%;
             background: white;
-            padding: 48px;
+            padding: 40px 50px;
             border-radius: var(--radius-2xl);
             box-shadow: var(--shadow-2xl);
             animation: fadeInUp 0.6s cubic-bezier(0, 0, 0.2, 1);
@@ -656,36 +656,36 @@
         /* Header */
         .header {
             text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 24px;
-            border-bottom: 3px solid var(--primary-500);
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--primary-500);
         }
         
         .header h1 {
             font-family: 'Poppins', sans-serif;
             color: var(--primary-500);
-            font-size: 2rem;
-            margin-bottom: 12px;
+            font-size: 1.75rem;
+            margin-bottom: 8px;
             font-weight: 800;
             letter-spacing: -0.5px;
         }
         
         .header p {
             color: var(--gray-600);
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 500;
         }
         
         /* Form Groups */
         .form-group {
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
         
         .form-group label {
             display: block;
             font-weight: 600;
             color: var(--gray-700);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 0.875rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -695,8 +695,8 @@
         .form-group input[type="file"],
         .form-group input[type="number"] {
             width: 100%;
-            padding: 16px 20px;
-            font-size: 1rem;
+            padding: 14px 18px;
+            font-size: 0.95rem;
             border: 2px solid var(--gray-300);
             border-radius: var(--radius-lg);
             background: white;
@@ -741,9 +741,9 @@
         }
         
         .file-upload-area {
-            border: 3px dashed #d1d5db;
-            border-radius: 16px;
-            padding: 48px 24px;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 36px 24px;
             text-align: center;
             background: #f9fafb;
             transition: all 0.3s;
@@ -759,38 +759,38 @@
         .file-upload-area.dragover {
             border-color: var(--primary-500);
             background: #f0fdf4;
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
         
         .file-upload-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 20px;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
             opacity: 0.4;
         }
         
         .file-upload-text {
-            font-size: 16px;
+            font-size: 15px;
             color: #374151;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .file-upload-hint {
-            font-size: 14px;
+            font-size: 13px;
             color: #9ca3af;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
         
         .browse-button {
             display: inline-block;
-            padding: 12px 32px;
+            padding: 10px 28px;
             background: white;
             border: 2px solid #e5e7eb;
             border-radius: 8px;
             color: #374151;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -919,20 +919,21 @@
         /* Radio Group */
         .radio-group {
             display: flex;
-            gap: 16px;
-            margin-top: 12px;
+            gap: 12px;
+            margin-top: 8px;
         }
         
         .radio-group label {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             cursor: pointer;
             font-weight: 500;
-            padding: 12px 20px;
+            padding: 10px 16px;
             border-radius: var(--radius-lg);
             transition: all 0.3s;
             border: 2px solid transparent;
+            font-size: 0.9rem;
         }
         
         .radio-group label:hover {
@@ -941,8 +942,8 @@
         }
         
         .radio-group input[type="radio"] {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
             accent-color: var(--primary-500);
         }
@@ -950,12 +951,12 @@
         /* Upload Button */
         .btn-upload {
             width: 100%;
-            padding: 18px;
+            padding: 15px;
             background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
             color: white;
             border: none;
             border-radius: var(--radius-lg);
-            font-size: 1.125rem;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -963,7 +964,7 @@
             position: relative;
             overflow: hidden;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
         }
         
         .btn-upload::before {
@@ -1035,8 +1036,9 @@
         .help-text {
             font-size: 0.75rem;
             color: var(--gray-500);
-            margin-top: 6px;
+            margin-top: 5px;
             font-weight: 400;
+            line-height: 1.4;
         }
         
         /* Progress Bar */
@@ -1419,7 +1421,7 @@
         // ============================================
         // VERSION & CACHE MANAGEMENT
         // ============================================
-        const APP_VERSION = '3.3.0'; // Update: Delete Data Feature + Year Range Fix
+        const APP_VERSION = '3.4.0'; // Update: Professional UI Proportions
         
         // Clear old cache on load
         if ('caches' in window) {
