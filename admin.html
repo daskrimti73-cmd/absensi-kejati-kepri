@@ -1098,6 +1098,41 @@
             z-index: 1;
         }
         
+        /* Preview Table Styles */
+        #previewTable {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        #previewTable th {
+            background: #1f2937;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #3b82f6;
+        }
+        
+        #previewTable td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #374151;
+        }
+        
+        #previewTable tbody tr:hover {
+            background: #f9fafb;
+        }
+        
+        #previewTable tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+        
+        #previewTable tbody tr:nth-child(even):hover {
+            background: #f3f4f6;
+        }
+        
         /* Upload History */
         .upload-history {
             margin-top: 32px;
@@ -1289,6 +1324,36 @@
         </form>
         
         <div class="status" id="status"></div>
+        
+        <!-- Preview Data Section -->
+        <div id="previewSection" style="display: none; margin-top: 24px;">
+            <div class="card" style="border: 2px solid #3b82f6;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h3 style="color: #1e40af; margin: 0; display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px;">👁️</span>
+                        Preview Data Excel
+                    </h3>
+                    <button type="button" id="btnClosePreview" style="background: #ef4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                        ✕ Tutup
+                    </button>
+                </div>
+                <div id="previewInfo" style="background: #eff6ff; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; color: #1e40af;"></div>
+                <div id="previewTableContainer" style="overflow-x: auto; max-height: 500px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <table id="previewTable" style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead id="previewTableHead" style="background: #f3f4f6; position: sticky; top: 0; z-index: 10;"></thead>
+                        <tbody id="previewTableBody"></tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 16px; display: flex; gap: 12px;">
+                    <button type="button" id="btnConfirmUpload" class="btn-upload" style="flex: 1;">
+                        ✅ Konfirmasi & Upload
+                    </button>
+                    <button type="button" id="btnCancelUpload" class="btn-upload" style="flex: 1; background: #6b7280;">
+                        ❌ Batal
+                    </button>
+                </div>
+            </div>
+        </div>
         
         <!-- Progress Bar -->
         <div class="progress-container" id="progressContainer">
@@ -2179,217 +2244,27 @@
                 console.log(`\n📊 Final total with GABUNGAN: ${allTransformedData.length} rows`);
                 
                 // ============================================
-                // DUPLICATE CHECK (for Append mode)
+                // SHOW PREVIEW BEFORE UPLOAD
                 // ============================================
-                showProgress(60, 'Cek duplikat...');
-                if (uploadMode === 'append') {
-                    showStatus('info', '⏳ Checking for existing data...');
-                    
-                    // Check if data already exists
-                    const { data: existingData, error: checkError } = await sbClient
-                        .from('absensi')
-                        .select('tahun, bulan, tanggal, bidang')
-                        .eq('tahun', tahun)
-                        .eq('bulan', bulan);
-                    
-                    if (checkError) {
-                        console.warn('⚠️ Could not check for duplicates:', checkError);
-                    } else if (existingData && existingData.length > 0) {
-                        // Found existing data
-                        const existingCount = existingData.length;
-                        const existingBidang = [...new Set(existingData.map(d => d.bidang))];
-                        
-                        console.warn(`\n⚠️ WARNING: Data already exists for ${bulan} ${tahun}!`);
-                        console.warn(`   Existing rows: ${existingCount}`);
-                        console.warn(`   Existing bidang: ${existingBidang.join(', ')}`);
-                        console.warn(`   New rows to insert: ${allTransformedData.length}`);
-                        console.warn(`\n   Using APPEND mode will create DUPLICATES!`);
-                        console.warn(`   Recommendation: Use REPLACE mode instead.`);
-                        
-                        // Ask user confirmation (via alert)
-                        const confirmAppend = confirm(
-                            `⚠️ WARNING: Data already exists for ${bulan} ${tahun}!\n\n` +
-                            `Existing: ${existingCount} rows\n` +
-                            `New: ${allTransformedData.length} rows\n\n` +
-                            `Using APPEND mode will create DUPLICATES.\n\n` +
-                            `Do you want to continue?\n\n` +
-                            `Click OK to continue (create duplicates)\n` +
-                            `Click Cancel to stop (recommended: use REPLACE mode instead)`
-                        );
-                        
-                        if (!confirmAppend) {
-                            throw new Error('Upload cancelled by user to prevent duplicates. Please use REPLACE mode.');
-                        }
-                        
-                        console.log(`   ⚠️ User confirmed: Proceeding with APPEND (duplicates will be created)`);
-                    } else {
-                        console.log(`   ✅ No existing data found for ${bulan} ${tahun} - Safe to append`);
-                    }
-                }
+                showProgress(60, 'Menyiapkan preview...');
+                showStatus('info', '👁️ Menampilkan preview data...');
                 
-                // Delete old data if replace mode
-                if (uploadMode === 'replace') {
-                    showStatus('info', '⏳ Menghapus data lama...');
-                    showProgress(70, 'Hapus data lama...');
-                    const { error: deleteError } = await sbClient
-                        .from('absensi')
-                        .delete()
-                        .eq('tahun', tahun)
-                        .eq('bulan', bulan);
-                    
-                    if (deleteError) throw deleteError;
-                    
-                    console.log(`   ✅ Deleted old data for ${bulan} ${tahun}`);
-                }
+                // Show preview and wait for user confirmation
+                showPreview(allTransformedData, bulan, tahun, uploadMode);
                 
-                // Insert new data
-                showStatus('info', '⏳ Mengupload data baru...');
-                showProgress(80, 'Upload ke database...');
-                const { data: insertedData, error: insertError } = await sbClient
-                    .from('absensi')
-                    .insert(allTransformedData);
+                // Reset button
+                btnUpload.disabled = false;
+                btnUpload.textContent = '📤 Upload Data';
                 
-                if (insertError) throw insertError;
-                
-                // Wait a bit for data to be fully inserted
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // AUTO-CLEANUP: Remove TOTAL columns (data with suspiciously high values)
-                // Different thresholds for different bidang:
-                // - GABUNGAN: WFO > 1000 (monthly total ~2000-3000)
-                // - Individual bidang: WFO > 300 (monthly total ~400-800)
-                showStatus('info', '⏳ Membersihkan kolom TOTAL...');
-                
-                // Cleanup GABUNGAN (threshold: 1000)
-                const { data: deletedGabungan, error: cleanupError1 } = await sbClient
-                    .from('absensi')
-                    .delete()
-                    .eq('tahun', tahun)
-                    .eq('bulan', bulan)
-                    .eq('bidang', 'GABUNGAN')
-                    .gt('wfo', 1000)
-                    .select();
-                
-                // Cleanup individual bidang (threshold: 300)
-                const { data: deletedBidang, error: cleanupError2 } = await sbClient
-                    .from('absensi')
-                    .delete()
-                    .eq('tahun', tahun)
-                    .eq('bulan', bulan)
-                    .neq('bidang', 'GABUNGAN')
-                    .gt('wfo', 300)
-                    .select();
-                
-                const totalDeleted = (deletedGabungan?.length || 0) + (deletedBidang?.length || 0);
-                
-                if (cleanupError1 || cleanupError2) {
-                    console.warn('⚠️ Cleanup warning:', cleanupError1 || cleanupError2);
-                } else if (totalDeleted > 0) {
-                    console.log(`✅ Cleaned up ${totalDeleted} TOTAL column rows`);
-                }
-                
-                // VALIDATION: Check uploaded data vs Excel summary
-                showStatus('info', '⏳ Memvalidasi data yang diupload...');
-                showProgress(90, 'Validasi...');
-                
-                const { data: uploadedData, error: validateError } = await sbClient
-                    .from('absensi')
-                    .select('bidang, wfo, dinas_luar, undangan, sakit, ijin, cuti, isoman, tidak_absen') // ✅ Include isoman
-                    .eq('tahun', tahun)
-                    .eq('bulan', bulan);
-                
-                if (validateError) {
-                    console.warn('⚠️ Validation error:', validateError);
-                } else {
-                    // Calculate totals per bidang
-                    const totals = {};
-                    uploadedData.forEach(row => {
-                        if (!totals[row.bidang]) {
-                            totals[row.bidang] = { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, isoman: 0, tidak_absen: 0, total: 0 };
-                        }
-                        totals[row.bidang].wfo += row.wfo;
-                        totals[row.bidang].dinas_luar += row.dinas_luar;
-                        totals[row.bidang].undangan += row.undangan;
-                        totals[row.bidang].sakit += row.sakit;
-                        totals[row.bidang].ijin += row.ijin;
-                        totals[row.bidang].cuti += row.cuti;
-                        totals[row.bidang].isoman += (row.isoman || 0); // ✅ Include isoman
-                        totals[row.bidang].tidak_absen += row.tidak_absen;
-                        totals[row.bidang].total += row.wfo + row.dinas_luar + row.undangan + row.sakit + row.ijin + row.cuti + (row.isoman || 0) + row.tidak_absen;
-                    });
-                    
-                    console.log('\n📊 VALIDASI HASIL UPLOAD:');
-                    console.log('═'.repeat(80));
-                    Object.keys(totals).sort().forEach(bidang => {
-                        const t = totals[bidang];
-                        console.log(`${bidang}:`);
-                        console.log(`  WFO=${t.wfo}, DL=${t.dinas_luar}, U=${t.undangan}, S=${t.sakit}, I=${t.ijin}, C=${t.cuti}, ISO=${t.isoman}, TA=${t.tidak_absen}`); // ✅ Show isoman
-                        console.log(`  TOTAL = ${t.total}`);
-                    });
-                    console.log('═'.repeat(80));
-                    console.log('⚠️ PENTING: Bandingkan angka di atas dengan Excel!');
-                    console.log('⚠️ Jika ada yang tidak sesuai, gunakan query SQL untuk memperbaiki.');
-                }
-                
-                // ============================================
-                // PARSE & UPLOAD REKAPITULASI (OPTIONAL)
-                // ============================================
-                console.log('\n' + '═'.repeat(80));
-                console.log('📊 PARSING REKAPITULASI (OPTIONAL)');
-                console.log('═'.repeat(80));
-                
-                try {
-                    const rekapData = parseRekapitulasi(workbook, bulan, tahun);
-                    
-                    if (rekapData) {
-                        console.log('✅ Rekapitulasi data found, uploading to Supabase...');
-                        const rekapSuccess = await uploadRekapitulasi(sbClient, rekapData);
-                        
-                        if (rekapSuccess) {
-                            console.log('✅ Rekapitulasi uploaded successfully!');
-                        } else {
-                            console.log('⚠️ Rekapitulasi upload failed (non-critical)');
-                        }
-                    } else {
-                        console.log('ℹ️ No rekapitulasi data found (this is OK, using calculated data)');
-                    }
-                } catch (rekapError) {
-                    console.log('⚠️ Rekapitulasi parsing error (non-critical):', rekapError.message);
-                    console.log('   System will use calculated data from absensi table');
-                }
-                
-                console.log('═'.repeat(80));
-                
-                showProgress(100, 'Selesai!');
-                
-                // Add to history
-                addToHistory(bulan, tahun, uploadMode, allTransformedData.length, 'success');
-                
-                if (totalDeleted > 0) {
-                    showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data (${totalDeleted} kolom TOTAL dihapus) untuk ${bulan} ${tahun}!\n\n⚠️ CEK CONSOLE (F12) untuk validasi hasil!`);
-                } else {
-                    showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!\n\n⚠️ CEK CONSOLE (F12) untuk validasi hasil!`);
-                }
-                
-                fileInput.value = '';
-                
-                // Hide progress after 2 seconds
-                setTimeout(hideProgress, 2000);
+                // Hide progress
+                document.getElementById('progressContainer').style.display = 'none';
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('❌ Error:', error);
                 showStatus('error', `❌ Error: ${error.message}`);
-                hideProgress();
+                showProgress(0, 'Error!');
                 
-                // Add to history as failed
-                addToHistory(
-                    document.getElementById('bulan').value,
-                    document.getElementById('tahun').value,
-                    uploadMode,
-                    0,
-                    'failed',
-                    error.message
-                );
+                addToHistory(bulan, tahun, uploadMode, 0, 'failed');
             } finally {
                 btnUpload.disabled = false;
                 btnUpload.textContent = '📤 Upload Data';
@@ -2413,6 +2288,180 @@
         // DELETE DATA FUNCTIONALITY
         // ============================================
         let dataToDelete = null;
+        
+        // ============================================
+        // PREVIEW DATA FUNCTIONALITY
+        // ============================================
+        let previewData = null;
+        
+        function showPreview(data, bulan, tahun, uploadMode) {
+            previewData = { data, bulan, tahun, uploadMode };
+            
+            const previewSection = document.getElementById('previewSection');
+            const previewInfo = document.getElementById('previewInfo');
+            const previewTableHead = document.getElementById('previewTableHead');
+            const previewTableBody = document.getElementById('previewTableBody');
+            
+            // Show preview section
+            previewSection.style.display = 'block';
+            previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // Display info
+            const bidangCount = {};
+            data.forEach(row => {
+                const bidang = row.bidang || 'Unknown';
+                bidangCount[bidang] = (bidangCount[bidang] || 0) + 1;
+            });
+            
+            const bidangList = Object.entries(bidangCount)
+                .map(([bidang, count]) => `<strong>${bidang}</strong>: ${count} data`)
+                .join(' | ');
+            
+            previewInfo.innerHTML = `
+                📊 <strong>${data.length} data</strong> akan diupload untuk <strong>${bulan} ${tahun}</strong><br>
+                ${bidangList}<br>
+                Mode: <strong>${uploadMode === 'replace' ? 'Replace (Hapus data lama)' : 'Append (Tambah data baru)'}</strong>
+            `;
+            
+            // Build table header
+            if (data.length > 0) {
+                const headers = Object.keys(data[0]);
+                previewTableHead.innerHTML = `
+                    <tr>
+                        <th style="text-align: center;">#</th>
+                        ${headers.map(h => `<th>${h}</th>`).join('')}
+                    </tr>
+                `;
+                
+                // Build table body (show max 100 rows for performance)
+                const displayData = data.slice(0, 100);
+                previewTableBody.innerHTML = displayData.map((row, idx) => `
+                    <tr>
+                        <td style="text-align: center; font-weight: 600; color: #6b7280;">${idx + 1}</td>
+                        ${headers.map(h => `<td>${row[h] !== null && row[h] !== undefined ? row[h] : '-'}</td>`).join('')}
+                    </tr>
+                `).join('');
+                
+                if (data.length > 100) {
+                    previewTableBody.innerHTML += `
+                        <tr>
+                            <td colspan="${headers.length + 1}" style="text-align: center; padding: 20px; background: #fef3c7; color: #92400e; font-weight: 600;">
+                                ⚠️ Menampilkan 100 dari ${data.length} data. Semua data akan diupload saat konfirmasi.
+                            </td>
+                        </tr>
+                    `;
+                }
+            }
+        }
+        
+        function hidePreview() {
+            document.getElementById('previewSection').style.display = 'none';
+            previewData = null;
+        }
+        
+        document.getElementById('btnClosePreview').addEventListener('click', hidePreview);
+        document.getElementById('btnCancelUpload').addEventListener('click', hidePreview);
+        
+        document.getElementById('btnConfirmUpload').addEventListener('click', async function() {
+            if (!previewData) {
+                alert('Tidak ada data untuk diupload!');
+                return;
+            }
+            
+            const { data, bulan, tahun, uploadMode } = previewData;
+            const btnConfirm = document.getElementById('btnConfirmUpload');
+            const btnCancel = document.getElementById('btnCancelUpload');
+            
+            btnConfirm.disabled = true;
+            btnCancel.disabled = true;
+            btnConfirm.textContent = '⏳ Mengupload...';
+            
+            try {
+                await performUpload(data, bulan, tahun, uploadMode);
+                hidePreview();
+                
+                // Reset form
+                document.getElementById('uploadForm').reset();
+                document.getElementById('fileList').innerHTML = '';
+            } catch (error) {
+                console.error('Upload error:', error);
+                showStatus('error', `❌ Error: ${error.message}`);
+            } finally {
+                btnConfirm.disabled = false;
+                btnCancel.disabled = false;
+                btnConfirm.textContent = '✅ Konfirmasi & Upload';
+            }
+        });
+        
+        async function performUpload(allTransformedData, bulan, tahun, uploadMode) {
+            showProgress(70, 'Menyimpan ke database...');
+            
+            // Use existing sbClient from global scope
+            const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            
+            // Delete old data if replace mode
+            if (uploadMode === 'replace') {
+                showStatus('info', '⏳ Menghapus data lama...');
+                showProgress(70, 'Hapus data lama...');
+                const { error: deleteError } = await sbClient
+                    .from('absensi')
+                    .delete()
+                    .eq('tahun', tahun)
+                    .eq('bulan', bulan);
+                
+                if (deleteError) throw deleteError;
+                
+                console.log(`   ✅ Deleted old data for ${bulan} ${tahun}`);
+            }
+            
+            // Insert new data
+            showProgress(80, 'Insert data baru...');
+            const { data: insertedData, error: insertError } = await sbClient
+                .from('absensi')
+                .insert(allTransformedData)
+                .select();
+            
+            if (insertError) throw insertError;
+            
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // AUTO-CLEANUP: Remove TOTAL columns
+            const { data: deletedGabungan, error: cleanupError1 } = await sbClient
+                .from('absensi')
+                .delete()
+                .eq('tahun', tahun)
+                .eq('bulan', bulan)
+                .eq('bidang', 'GABUNGAN')
+                .gt('wfo', 1000)
+                .select();
+            
+            const { data: deletedBidang, error: cleanupError2 } = await sbClient
+                .from('absensi')
+                .delete()
+                .eq('tahun', tahun)
+                .eq('bulan', bulan)
+                .neq('bidang', 'GABUNGAN')
+                .gt('wfo', 300)
+                .select();
+            
+            const totalDeleted = (deletedGabungan?.length || 0) + (deletedBidang?.length || 0);
+            
+            if (cleanupError1 || cleanupError2) {
+                console.warn('⚠️ Cleanup warning:', cleanupError1 || cleanupError2);
+            } else if (totalDeleted > 0) {
+                console.log(`✅ Cleaned up ${totalDeleted} TOTAL column rows`);
+            }
+            
+            showProgress(100, 'Selesai!');
+            
+            addToHistory(bulan, tahun, uploadMode, allTransformedData.length, 'success');
+            
+            if (totalDeleted > 0) {
+                showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data (${totalDeleted} kolom TOTAL dihapus) untuk ${bulan} ${tahun}!\n\n⚠️ CEK CONSOLE (F12) untuk validasi hasil!`);
+            } else {
+                showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!\n\n⚠️ CEK CONSOLE (F12) untuk validasi hasil!`);
+            }
+        }
         
         document.getElementById('btnCheckData').addEventListener('click', async function() {
             const tahun = parseInt(document.getElementById('deleteTahun').value);
