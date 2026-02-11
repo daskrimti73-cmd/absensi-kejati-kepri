@@ -2225,10 +2225,66 @@
         }
 
         // Initialize when DOM is ready
+        // ============================================
+        // DYNAMIC YEAR FILTER LOADER
+        // ============================================
+        async function loadAvailableYears() {
+            try {
+                // Query distinct years from database
+                const { data, error } = await supabaseClient
+                    .from('absensi')
+                    .select('tahun')
+                    .order('tahun', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading years:', error);
+                    return;
+                }
+                
+                // Get unique years
+                const uniqueYears = [...new Set(data.map(item => item.tahun))].sort((a, b) => b - a);
+                
+                if (uniqueYears.length === 0) {
+                    console.log('No years found in database, using defaults');
+                    return;
+                }
+                
+                console.log('Available years from database:', uniqueYears);
+                
+                // Update standard mode year filter
+                const tahunFilter = document.getElementById('tahunFilter');
+                if (tahunFilter) {
+                    const currentValue = tahunFilter.value;
+                    tahunFilter.innerHTML = uniqueYears.map(year => 
+                        `<option value="${year}" ${year == currentValue ? 'selected' : ''}>${year}</option>`
+                    ).join('');
+                }
+                
+                // Update comparison mode year filter
+                const globalYearSelect = document.getElementById('globalYearSelect');
+                if (globalYearSelect) {
+                    const currentValue = globalYearSelect.value;
+                    globalYearSelect.innerHTML = uniqueYears.map(year => 
+                        `<option value="${year}" ${year == currentValue ? 'selected' : ''}>${year}</option>`
+                    ).join('');
+                }
+                
+                console.log('✅ Year filters updated dynamically');
+                
+            } catch (err) {
+                console.error('Error in loadAvailableYears:', err);
+            }
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard Version: 4.0.0 - GABUNGAN MODE');
+            console.log('Dashboard Version: 5.0.0 - DYNAMIC YEAR FILTER');
             console.log('Dashboard now reads from GABUNGAN sheet (not sum of all bidang)');
             console.log('CHECK IN calculation: Total - Tidak Absen (includes ISOMAN)');
+            
+            // Load available years from database
+            loadAvailableYears();
+            
+            // Then update dashboard
             updateBidangDashboard();
         });
         
