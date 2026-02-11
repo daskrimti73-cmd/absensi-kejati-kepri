@@ -175,35 +175,28 @@
             width: 220px;
             height: 220px;
             margin: 0 auto 25px;
-            background: white;
+            background: transparent;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 
-                0 0 0 12px rgba(255, 255, 255, 0.2),
-                0 25px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: none;
             position: relative;
             overflow: visible;
-            padding: 30px;
+            padding: 0;
         }
 
         .avatar::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-            border-radius: 50%;
+            display: none;
         }
 
         .avatar-logo {
-            width: 160px;
-            height: 160px;
+            width: 220px;
+            height: 220px;
             object-fit: contain;
             position: relative;
             z-index: 1;
-            filter: drop-shadow(0 3px 10px rgba(0,0,0,0.15));
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
         }
 
         /* Title */
@@ -403,13 +396,13 @@
             .avatar {
                 width: 180px;
                 height: 180px;
-                padding: 25px;
+                padding: 0;
                 margin-bottom: 20px;
             }
 
             .avatar-logo {
-                width: 130px;
-                height: 130px;
+                width: 180px;
+                height: 180px;
             }
 
             .login-title {
@@ -504,7 +497,7 @@
 
     <script>
         // Version check
-        console.log('🔄 Login Page Version: 6.0 - Logo Lokal (download.png)');
+        console.log('🔄 Login Page Version: 7.0 - Logo Tanpa Border');
         console.log('📅 Last Update:', new Date().toISOString());
         
         // Generate stars
