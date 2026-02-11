@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Admin Panel - Upload Data Absensi v4.2.0 Professional</title>
+    <title>Admin Panel - Upload Data Absensi v4.3.0 Professional</title>
     
     <!-- CACHE BUSTING: Prevent browser from caching old version -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -1466,13 +1466,15 @@
                 </div>
             </div>
             
-            <!-- Data Table -->
-            <div id="dataTableSection" style="display: none; padding: 24px 32px;">
-                <div style="overflow-x: auto; max-height: 600px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px;">
-                    <table id="dataTable" style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
-                        <thead id="dataTableHead" style="background: #1f2937; color: white; position: sticky; top: 0; z-index: 10;"></thead>
-                        <tbody id="dataTableBody"></tbody>
-                    </table>
+            <!-- Excel Preview Section -->
+            <div id="excelPreviewSection" style="display: none; padding: 24px 32px;">
+                <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+                    <div style="background: #f3f4f6; padding: 12px 16px; border-bottom: 1px solid #e5e7eb;">
+                        <div style="display: flex; justify-content: between; align-items: center;">
+                            <span style="font-weight: 600; color: #374151; font-size: 0.9rem;">📄 Preview Excel</span>
+                        </div>
+                    </div>
+                    <div id="excelPreviewContent" style="overflow: auto; max-height: 600px; background: white;"></div>
                 </div>
             </div>
             
@@ -1499,7 +1501,7 @@
         // ============================================
         // VERSION & CACHE MANAGEMENT
         // ============================================
-        const APP_VERSION = '4.2.0'; // Update: Excel Download from Database
+        const APP_VERSION = '4.3.0'; // Update: Excel Preview from Database (No Table)
         
         // Clear old cache on load
         if ('caches' in window) {
@@ -1523,7 +1525,7 @@
         console.log('✅ Progress Bar: ENABLED');
         console.log('✅ Delete Data Feature: ENABLED → UPGRADED to Data Management');
         console.log('✅ Excel Preview on File Select: ENABLED');
-        console.log('✅ Excel Download from Database: ENABLED');
+        console.log('✅ Excel Preview from Database: ENABLED (No HTML Table)');
         console.log('✅ Year Range: 1990-2100');
         console.log('═══════════════════════════════════════════════════');
         console.log('✅ Upload History: ENABLED');
@@ -2668,7 +2670,7 @@
             // Hide sections
             document.getElementById('emptyState').style.display = 'none';
             document.getElementById('dataInfoSection').style.display = 'none';
-            document.getElementById('dataTableSection').style.display = 'none';
+            document.getElementById('excelPreviewSection').style.display = 'none';
             
             try {
                 // Fetch data from database
@@ -2717,41 +2719,8 @@
                     `;
                     document.getElementById('dataInfoSection').style.display = 'block';
                     
-                    // Build Excel-like table
-                    if (data.length > 0) {
-                        const headers = Object.keys(data[0]);
-                        const dataTableHead = document.getElementById('dataTableHead');
-                        const dataTableBody = document.getElementById('dataTableBody');
-                        const dataTable = document.getElementById('dataTable');
-                        
-                        // Apply Excel-like table styling
-                        dataTable.style.cssText = `
-                            width: 100%;
-                            border-collapse: collapse;
-                            font-family: 'Calibri', 'Arial', sans-serif;
-                            font-size: 11pt;
-                            background: white;
-                        `;
-                        
-                        dataTableHead.innerHTML = `
-                            <tr>
-                                <th style="border: 1px solid #d0d0d0; padding: 6px 10px; background: #f2f2f2; font-weight: 600; color: #000; text-align: center; min-width: 50px;">#</th>
-                                ${headers.map(h => `<th style="border: 1px solid #d0d0d0; padding: 6px 10px; background: #f2f2f2; font-weight: 600; color: #000; text-align: left; min-width: 80px; white-space: nowrap;">${h.toUpperCase()}</th>`).join('')}
-                            </tr>
-                        `;
-                        
-                        dataTableBody.innerHTML = data.map((row, idx) => {
-                            const bgColor = idx % 2 === 0 ? 'white' : '#f9f9f9';
-                            return `
-                                <tr style="background: ${bgColor};">
-                                    <td style="border: 1px solid #d0d0d0; padding: 4px 10px; text-align: center; font-weight: 600; color: #666;">${idx + 1}</td>
-                                    ${headers.map(h => `<td style="border: 1px solid #d0d0d0; padding: 4px 10px; color: #000; white-space: nowrap;">${row[h] !== null && row[h] !== undefined ? row[h] : ''}</td>`).join('')}
-                                </tr>
-                            `;
-                        }).join('');
-                        
-                        document.getElementById('dataTableSection').style.display = 'block';
-                    }
+                    // Generate and display Excel preview
+                    generateExcelPreview(data);
                 }
                 
             } catch (error) {
@@ -2764,6 +2733,83 @@
                 btnLoad.textContent = '🔍 Tampilkan Data';
             }
         });
+        
+        // ============================================
+        // GENERATE EXCEL PREVIEW FROM DATABASE
+        // ============================================
+        function generateExcelPreview(data) {
+            if (!data || data.length === 0) return;
+            
+            // Create workbook from data
+            const ws = XLSX.utils.json_to_sheet(data);
+            
+            // Convert to HTML with Excel styling
+            const htmlTable = XLSX.utils.sheet_to_html(ws, {
+                id: 'generated-excel-table',
+                editable: false
+            });
+            
+            // Display in preview section
+            const previewContent = document.getElementById('excelPreviewContent');
+            previewContent.innerHTML = htmlTable;
+            
+            // Apply Excel-like styling
+            styleGeneratedExcelTable();
+            
+            // Show preview section
+            document.getElementById('excelPreviewSection').style.display = 'block';
+        }
+        
+        function styleGeneratedExcelTable() {
+            const table = document.getElementById('generated-excel-table');
+            if (!table) return;
+            
+            // Apply Excel-like styles to table
+            table.style.cssText = `
+                width: 100%;
+                border-collapse: collapse;
+                font-family: 'Calibri', 'Arial', sans-serif;
+                font-size: 11pt;
+                background: white;
+            `;
+            
+            // Style all cells
+            const cells = table.querySelectorAll('td, th');
+            cells.forEach(cell => {
+                cell.style.cssText = `
+                    border: 1px solid #d0d0d0;
+                    padding: 4px 8px;
+                    min-width: 60px;
+                    text-align: left;
+                    background: white;
+                    color: #000;
+                `;
+            });
+            
+            // Style header cells
+            const headers = table.querySelectorAll('th');
+            headers.forEach(header => {
+                header.style.cssText = `
+                    border: 1px solid #d0d0d0;
+                    padding: 6px 8px;
+                    background: #f2f2f2;
+                    font-weight: 600;
+                    color: #000;
+                    text-align: center;
+                `;
+            });
+            
+            // Add zebra striping
+            const rows = table.querySelectorAll('tr');
+            rows.forEach((row, index) => {
+                if (index % 2 === 0 && index > 0) {
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        cell.style.background = '#f9f9f9';
+                    });
+                }
+            });
+        }
         
         // ============================================
         // DOWNLOAD EXCEL FUNCTIONALITY
@@ -2829,7 +2875,7 @@
                 // Reset state
                 currentLoadedData = null;
                 document.getElementById('dataInfoSection').style.display = 'none';
-                document.getElementById('dataTableSection').style.display = 'none';
+                document.getElementById('excelPreviewSection').style.display = 'none';
                 document.getElementById('emptyState').innerHTML = `
                     <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">✅</div>
                     <p style="font-size: 1.1rem; font-weight: 600; color: #16a34a; margin-bottom: 8px;">
@@ -2846,7 +2892,7 @@
                 alert(`❌ Error: ${error.message}`);
             } finally {
                 btnDelete.disabled = false;
-                btnDelete.textContent = '🗑️ Hapus Data Ini';
+                btnDelete.textContent = '🗑️ Hapus Data';
             }
         });
     </script>
