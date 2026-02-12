@@ -2525,6 +2525,14 @@
                 console.log('📋 Sheet names:', workbook.SheetNames);
                 showProgress(30, 'Memproses sheets...');
                 
+                // ============================================
+                // PARSE REKAPITULASI DATA (CRITICAL!)
+                // ============================================
+                const rekapData = parseRekapitulasi(workbook, bulan, tahun);
+                if (!rekapData) {
+                    console.warn('⚠️ Failed to parse rekapitulasi data');
+                }
+                
                 // Process all sheets (each sheet = 1 bidang)
                 let allTransformedData = [];
                 
@@ -2700,7 +2708,7 @@
                 showStatus('info', '👁️ Menampilkan preview data...');
                 
                 // Show preview and wait for user confirmation
-                showPreview(allTransformedData, bulan, tahun, uploadMode);
+                showPreview(allTransformedData, bulan, tahun, uploadMode, rekapData);
                 
                 // Reset button
                 btnUpload.disabled = false;
@@ -2754,8 +2762,8 @@
         // ============================================
         let previewData = null;
         
-        function showPreview(data, bulan, tahun, uploadMode) {
-            previewData = { data, bulan, tahun, uploadMode };
+        function showPreview(data, bulan, tahun, uploadMode, rekapData) {
+            previewData = { data, bulan, tahun, uploadMode, rekapData };
             
             const previewSection = document.getElementById('previewSection');
             const previewInfo = document.getElementById('previewInfo');
@@ -2828,7 +2836,7 @@
                 return;
             }
             
-            const { data, bulan, tahun, uploadMode } = previewData;
+            const { data, bulan, tahun, uploadMode, rekapData } = previewData;
             const btnConfirm = document.getElementById('btnConfirmUpload');
             const btnCancel = document.getElementById('btnCancelUpload');
             
@@ -2837,7 +2845,7 @@
             btnConfirm.textContent = '⏳ Mengupload...';
             
             try {
-                await performUpload(data, bulan, tahun, uploadMode);
+                await performUpload(data, bulan, tahun, uploadMode, rekapData);
                 hidePreview();
                 
                 // Reset form
@@ -2890,7 +2898,7 @@
             return data;
         }
         
-        async function performUpload(allTransformedData, bulan, tahun, uploadMode) {
+        async function performUpload(allTransformedData, bulan, tahun, uploadMode, rekapData) {
             showProgress(70, 'Menyimpan ke database...');
             
             // Use existing sbClient from global scope
@@ -2947,6 +2955,19 @@
                 console.warn('⚠️ Cleanup warning:', cleanupError1 || cleanupError2);
             } else if (totalDeleted > 0) {
                 console.log(`✅ Cleaned up ${totalDeleted} TOTAL column rows`);
+            }
+            
+            // ============================================
+            // UPLOAD REKAPITULASI DATA (CRITICAL!)
+            // ============================================
+            if (rekapData) {
+                showProgress(90, 'Menyimpan rekapitulasi...');
+                const rekapSuccess = await uploadRekapitulasi(sbClient, rekapData);
+                if (!rekapSuccess) {
+                    console.warn('⚠️ Failed to upload rekapitulasi data');
+                }
+            } else {
+                console.warn('⚠️ No rekapitulasi data to upload');
             }
             
             // ============================================
