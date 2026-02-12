@@ -2949,8 +2949,6 @@
                 console.log(`✅ Cleaned up ${totalDeleted} TOTAL column rows`);
             }
             
-            showProgress(100, 'Selesai!');
-            
             // ============================================
             // UPLOAD EXCEL FILE TO STORAGE (NEW FEATURE)
             // ============================================
@@ -2963,6 +2961,8 @@
                 console.warn('   Data is still saved to database successfully');
                 // Don't throw error - data upload is still successful
             }
+            
+            showProgress(100, 'Selesai!');
             
             addToHistory(bulan, tahun, uploadMode, allTransformedData.length, 'success');
             
