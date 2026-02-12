@@ -16,128 +16,13 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(180deg, #0a1628 0%, #1a2744 50%, #0f1b2e 100%);
+            background: linear-gradient(180deg, rgba(10, 22, 40, 0.92) 0%, rgba(26, 39, 68, 0.95) 50%, rgba(15, 27, 46, 0.92) 100%), 
+                        url('627395722_1236737331177778_6790041669068361827_n.jpg') center center / cover no-repeat fixed;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
             position: relative;
-        }
-
-        /* Animated Background Elements */
-        .stars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 3s infinite;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-
-        /* Floating Clouds */
-        .cloud {
-            position: absolute;
-            background: rgba(30, 58, 138, 0.3);
-            border-radius: 100px;
-            animation: float 20s infinite ease-in-out;
-        }
-
-        .cloud1 {
-            width: 200px;
-            height: 80px;
-            top: 10%;
-            left: -200px;
-            animation-delay: 0s;
-        }
-
-        .cloud2 {
-            width: 300px;
-            height: 120px;
-            top: 60%;
-            right: -300px;
-            animation-delay: 5s;
-        }
-
-        .cloud3 {
-            width: 250px;
-            height: 100px;
-            bottom: 20%;
-            left: -250px;
-            animation-delay: 10s;
-        }
-
-        @keyframes float {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(calc(100vw + 300px)); }
-            100% { transform: translateX(calc(100vw + 300px)); }
-        }
-
-        /* Moon */
-        .moon {
-            position: absolute;
-            top: 8%;
-            right: 10%;
-            width: 120px;
-            height: 120px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            box-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
-            animation: moonGlow 4s ease-in-out infinite;
-        }
-
-        @keyframes moonGlow {
-            0%, 100% { box-shadow: 0 0 60px rgba(255, 255, 255, 0.3); }
-            50% { box-shadow: 0 0 80px rgba(255, 255, 255, 0.5); }
-        }
-
-        /* Floating Circles */
-        .circle {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(59, 130, 246, 0.1);
-            animation: floatCircle 15s infinite ease-in-out;
-        }
-
-        .circle1 {
-            width: 80px;
-            height: 80px;
-            top: 20%;
-            left: 15%;
-            animation-delay: 0s;
-        }
-
-        .circle2 {
-            width: 60px;
-            height: 60px;
-            top: 70%;
-            right: 20%;
-            animation-delay: 3s;
-        }
-
-        .circle3 {
-            width: 40px;
-            height: 40px;
-            bottom: 15%;
-            left: 25%;
-            animation-delay: 6s;
-        }
-
-        @keyframes floatCircle {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-30px) scale(1.1); }
         }
 
         /* Login Container */
@@ -145,124 +30,150 @@
             position: relative;
             z-index: 10;
             text-align: center;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 28px 28px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
         }
 
         /* Avatar */
         .avatar-container {
-            margin-bottom: 30px;
-            animation: bounceIn 1s ease-out;
-        }
-
-        @keyframes bounceIn {
-            0% { transform: scale(0); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+            margin-bottom: 18px;
         }
 
         .avatar {
-            width: 220px;
-            height: 220px;
-            margin: 0 auto 25px;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 14px;
             background: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 
-                0 0 0 12px rgba(255, 255, 255, 0.2),
-                0 25px 50px rgba(0, 0, 0, 0.5);
+                0 0 0 4px rgba(255, 255, 255, 0.15),
+                0 0 0 8px rgba(255, 255, 255, 0.08),
+                0 12px 24px rgba(0, 0, 0, 0.4);
             position: relative;
             overflow: visible;
-            padding: 30px;
+            padding: 15px;
+            transition: transform 0.3s ease;
         }
 
-        .avatar::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-            border-radius: 50%;
+        .avatar:hover {
+            transform: scale(1.05);
         }
 
         .avatar-logo {
-            width: 160px;
-            height: 160px;
+            width: 70px;
+            height: 70px;
             object-fit: contain;
             position: relative;
             z-index: 1;
-            filter: drop-shadow(0 3px 10px rgba(0,0,0,0.15));
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
         }
 
         /* Title */
         .login-title {
-            font-size: 42px;
+            font-size: 26px;
             font-weight: 800;
             color: white;
-            margin-bottom: 8px;
-            letter-spacing: 4px;
+            margin-bottom: 5px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            text-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #ffffff 0%, #93c5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .login-subtitle {
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 40px;
-            font-weight: 500;
-            letter-spacing: 2px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 22px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
 
         /* Form */
         .login-form {
-            width: 400px;
+            width: 300px;
             max-width: 90vw;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
             position: relative;
+        }
+
+        .input-group::before {
+            content: '';
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.5;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .input-group:first-of-type::before {
+            content: '👤';
+            font-size: 14px;
+        }
+
+        .input-group:nth-of-type(2)::before {
+            content: '🔒';
+            font-size: 14px;
         }
 
         .input-group input {
             width: 100%;
-            padding: 18px 24px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid transparent;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: 500;
+            padding: 12px 16px 12px 40px;
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
             color: #1e293b;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'Poppins', sans-serif;
-            text-align: center;
+            text-align: left;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .input-group input::placeholder {
             color: #94a3b8;
             text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 1px;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            font-weight: 600;
         }
 
         .input-group input:focus {
             outline: none;
             background: white;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            box-shadow: 
+                0 0 0 4px rgba(59, 130, 246, 0.15),
+                0 8px 24px rgba(59, 130, 246, 0.2);
             transform: translateY(-2px);
+        }
+
+        .input-group input:hover {
+            border-color: rgba(59, 130, 246, 0.3);
         }
 
         /* Remember & Forgot */
@@ -270,77 +181,133 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 0 10px;
+            margin-bottom: 16px;
+            margin-top: 14px;
+            padding: 0 2px;
         }
 
         .remember-me {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
+            gap: 6px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
             cursor: pointer;
             user-select: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .remember-me:hover {
+            color: white;
         }
 
         .remember-me input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+            width: 15px;
+            height: 15px;
             cursor: pointer;
             accent-color: #3b82f6;
+            border-radius: 4px;
         }
 
         .forgot-password {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
             text-decoration: none;
-            transition: color 0.3s;
+            transition: all 0.3s;
+            font-weight: 500;
+            position: relative;
+        }
+
+        .forgot-password::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #3b82f6;
+            transition: width 0.3s;
         }
 
         .forgot-password:hover {
             color: #3b82f6;
         }
 
+        .forgot-password:hover::after {
+            width: 100%;
+        }
+
         /* Login Button */
         .login-button {
             width: 100%;
-            padding: 18px;
-            background: transparent;
+            padding: 13px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50px;
-            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: 'Poppins', sans-serif;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            box-shadow: 
+                0 8px 24px rgba(59, 130, 246, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-button:hover::before {
+            left: 100%;
         }
 
         .login-button:hover {
-            background: rgba(59, 130, 246, 0.2);
-            border-color: #3b82f6;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 32px rgba(59, 130, 246, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .login-button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
+            box-shadow: 
+                0 6px 16px rgba(59, 130, 246, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .login-button:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         /* Create Account */
         .create-account {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14px;
-            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 10px;
+            margin-top: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .create-account a {
@@ -356,15 +323,19 @@
 
         /* Error Message */
         .error-message {
-            background: rgba(239, 68, 68, 0.9);
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
-            padding: 14px 20px;
-            border-radius: 50px;
-            font-size: 14px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 11px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 14px;
             display: none;
             animation: shake 0.5s;
+            box-shadow: 
+                0 8px 24px rgba(239, 68, 68, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .error-message.show {
@@ -373,8 +344,8 @@
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
         }
 
         /* Loading Spinner */
@@ -396,52 +367,75 @@
 
         /* Responsive */
         @media (max-width: 480px) {
+            .login-container {
+                padding: 24px 20px;
+                border-radius: 18px;
+            }
+
             .login-title {
-                font-size: 32px;
+                font-size: 22px;
+                letter-spacing: 2.5px;
+            }
+
+            .login-subtitle {
+                font-size: 10px;
+                letter-spacing: 1px;
+                margin-bottom: 18px;
             }
 
             .avatar {
-                width: 180px;
-                height: 180px;
-                padding: 25px;
-                margin-bottom: 20px;
+                width: 85px;
+                height: 85px;
+                padding: 13px;
+                margin-bottom: 12px;
             }
 
             .avatar-logo {
-                width: 130px;
-                height: 130px;
+                width: 60px;
+                height: 60px;
             }
 
-            .login-title {
-                font-size: 36px;
+            .login-form {
+                width: 100%;
             }
 
-            .moon {
-                width: 80px;
-                height: 80px;
-                top: 5%;
-                right: 5%;
+            .input-group input {
+                padding: 11px 14px 11px 38px;
+                font-size: 11px;
+            }
+
+            .input-group::before {
+                left: 14px;
+                font-size: 13px;
+            }
+
+            .login-button {
+                padding: 12px;
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+
+            .form-options {
+                flex-direction: column;
+                gap: 7px;
+                align-items: flex-start;
+                margin-top: 12px;
+                margin-bottom: 14px;
+            }
+
+            .remember-me,
+            .forgot-password {
+                font-size: 10px;
+            }
+
+            .create-account {
+                font-size: 9px;
+                padding: 8px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Stars Background -->
-    <div class="stars" id="stars"></div>
-
-    <!-- Moon -->
-    <div class="moon"></div>
-
-    <!-- Floating Clouds -->
-    <div class="cloud cloud1"></div>
-    <div class="cloud cloud2"></div>
-    <div class="cloud cloud3"></div>
-
-    <!-- Floating Circles -->
-    <div class="circle circle1"></div>
-    <div class="circle circle2"></div>
-    <div class="circle circle3"></div>
-
     <!-- Login Container -->
     <div class="login-container">
         <!-- Avatar -->
@@ -504,20 +498,17 @@
 
     <script>
         // Version check
-        console.log('🔄 Login Page Version: 8.0 - Restore White Circle Background');
+        console.log('🔄 Login Page Version: 11.0 - Clean Professional Design');
         console.log('📅 Last Update:', new Date().toISOString());
+        console.log('✨ Glassmorphism Card: ENABLED');
+        console.log('✨ Enhanced Input Fields with Icons: ENABLED');
+        console.log('✨ Modern Gradient Button: ENABLED');
+        console.log('✨ Professional Typography: ENABLED');
+        console.log('✨ Ultra Compact Size: OPTIMIZED');
+        console.log('🏛️ Kejati Kepri Background: ENABLED');
+        console.log('🔐 Auto-Fill Credentials: ENABLED');
+        console.log('🎨 Clean Design (No Animations): ENABLED');
         
-        // Generate stars
-        const starsContainer = document.getElementById('stars');
-        for (let i = 0; i < 100; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.animationDelay = Math.random() * 3 + 's';
-            starsContainer.appendChild(star);
-        }
-
         // Credentials
         const VALID_USERNAME = '4BS3NSI66';
         const VALID_PASSWORD = 'K3J4T12020';
@@ -543,10 +534,26 @@
             }
         }
 
-        // Load remembered username
+        // Simple encode/decode functions for password storage
+        function encodePassword(password) {
+            return btoa(password); // Base64 encode
+        }
+
+        function decodePassword(encoded) {
+            try {
+                return atob(encoded); // Base64 decode
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // Load remembered credentials
         const rememberedUser = localStorage.getItem('rememberedUsername');
-        if (rememberedUser) {
+        const rememberedPass = localStorage.getItem('rememberedPassword');
+        
+        if (rememberedUser && rememberedPass) {
             usernameInput.value = rememberedUser;
+            passwordInput.value = decodePassword(rememberedPass);
             rememberMe.checked = true;
         }
 
@@ -567,11 +574,13 @@
             // Simulate network delay
             setTimeout(() => {
                 if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-                    // Remember username if checked
+                    // Remember credentials if checked
                     if (rememberMe.checked) {
                         localStorage.setItem('rememberedUsername', username);
+                        localStorage.setItem('rememberedPassword', encodePassword(password));
                     } else {
                         localStorage.removeItem('rememberedUsername');
+                        localStorage.removeItem('rememberedPassword');
                     }
 
                     // Success - store session

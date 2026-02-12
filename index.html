@@ -1219,7 +1219,12 @@
                         <!-- Global Year Filter -->
                         <div style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--gray-300);">
                             <label style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <span style="font-size: 1.5rem;">📅</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
                                 Tahun:
                             </label>
                             <select id="globalYearSelect" style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 120px; transition: all 0.3s;">
@@ -2277,9 +2282,32 @@
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard Version: 5.0.0 - DYNAMIC YEAR FILTER');
+            const timestamp = Date.now();
+            console.log('═══════════════════════════════════════════════════');
+            console.log('Dashboard Version: 5.2.0 - SVG ICONS FINAL FIX');
+            console.log('Build Timestamp:', timestamp);
+            console.log('═══════════════════════════════════════════════════');
             console.log('Dashboard now reads from GABUNGAN sheet (not sum of all bidang)');
             console.log('CHECK IN calculation: Total - Tidak Absen (includes ISOMAN)');
+            console.log('✨ All emoji replaced with professional SVG icons (v2)');
+            console.log('🔄 If you still see emoji, your browser cache is VERY strong!');
+            console.log('💡 Solution: Close ALL tabs, Clear cache (Ctrl+Shift+Delete), Restart browser');
+            console.log('═══════════════════════════════════════════════════');
+            
+            // Force clear cache aggressively
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    names.forEach(name => caches.delete(name));
+                    console.log('✅ Cache cleared:', names.length, 'caches deleted');
+                });
+            }
+            
+            // Force reload period cards with delay to ensure DOM is ready
+            setTimeout(function() {
+                console.log('🔄 Regenerating period cards with SVG icons...');
+                updatePeriodCards();
+                console.log('✅ Period cards regenerated');
+            }, 200);
             
             // Load available years from database
             loadAvailableYears();
@@ -2341,13 +2369,14 @@
             
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             const colors = ['#1a5f2a', '#2d8f4e', '#0891b2', '#7c3aed', '#dc2626', '#ea580c', '#0d9488', '#6366f1', '#d97706', '#be185d', '#065f46', '#7e22ce'];
-            const icons = ['📅', '📆', '🗓️', '📋', '📊', '📈', '📉', '📌', '📎', '🔖', '📇', '🗂️'];
+            // Using SVG calendar icon for all periods - v2 with larger size
+            const calendarIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
+
 
             
             for (let i = 1; i <= count; i++) {
                 const defaultMonth = months[(11 - count + i) % 12]; // Smart default: recent months
                 const color = colors[i - 1];
-                const icon = icons[i - 1];
                 
                 const card = document.createElement('div');
                 card.style.cssText = `
@@ -2362,10 +2391,10 @@
                 `;
                 
                 card.innerHTML = `
-                    <div style="position: absolute; top: -20px; right: -20px; font-size: 5rem; opacity: 0.05;">${icon}</div>
+                    <div style="position: absolute; top: 10px; right: 10px; opacity: 0.08; color: ${color}; transform: scale(2);">${calendarIcon}</div>
                     <h4 style="color: ${color}; font-weight: 800; margin-bottom: 1.25rem; font-size: 1rem; text-transform: uppercase; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 0.5rem; position: relative; z-index: 1;">
-                        <span style="font-size: 1.5rem;">${icon}</span>
-                        Periode ${i}
+                        <span style="color: ${color}; display: inline-flex; align-items: center;">${calendarIcon}</span>
+                        <span>PERIODE ${i}</span>
                     </h4>
                     <select id="bulanCompare${i}" style="width: 100%; padding: 0.875rem; border: 2px solid ${color}40; border-radius: var(--radius-lg); font-weight: 600; font-size: 0.9375rem; transition: all 0.3s; position: relative; z-index: 1;">
                         ${months.map(m => `<option value="${m}" ${m === defaultMonth ? 'selected' : ''}>${m}</option>`).join('')}
