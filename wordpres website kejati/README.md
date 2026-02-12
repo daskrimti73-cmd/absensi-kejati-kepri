@@ -94,7 +94,7 @@ Dashboard interaktif untuk visualisasi data absensi pegawai dengan grafik batang
 5. Klik **Upload Data**
 
 ### View Data
-1. Buka website: `https://ikhsandimas.github.io/absensi-kejati-kepri/`
+1. Buka website: `https://daskrimti73-cmd.github.io/absensi-kejati-kepri/`
 2. Pilih bulan & tahun
 3. Lihat grafik & statistik
 
@@ -145,7 +145,7 @@ Dashboard interaktif untuk visualisasi data absensi pegawai dengan grafik batang
 ## 🌐 Deployment
 
 Website di-deploy menggunakan GitHub Pages:
-- URL: `https://ikhsandimas.github.io/absensi-kejati-kepri/`
+- URL: `https://daskrimti73-cmd.github.io/absensi-kejati-kepri/`
 
 ---
 
