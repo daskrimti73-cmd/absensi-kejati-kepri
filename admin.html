@@ -3353,19 +3353,38 @@
             btnDelete.textContent = '⏳ Menghapus...';
             
             try {
-                let deleteQuery = sbClient
+                // Delete from absensi table
+                let deleteAbsensiQuery = sbClient
                     .from('absensi')
                     .delete()
                     .eq('tahun', tahun);
                 
                 // Add bulan filter only if not "SEMUA"
                 if (bulan !== 'SEMUA') {
-                    deleteQuery = deleteQuery.eq('bulan', bulan);
+                    deleteAbsensiQuery = deleteAbsensiQuery.eq('bulan', bulan);
                 }
                 
-                const { error } = await deleteQuery;
+                const { error: absensiError } = await deleteAbsensiQuery;
                 
-                if (error) throw error;
+                if (absensiError) throw absensiError;
+                
+                // Delete from rekapitulasi table
+                let deleteRekapQuery = sbClient
+                    .from('rekapitulasi')
+                    .delete()
+                    .eq('tahun', tahun);
+                
+                // Add bulan filter only if not "SEMUA"
+                if (bulan !== 'SEMUA') {
+                    deleteRekapQuery = deleteRekapQuery.eq('bulan', bulan);
+                }
+                
+                const { error: rekapError } = await deleteRekapQuery;
+                
+                if (rekapError) {
+                    console.warn('Warning: Failed to delete rekapitulasi data:', rekapError);
+                    // Don't throw error, just warn - rekapitulasi might not exist
+                }
                 
                 alert(`✅ Berhasil menghapus ${data.length} data untuk ${displayBulan} ${tahun}!`);
                 
