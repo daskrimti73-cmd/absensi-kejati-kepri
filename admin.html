@@ -3353,6 +3353,8 @@
             btnDelete.textContent = '⏳ Menghapus...';
             
             try {
+                console.log(`🗑️ Deleting data for tahun=${tahun}, bulan=${bulan}`);
+                
                 // Delete from absensi table
                 let deleteAbsensiQuery = sbClient
                     .from('absensi')
@@ -3367,6 +3369,7 @@
                 const { error: absensiError } = await deleteAbsensiQuery;
                 
                 if (absensiError) throw absensiError;
+                console.log('✅ Absensi data deleted successfully');
                 
                 // Delete from rekapitulasi table
                 let deleteRekapQuery = sbClient
@@ -3379,14 +3382,16 @@
                     deleteRekapQuery = deleteRekapQuery.eq('bulan', bulan);
                 }
                 
-                const { error: rekapError } = await deleteRekapQuery;
+                const { error: rekapError, data: rekapData } = await deleteRekapQuery;
                 
                 if (rekapError) {
-                    console.warn('Warning: Failed to delete rekapitulasi data:', rekapError);
+                    console.warn('⚠️ Warning: Failed to delete rekapitulasi data:', rekapError);
                     // Don't throw error, just warn - rekapitulasi might not exist
+                } else {
+                    console.log('✅ Rekapitulasi data deleted successfully');
                 }
                 
-                alert(`✅ Berhasil menghapus ${data.length} data untuk ${displayBulan} ${tahun}!`);
+                alert(`✅ Berhasil menghapus ${data.length} data absensi dan data rekapitulasi untuk ${displayBulan} ${tahun}!\n\nSilakan refresh dashboard untuk melihat perubahan.`);
                 
                 // Reset state
                 currentLoadedData = null;
