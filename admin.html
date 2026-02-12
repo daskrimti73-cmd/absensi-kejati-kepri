@@ -1655,6 +1655,7 @@
                             <span>BULAN</span>
                         </label>
                         <select id="filterBulan" style="width: 100%; padding: 12px 16px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; font-weight: 500; cursor: pointer;">
+                            <option value="SEMUA">Semua Bulan</option>
                             <option value="Januari">Januari</option>
                             <option value="Februari">Februari</option>
                             <option value="Maret">Maret</option>
@@ -2998,22 +2999,30 @@
             
             try {
                 // Fetch data from database
-                const { data, error } = await sbClient
+                let query = sbClient
                     .from('absensi')
                     .select('*')
-                    .eq('tahun', tahun)
-                    .eq('bulan', bulan)
+                    .eq('tahun', tahun);
+                
+                // Add bulan filter only if not "SEMUA"
+                if (bulan !== 'SEMUA') {
+                    query = query.eq('bulan', bulan);
+                }
+                
+                const { data, error } = await query
                     .order('tanggal', { ascending: true })
                     .order('bidang', { ascending: true });
                 
                 if (error) throw error;
+                
+                const displayBulan = bulan === 'SEMUA' ? 'semua bulan' : bulan;
                 
                 if (!data || data.length === 0) {
                     // Show empty state
                     document.getElementById('emptyState').innerHTML = `
                         <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">📭</div>
                         <p style="font-size: 1.1rem; font-weight: 600; color: #6b7280; margin-bottom: 8px;">
-                            Tidak ada data untuk ${bulan} ${tahun}
+                            Tidak ada data untuk ${displayBulan} ${tahun}
                         </p>
                         <p style="font-size: 0.9rem; color: #9ca3af;">
                             Silakan upload data terlebih dahulu atau pilih bulan/tahun lain
@@ -3038,13 +3047,18 @@
                     
                     // Show data info
                     document.getElementById('dataInfo').innerHTML = `
-                        📊 <strong>${data.length} data</strong> untuk <strong>${bulan} ${tahun}</strong><br>
+                        📊 <strong>${data.length} data</strong> untuk <strong>${displayBulan} ${tahun}</strong><br>
                         <span style="font-size: 0.85rem; opacity: 0.9;">${bidangSummary}</span>
                     `;
                     document.getElementById('dataInfoSection').style.display = 'block';
                     
-                    // Download and display Excel file from storage
-                    await displayExcelFromStorage(tahun, bulan);
+                    // For "SEMUA", generate preview from database (no Excel file for all months)
+                    if (bulan === 'SEMUA') {
+                        generateExcelPreview(data);
+                    } else {
+                        // Download and display Excel file from storage
+                        await displayExcelFromStorage(tahun, bulan);
+                    }
                 }
                 
             } catch (error) {
@@ -3323,9 +3337,11 @@
             
             const { data, tahun, bulan } = currentLoadedData;
             
+            const displayBulan = bulan === 'SEMUA' ? 'semua bulan' : bulan;
+            
             const confirmation = confirm(
                 `⚠️ PERINGATAN!\n\n` +
-                `Anda akan menghapus ${data.length} data untuk ${bulan} ${tahun}.\n\n` +
+                `Anda akan menghapus ${data.length} data untuk ${displayBulan} ${tahun}.\n\n` +
                 `Tindakan ini TIDAK DAPAT DIBATALKAN!\n\n` +
                 `Apakah Anda yakin ingin melanjutkan?`
             );
@@ -3337,15 +3353,21 @@
             btnDelete.textContent = '⏳ Menghapus...';
             
             try {
-                const { error } = await sbClient
+                let deleteQuery = sbClient
                     .from('absensi')
                     .delete()
-                    .eq('tahun', tahun)
-                    .eq('bulan', bulan);
+                    .eq('tahun', tahun);
+                
+                // Add bulan filter only if not "SEMUA"
+                if (bulan !== 'SEMUA') {
+                    deleteQuery = deleteQuery.eq('bulan', bulan);
+                }
+                
+                const { error } = await deleteQuery;
                 
                 if (error) throw error;
                 
-                alert(`✅ Berhasil menghapus ${data.length} data untuk ${bulan} ${tahun}!`);
+                alert(`✅ Berhasil menghapus ${data.length} data untuk ${displayBulan} ${tahun}!`);
                 
                 // Reset state
                 currentLoadedData = null;
