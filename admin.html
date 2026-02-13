@@ -151,8 +151,10 @@
                                 console.log(`✅ Found header "JENIS KEHADIRAN" at row ${k}, col ${m}`);
                                 
                                 // Cari kolom yang berisi persentase
-                                // Strategi: Cek 5 kolom setelah label, cari yang berisi % ATAU angka desimal < 1
+                                // Strategi: Cek kolom setelah "Jumlah", cari yang berisi % ATAU angka desimal < 1
                                 for (let n = m + 1; n < Math.min(m + 6, headerRowData.length); n++) {
+                                    let foundPct = false;
+                                    
                                     // Cek beberapa baris data untuk menemukan % atau desimal
                                     for (let testRow = k + 1; testRow < Math.min(k + 10, data.length); testRow++) {
                                         if (data[testRow] && data[testRow][n] !== undefined && data[testRow][n] !== null && data[testRow][n] !== '') {
@@ -163,19 +165,35 @@
                                             // Cek apakah berisi % (format string "84.62%")
                                             if (testValueStr.includes('%')) {
                                                 pctCol = n;
+                                                foundPct = true;
                                                 console.log(`  ✅ Found percentage column at index ${pctCol} (format: string with %, value: ${testValueStr})`);
                                                 break;
                                             }
                                             
                                             // Cek apakah angka desimal antara 0 dan 1 (format: 0.8462)
-                                            if (typeof testValue === 'number' && testValue > 0 && testValue < 1) {
-                                                pctCol = n;
-                                                console.log(`  ✅ Found percentage column at index ${pctCol} (format: decimal, value: ${testValue})`);
-                                                break;
+                                            // DAN bukan angka yang terlalu kecil (< 0.001) atau terlalu besar (> 0.99)
+                                            if (typeof testValue === 'number' && testValue > 0.001 && testValue <= 1) {
+                                                // Verifikasi: cek apakah ada beberapa nilai di kolom ini yang semuanya antara 0-1
+                                                let validCount = 0;
+                                                for (let vRow = k + 1; vRow < Math.min(k + 8, data.length); vRow++) {
+                                                    const vVal = data[vRow] && data[vRow][n];
+                                                    if (typeof vVal === 'number' && vVal > 0 && vVal <= 1) {
+                                                        validCount++;
+                                                    }
+                                                }
+                                                
+                                                // Jika ada minimal 3 nilai yang valid, ini kolom persentase
+                                                if (validCount >= 3) {
+                                                    pctCol = n;
+                                                    foundPct = true;
+                                                    console.log(`  ✅ Found percentage column at index ${pctCol} (format: decimal, value: ${testValue}, validCount: ${validCount})`);
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
-                                    if (pctCol !== -1) break;
+                                    
+                                    if (foundPct) break;
                                 }
                                 break;
                             }
@@ -183,70 +201,108 @@
                         if (headerRow !== -1) break;
                     }
                     
-                    if (headerRow !== -1 && labelCol !== -1 && pctCol !== -1) {
-                        console.log(`✅ Found percentage data at row ${headerRow}, labelCol=${labelCol}, pctCol=${pctCol}`);
+                    if (headerRow !== -1 && labelCol !== -1) {
+                        console.log(`✅ Found data section at row ${headerRow}, labelCol=${labelCol}`);
                         
-                        // Baca persentase
-                        const pctLabelMap = [
-                            { patterns: ['WFO'], key: 'wfo_pct' },
-                            { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar_pct' },
-                            { patterns: ['UNDANGAN'], key: 'undangan_pct' },
-                            { patterns: ['SAKIT'], key: 'sakit_pct' },
-                            { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin_pct' },
-                            { patterns: ['CUTI'], key: 'cuti_pct' },
-                            { patterns: ['ISOMAN'], key: 'ijin_pct' },
-                            { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA'], key: 'tidak_absen_pct' }
-                        ];
+                        // STRATEGI BARU: Coba baca dari kolom labelCol+2 dulu (biasanya persentase ada di sini)
+                        // Jika tidak ada, baru gunakan pctCol yang sudah dideteksi
+                        let finalPctCol = pctCol;
                         
-                        
-                        for (let k = headerRow + 1; k < Math.min(headerRow + 15, data.length); k++) {
-                            const pctRow = data[k];
-                            if (!pctRow || pctRow.length === 0) continue;
+                        // Cek apakah kolom labelCol+2 berisi persentase
+                        if (labelCol + 2 < data[headerRow].length) {
+                            let testPctCol = labelCol + 2;
+                            let hasValidPct = false;
                             
-                            const label = String(pctRow[labelCol] || '').toUpperCase().trim();
-                            if (!label) continue;
-                            
-                            for (const { patterns, key } of pctLabelMap) {
-                                let matched = false;
-                                for (const pattern of patterns) {
-                                    if (label === pattern || label.includes(pattern)) {
-                                        matched = true;
+                            for (let testRow = headerRow + 1; testRow < Math.min(headerRow + 5, data.length); testRow++) {
+                                if (data[testRow] && data[testRow][testPctCol]) {
+                                    const testVal = data[testRow][testPctCol];
+                                    const testValStr = String(testVal);
+                                    
+                                    // Cek apakah berisi % atau desimal
+                                    if (testValStr.includes('%') || (typeof testVal === 'number' && testVal > 0 && testVal <= 1)) {
+                                        hasValidPct = true;
                                         break;
                                     }
                                 }
+                            }
+                            
+                            if (hasValidPct) {
+                                finalPctCol = testPctCol;
+                                console.log(`✅ Using column ${finalPctCol} (labelCol+2) for percentage`);
+                            } else if (pctCol !== -1) {
+                                console.log(`✅ Using detected column ${finalPctCol} for percentage`);
+                            }
+                        }
+                        
+                        if (finalPctCol === -1) {
+                            console.log('⚠️ Percentage column not found, will calculate manually');
+                        } else {
+                            console.log(`✅ Reading percentage from column ${finalPctCol}`);
+                            
+                            // Baca persentase
+                            const pctLabelMap = [
+                                { patterns: ['WFO'], key: 'wfo_pct' },
+                                { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar_pct' },
+                                { patterns: ['UNDANGAN'], key: 'undangan_pct' },
+                                { patterns: ['SAKIT'], key: 'sakit_pct' },
+                                { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin_pct' },
+                                { patterns: ['CUTI'], key: 'cuti_pct' },
+                                { patterns: ['ISOMAN'], key: 'ijin_pct' },
+                                { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA'], key: 'tidak_absen_pct' }
+                            ];
+                            
+                            
+                            for (let k = headerRow + 1; k < Math.min(headerRow + 15, data.length); k++) {
+                                const pctRow = data[k];
+                                if (!pctRow || pctRow.length === 0) continue;
                                 
-                                if (matched) {
-                                    let pctValue = pctRow[pctCol];
-                                    
-                                    // Parse persentase (bisa format "84.4%" atau 0.844 atau "84.62%")
-                                    if (typeof pctValue === 'string') {
-                                        // Hapus % dan parse
-                                        pctValue = pctValue.replace('%', '').trim();
-                                        pctValue = parseFloat(pctValue);
-                                    } else if (typeof pctValue === 'number') {
-                                        if (pctValue < 1) {
-                                            // Format desimal (0.8462 -> 84.62)
-                                            pctValue = pctValue * 100;
+                                const label = String(pctRow[labelCol] || '').toUpperCase().trim();
+                                if (!label) continue;
+                                
+                                console.log(`  🔍 Row ${k}: label="${label}", value at col ${finalPctCol}="${pctRow[finalPctCol]}"`);
+                                
+                                for (const { patterns, key } of pctLabelMap) {
+                                    let matched = false;
+                                    for (const pattern of patterns) {
+                                        if (label === pattern || label.includes(pattern)) {
+                                            matched = true;
+                                            break;
                                         }
-                                        // Sudah dalam format persen (84.62)
                                     }
                                     
-                                    // Bulatkan ke 1 desimal
-                                    pctValue = parseFloat(pctValue.toFixed(1));
-                                    
-                                    if (!isNaN(pctValue)) {
-                                        // Jika ISOMAN, tambahkan ke IJIN
-                                        if (label.includes('ISOMAN') && rekapData.ijin_pct !== null) {
-                                            rekapData.ijin_pct += pctValue;
-                                            rekapData.ijin_pct = parseFloat(rekapData.ijin_pct.toFixed(1));
-                                            console.log(`  ✅ ISOMAN: ${pctValue}% (added to IJIN, total: ${rekapData.ijin_pct}%)`);
-                                        } else {
-                                            rekapData[key] = pctValue;
-                                            console.log(`  ✅ ${patterns[0]}: ${pctValue}%`);
+                                    if (matched) {
+                                        let pctValue = pctRow[finalPctCol];
+                                        
+                                        // Parse persentase (bisa format "84.4%" atau 0.844 atau "84.62%")
+                                        if (typeof pctValue === 'string') {
+                                            // Hapus % dan parse
+                                            pctValue = pctValue.replace('%', '').trim();
+                                            pctValue = parseFloat(pctValue);
+                                        } else if (typeof pctValue === 'number') {
+                                            if (pctValue < 1) {
+                                                // Format desimal (0.8462 -> 84.62)
+                                                pctValue = pctValue * 100;
+                                            }
+                                            // Sudah dalam format persen (84.62)
                                         }
-                                        persentaseFound = true;
+                                        
+                                        // Bulatkan ke 1 desimal
+                                        pctValue = parseFloat(pctValue.toFixed(1));
+                                        
+                                        if (!isNaN(pctValue)) {
+                                            // Jika ISOMAN, tambahkan ke IJIN
+                                            if (label.includes('ISOMAN') && rekapData.ijin_pct !== null) {
+                                                rekapData.ijin_pct += pctValue;
+                                                rekapData.ijin_pct = parseFloat(rekapData.ijin_pct.toFixed(1));
+                                                console.log(`  ✅ ISOMAN: ${pctValue}% (added to IJIN, total: ${rekapData.ijin_pct}%)`);
+                                            } else {
+                                                rekapData[key] = pctValue;
+                                                console.log(`  ✅ ${patterns[0]}: ${pctValue}%`);
+                                            }
+                                            persentaseFound = true;
+                                        }
+                                        break;
                                     }
-                                    break;
                                 }
                             }
                         }
