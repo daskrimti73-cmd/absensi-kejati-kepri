@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v3.4.2</title>
+    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v3.5.0</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1738,7 +1738,7 @@
                 
                 // PRIORITAS: Gunakan persentase dari Excel jika ada
                 if (rekapData.wfo_pct !== null) {
-                    console.log('Using PERCENTAGE from Excel (not calculated)');
+                    console.log('✅ Using PERCENTAGE from Excel (not calculated)');
                     pctWfo = rekapData.wfo_pct.toFixed(1);
                     pctDinas = (rekapData.dinas_luar_pct || 0).toFixed(1);
                     pctUndangan = (rekapData.undangan_pct || 0).toFixed(1);
@@ -1746,6 +1746,7 @@
                     pctIjin = (rekapData.ijin_pct || 0).toFixed(1);
                     pctCuti = (rekapData.cuti_pct || 0).toFixed(1);
                     pctAlpha = (rekapData.tidak_absen_pct || 0).toFixed(1);
+                    console.log(`📊 Persentase dari Excel: WFO=${pctWfo}%, Dinas=${pctDinas}%, Cuti=${pctCuti}%, Alpha=${pctAlpha}%`);
                 } else {
                     // Fallback: Hitung dari angka mentah
                     console.log(' Calculating percentage from raw numbers');
