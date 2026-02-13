@@ -1605,13 +1605,14 @@
             if (!supabaseClient) return null;
             
             try {
-                console.log(`Checking for rekapitulasi data: ${bulan} ${tahun}`);
+                console.log(`🔍 Checking for rekapitulasi data: ${bulan} ${tahun} (bidang: GABUNGAN)`);
                 
                 const { data, error } = await supabaseClient
                     .from('rekapitulasi')
                     .select('*')
                     .eq('bulan', bulan)
                     .eq('tahun', parseInt(tahun))
+                    .eq('bidang', 'GABUNGAN')  // PENTING: Filter untuk GABUNGAN saja
                     .single();
                 
                 if (error) {
