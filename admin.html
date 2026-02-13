@@ -102,6 +102,7 @@
         const rekapData = {
             bulan: bulan,
             tahun: tahun,
+            bidang: 'GABUNGAN', // PENTING: Kolom bidang wajib diisi
             wfo: 0,
             dinas_luar: 0,
             undangan: 0,
@@ -147,18 +148,24 @@
                             if (headerCell === 'JENIS' || headerCell === 'JENIS KEHADIRAN') {
                                 headerRow = k;
                                 labelCol = m;
-                                // Cari kolom yang berisi persentase (biasanya kolom ke-2 atau ke-3 setelah label)
-                                // Cek beberapa kolom setelah label untuk menemukan yang berisi %
-                                for (let n = m + 1; n < Math.min(m + 5, headerRowData.length); n++) {
-                                    // Cek baris data pertama untuk melihat apakah ada %
-                                    if (k + 1 < data.length) {
-                                        const testValue = String(data[k + 1][n] || '');
-                                        if (testValue.includes('%')) {
-                                            pctCol = n;
-                                            console.log(`✅ Found percentage column at index ${pctCol} (value: ${testValue})`);
-                                            break;
+                                console.log(`✅ Found header "JENIS KEHADIRAN" at row ${k}, col ${m}`);
+                                
+                                // Cari kolom yang berisi persentase
+                                // Strategi: Cek 5 kolom setelah label, cari yang berisi %
+                                for (let n = m + 1; n < Math.min(m + 6, headerRowData.length); n++) {
+                                    // Cek beberapa baris data untuk menemukan %
+                                    for (let testRow = k + 1; testRow < Math.min(k + 10, data.length); testRow++) {
+                                        if (data[testRow] && data[testRow][n]) {
+                                            const testValue = String(data[testRow][n] || '');
+                                            console.log(`  🔍 Testing col ${n}, row ${testRow}: "${testValue}"`);
+                                            if (testValue.includes('%')) {
+                                                pctCol = n;
+                                                console.log(`  ✅ Found percentage column at index ${pctCol} (value: ${testValue})`);
+                                                break;
+                                            }
                                         }
                                     }
+                                    if (pctCol !== -1) break;
                                 }
                                 break;
                             }
