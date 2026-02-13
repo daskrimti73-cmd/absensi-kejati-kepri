@@ -506,7 +506,8 @@
                 .from('rekapitulasi')
                 .select('*')
                 .eq('tahun', dataToUpload.tahun)
-                .eq('bulan', dataToUpload.bulan);
+                .eq('bulan', dataToUpload.bulan)
+                .eq('bidang', dataToUpload.bidang);  // PENTING: Filter berdasarkan bidang juga
             
             if (checkError) {
                 console.error('❌ Error checking:', checkError);
@@ -520,7 +521,8 @@
                     .from('rekapitulasi')
                     .update(dataToUpload)
                     .eq('tahun', dataToUpload.tahun)
-                    .eq('bulan', dataToUpload.bulan);
+                    .eq('bulan', dataToUpload.bulan)
+                    .eq('bidang', dataToUpload.bidang);  // PENTING: Filter berdasarkan bidang juga
                 
                 if (updateError) {
                     console.error('❌ Error updating:', updateError);
