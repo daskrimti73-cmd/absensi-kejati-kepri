@@ -151,16 +151,26 @@
                                 console.log(`✅ Found header "JENIS KEHADIRAN" at row ${k}, col ${m}`);
                                 
                                 // Cari kolom yang berisi persentase
-                                // Strategi: Cek 5 kolom setelah label, cari yang berisi %
+                                // Strategi: Cek 5 kolom setelah label, cari yang berisi % ATAU angka desimal < 1
                                 for (let n = m + 1; n < Math.min(m + 6, headerRowData.length); n++) {
-                                    // Cek beberapa baris data untuk menemukan %
+                                    // Cek beberapa baris data untuk menemukan % atau desimal
                                     for (let testRow = k + 1; testRow < Math.min(k + 10, data.length); testRow++) {
-                                        if (data[testRow] && data[testRow][n]) {
-                                            const testValue = String(data[testRow][n] || '');
-                                            console.log(`  🔍 Testing col ${n}, row ${testRow}: "${testValue}"`);
-                                            if (testValue.includes('%')) {
+                                        if (data[testRow] && data[testRow][n] !== undefined && data[testRow][n] !== null && data[testRow][n] !== '') {
+                                            const testValue = data[testRow][n];
+                                            const testValueStr = String(testValue);
+                                            console.log(`  🔍 Testing col ${n}, row ${testRow}: "${testValueStr}" (type: ${typeof testValue})`);
+                                            
+                                            // Cek apakah berisi % (format string "84.62%")
+                                            if (testValueStr.includes('%')) {
                                                 pctCol = n;
-                                                console.log(`  ✅ Found percentage column at index ${pctCol} (value: ${testValue})`);
+                                                console.log(`  ✅ Found percentage column at index ${pctCol} (format: string with %, value: ${testValueStr})`);
+                                                break;
+                                            }
+                                            
+                                            // Cek apakah angka desimal antara 0 dan 1 (format: 0.8462)
+                                            if (typeof testValue === 'number' && testValue > 0 && testValue < 1) {
+                                                pctCol = n;
+                                                console.log(`  ✅ Found percentage column at index ${pctCol} (format: decimal, value: ${testValue})`);
                                                 break;
                                             }
                                         }
