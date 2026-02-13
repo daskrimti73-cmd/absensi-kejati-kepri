@@ -224,10 +224,33 @@
             if (persentaseFound) break;
         }
         
+        // ============================================
+        // STEP 3: HITUNG PERSENTASE JIKA TIDAK ADA
+        // ============================================
         if (persentaseFound) {
             console.log('✅ Persentase berhasil dibaca dari Excel!');
         } else {
-            console.log('⚠️ Persentase tidak ditemukan, akan gunakan angka mentah');
+            console.log('⚠️ Persentase tidak ditemukan di Excel, menghitung dari angka mentah...');
+            
+            // Hitung persentase dari angka mentah
+            if (rekapData.total > 0) {
+                rekapData.wfo_pct = parseFloat(((rekapData.wfo / rekapData.total) * 100).toFixed(1));
+                rekapData.dinas_luar_pct = parseFloat(((rekapData.dinas_luar / rekapData.total) * 100).toFixed(1));
+                rekapData.undangan_pct = parseFloat(((rekapData.undangan / rekapData.total) * 100).toFixed(1));
+                rekapData.sakit_pct = parseFloat(((rekapData.sakit / rekapData.total) * 100).toFixed(1));
+                rekapData.ijin_pct = parseFloat(((rekapData.ijin / rekapData.total) * 100).toFixed(1));
+                rekapData.cuti_pct = parseFloat(((rekapData.cuti / rekapData.total) * 100).toFixed(1));
+                rekapData.tidak_absen_pct = parseFloat(((rekapData.tidak_absen / rekapData.total) * 100).toFixed(1));
+                
+                console.log('✅ Persentase berhasil dihitung:');
+                console.log(`   WFO: ${rekapData.wfo_pct}%`);
+                console.log(`   DINAS LUAR: ${rekapData.dinas_luar_pct}%`);
+                console.log(`   UNDANGAN: ${rekapData.undangan_pct}%`);
+                console.log(`   SAKIT: ${rekapData.sakit_pct}%`);
+                console.log(`   IJIN: ${rekapData.ijin_pct}%`);
+                console.log(`   CUTI: ${rekapData.cuti_pct}%`);
+                console.log(`   TIDAK ABSEN: ${rekapData.tidak_absen_pct}%`);
+            }
         }
         
         // ============================================
@@ -381,46 +404,60 @@
     
     async function uploadRekapitulasi(supabaseClient, rekapData) {
         console.log('📤 Uploading rekapitulasi...');
+        console.log('📊 Data yang akan diupload:', rekapData);
         
         try {
+            // PENTING: Hapus kolom 'total' karena tidak ada di tabel database
+            const dataToUpload = { ...rekapData };
+            delete dataToUpload.total;
+            
+            console.log('📊 Data setelah hapus total:', dataToUpload);
+            
             const { data: existing, error: checkError } = await supabaseClient
                 .from('rekapitulasi')
                 .select('*')
-                .eq('tahun', rekapData.tahun)
-                .eq('bulan', rekapData.bulan);
+                .eq('tahun', dataToUpload.tahun)
+                .eq('bulan', dataToUpload.bulan);
             
             if (checkError) {
                 console.error('❌ Error checking:', checkError);
+                console.error('❌ Error detail:', JSON.stringify(checkError));
                 return false;
             }
             
             if (existing && existing.length > 0) {
+                console.log('📝 Data sudah ada, melakukan UPDATE...');
                 const { error: updateError } = await supabaseClient
                     .from('rekapitulasi')
-                    .update(rekapData)
-                    .eq('tahun', rekapData.tahun)
-                    .eq('bulan', rekapData.bulan);
+                    .update(dataToUpload)
+                    .eq('tahun', dataToUpload.tahun)
+                    .eq('bulan', dataToUpload.bulan);
                 
                 if (updateError) {
                     console.error('❌ Error updating:', updateError);
+                    console.error('❌ Error detail:', JSON.stringify(updateError));
                     return false;
                 }
-                console.log('✅ Rekapitulasi updated');
+                console.log('✅ Rekapitulasi updated successfully');
             } else {
+                console.log('📝 Data belum ada, melakukan INSERT...');
                 const { error: insertError } = await supabaseClient
                     .from('rekapitulasi')
-                    .insert([rekapData]);
+                    .insert([dataToUpload]);
                 
                 if (insertError) {
                     console.error('❌ Error inserting:', insertError);
+                    console.error('❌ Error detail:', JSON.stringify(insertError));
+                    console.error('❌ Data yang gagal diinsert:', JSON.stringify(dataToUpload));
                     return false;
                 }
-                console.log('✅ Rekapitulasi inserted');
+                console.log('✅ Rekapitulasi inserted successfully');
             }
             
             return true;
         } catch (error) {
-            console.error('❌ Error:', error);
+            console.error('❌ Unexpected error:', error);
+            console.error('❌ Error stack:', error.stack);
             return false;
         }
     }
