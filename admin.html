@@ -123,20 +123,22 @@
         // ============================================
         // STEP 1: COBA BACA PERSENTASE (PRIORITAS 1)
         // ============================================
-        console.log('\n🔍 STEP 1: Mencari PERSENTASE KEHADIRAN KESELURUHAN...');
+        console.log('\n🔍 STEP 1: Mencari PERSENTASE atau KEHADIRAN KESELURUHAN...');
         
         let persentaseFound = false;
         for (let i = 0; i < data.length; i++) {
             const row = data[i];
             for (let j = 0; j < row.length; j++) {
                 const cell = String(row[j] || '').toUpperCase().trim();
-                if (cell.includes('PERSENTASE') && (cell.includes('KEHADIRAN') || cell.includes('GABUNGAN'))) {
-                    console.log(`✅ Found "PERSENTASE" section at row ${i}`);
+                // Cari "PERSENTASE KEHADIRAN" atau "KEHADIRAN KESELURUHAN"
+                if ((cell.includes('PERSENTASE') && cell.includes('KEHADIRAN')) || 
+                    (cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN'))) {
+                    console.log(`✅ Found section at row ${i}: "${cell}"`);
                     
-                    // Cari header dan kolom TOTAL
+                    // Cari header dan kolom dengan persentase
                     let headerRow = -1;
                     let labelCol = -1;
-                    let totalCol = -1;
+                    let pctCol = -1; // Kolom yang berisi persentase
                     
                     for (let k = i; k < Math.min(i + 5, data.length); k++) {
                         const headerRowData = data[k];
@@ -145,12 +147,17 @@
                             if (headerCell === 'JENIS' || headerCell === 'JENIS KEHADIRAN') {
                                 headerRow = k;
                                 labelCol = m;
-                                // Cari kolom TOTAL
-                                for (let n = m + 1; n < headerRowData.length; n++) {
-                                    const colName = String(headerRowData[n] || '').toUpperCase().trim();
-                                    if (colName === 'TOTAL') {
-                                        totalCol = n;
-                                        break;
+                                // Cari kolom yang berisi persentase (biasanya kolom ke-2 atau ke-3 setelah label)
+                                // Cek beberapa kolom setelah label untuk menemukan yang berisi %
+                                for (let n = m + 1; n < Math.min(m + 5, headerRowData.length); n++) {
+                                    // Cek baris data pertama untuk melihat apakah ada %
+                                    if (k + 1 < data.length) {
+                                        const testValue = String(data[k + 1][n] || '');
+                                        if (testValue.includes('%')) {
+                                            pctCol = n;
+                                            console.log(`✅ Found percentage column at index ${pctCol} (value: ${testValue})`);
+                                            break;
+                                        }
                                     }
                                 }
                                 break;
@@ -159,8 +166,8 @@
                         if (headerRow !== -1) break;
                     }
                     
-                    if (headerRow !== -1 && labelCol !== -1 && totalCol !== -1) {
-                        console.log(`✅ Found percentage header at row ${headerRow}, labelCol=${labelCol}, totalCol=${totalCol}`);
+                    if (headerRow !== -1 && labelCol !== -1 && pctCol !== -1) {
+                        console.log(`✅ Found percentage data at row ${headerRow}, labelCol=${labelCol}, pctCol=${pctCol}`);
                         
                         // Baca persentase
                         const pctLabelMap = [
@@ -173,6 +180,7 @@
                             { patterns: ['ISOMAN'], key: 'ijin_pct' },
                             { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA'], key: 'tidak_absen_pct' }
                         ];
+                        
                         
                         for (let k = headerRow + 1; k < Math.min(headerRow + 15, data.length); k++) {
                             const pctRow = data[k];
@@ -191,22 +199,30 @@
                                 }
                                 
                                 if (matched) {
-                                    let pctValue = pctRow[totalCol];
+                                    let pctValue = pctRow[pctCol];
                                     
-                                    // Parse persentase (bisa format "84.4%" atau 0.844)
-                                    if (typeof pctValue === 'string' && pctValue.includes('%')) {
-                                        pctValue = parseFloat(pctValue.replace('%', ''));
-                                    } else if (typeof pctValue === 'number' && pctValue < 1) {
-                                        pctValue = pctValue * 100; // Convert 0.844 to 84.4
-                                    } else {
+                                    // Parse persentase (bisa format "84.4%" atau 0.844 atau "84.62%")
+                                    if (typeof pctValue === 'string') {
+                                        // Hapus % dan parse
+                                        pctValue = pctValue.replace('%', '').trim();
                                         pctValue = parseFloat(pctValue);
+                                    } else if (typeof pctValue === 'number') {
+                                        if (pctValue < 1) {
+                                            // Format desimal (0.8462 -> 84.62)
+                                            pctValue = pctValue * 100;
+                                        }
+                                        // Sudah dalam format persen (84.62)
                                     }
+                                    
+                                    // Bulatkan ke 1 desimal
+                                    pctValue = parseFloat(pctValue.toFixed(1));
                                     
                                     if (!isNaN(pctValue)) {
                                         // Jika ISOMAN, tambahkan ke IJIN
                                         if (label.includes('ISOMAN') && rekapData.ijin_pct !== null) {
                                             rekapData.ijin_pct += pctValue;
-                                            console.log(`  ✅ ISOMAN: ${pctValue}% (added to IJIN, total: ${rekapData.ijin_pct.toFixed(1)}%)`);
+                                            rekapData.ijin_pct = parseFloat(rekapData.ijin_pct.toFixed(1));
+                                            console.log(`  ✅ ISOMAN: ${pctValue}% (added to IJIN, total: ${rekapData.ijin_pct}%)`);
                                         } else {
                                             rekapData[key] = pctValue;
                                             console.log(`  ✅ ${patterns[0]}: ${pctValue}%`);
