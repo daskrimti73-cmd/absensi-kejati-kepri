@@ -1450,6 +1450,11 @@
                 font-size: 1rem;
                 padding: 16px;
             }
+            
+            /* Force single column on mobile for all grids */
+            div[style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
         }
         
         /* Professional Header Responsive */
