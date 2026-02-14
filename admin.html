@@ -152,7 +152,8 @@
                                 
                                 // Cari kolom yang berisi persentase
                                 // Strategi: Cek kolom setelah "Jumlah", cari yang berisi % ATAU angka desimal < 1
-                                for (let n = m + 1; n < Math.min(m + 6, headerRowData.length); n++) {
+                                // Scan sampai 10 kolom untuk fleksibilitas
+                                for (let n = m + 1; n < Math.min(m + 10, headerRowData.length); n++) {
                                     let foundPct = false;
                                     
                                     // Cek beberapa baris data untuk menemukan % atau desimal
