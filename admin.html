@@ -1521,6 +1521,288 @@
                 border-radius: 16px 16px 0 0;
             }
         }
+        
+        /* ============================================
+           ENHANCED MOBILE RESPONSIVE
+           ============================================ */
+        
+        /* Tablet & Small Desktop (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .container {
+                max-width: 90%;
+            }
+        }
+        
+        /* Mobile Landscape & Tablet Portrait (481px - 768px) */
+        @media (max-width: 768px) {
+            /* Form Elements */
+            .form-group label {
+                font-size: 13px;
+            }
+            
+            .form-group select,
+            .form-group input {
+                padding: 10px 14px;
+                font-size: 14px;
+            }
+            
+            /* Buttons */
+            .btn-upload {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+            
+            /* File List */
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .file-info {
+                width: 100%;
+            }
+            
+            .file-status {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            /* Progress Bar */
+            .progress-container {
+                margin-top: 15px;
+            }
+            
+            /* Status Messages */
+            .status {
+                font-size: 13px;
+                padding: 12px;
+            }
+            
+            /* History Items */
+            .history-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .history-info {
+                width: 100%;
+            }
+            
+            .history-status {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+        
+        /* Mobile Portrait (320px - 480px) */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+            
+            .container {
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .header p {
+                font-size: 12px;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .form-group label {
+                font-size: 12px;
+                margin-bottom: 6px;
+            }
+            
+            .form-group select,
+            .form-group input {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            
+            .btn-upload {
+                padding: 11px 16px;
+                font-size: 13px;
+            }
+            
+            /* Radio Buttons */
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .radio-option {
+                width: 100%;
+            }
+            
+            /* File Upload Area */
+            .file-upload-area {
+                padding: 20px 15px;
+            }
+            
+            .file-upload-icon {
+                font-size: 36px;
+            }
+            
+            .file-upload-text {
+                font-size: 13px;
+            }
+            
+            .file-upload-hint {
+                font-size: 11px;
+            }
+            
+            /* Tables */
+            table {
+                font-size: 11px;
+            }
+            
+            table th,
+            table td {
+                padding: 8px 6px;
+            }
+            
+            /* Data Management Section */
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            .filter-group label {
+                font-size: 11px;
+            }
+            
+            .filter-group input,
+            .filter-group select {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            
+            /* Empty State */
+            .empty-state {
+                padding: 30px 20px;
+            }
+            
+            .empty-state p {
+                font-size: 13px;
+            }
+        }
+        
+        /* Small Mobile (320px - 360px) */
+        @media (max-width: 360px) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                padding: 16px 12px;
+                border-radius: 10px;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+            }
+            
+            .header h1 {
+                font-size: 18px;
+            }
+            
+            .header p {
+                font-size: 11px;
+            }
+            
+            .form-group {
+                margin-bottom: 16px;
+            }
+            
+            .form-group label {
+                font-size: 11px;
+            }
+            
+            .form-group select,
+            .form-group input {
+                padding: 9px 10px;
+                font-size: 12px;
+            }
+            
+            .btn-upload {
+                padding: 10px 14px;
+                font-size: 12px;
+            }
+            
+            .file-upload-area {
+                padding: 16px 12px;
+            }
+            
+            .file-upload-icon {
+                font-size: 32px;
+            }
+            
+            .file-upload-text {
+                font-size: 12px;
+            }
+            
+            .file-upload-hint {
+                font-size: 10px;
+            }
+            
+            table {
+                font-size: 10px;
+            }
+            
+            table th,
+            table td {
+                padding: 6px 4px;
+            }
+        }
+        
+        /* Landscape Orientation Fix */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                margin: 10px auto;
+            }
+            
+            .header {
+                margin-bottom: 15px;
+                padding-bottom: 10px;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+        }
+        
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Larger touch targets */
+            .btn-upload,
+            button,
+            select,
+            input[type="file"] {
+                min-height: 44px; /* iOS recommended touch target */
+            }
+            
+            /* Remove hover effects on touch devices */
+            .btn-upload:hover,
+            .file-upload-area:hover {
+                transform: none;
+            }
+            
+            /* Better tap feedback */
+            .btn-upload:active {
+                transform: scale(0.98);
+            }
+        }
     </style>
 </head>
 <body>

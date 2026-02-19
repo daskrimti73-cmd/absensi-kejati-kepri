@@ -1058,6 +1058,135 @@
                 font-size: 0.75rem;
             }
         }
+        
+        /* ============================================
+           ENHANCED MOBILE RESPONSIVE FOR CHARTS
+           ============================================ */
+        
+        /* Better Chart Responsiveness */
+        @media (max-width: 768px) {
+            /* Chart Canvas */
+            canvas {
+                max-width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* Chart Containers */
+            .summary-chart-container,
+            .bidang-chart-container {
+                position: relative;
+                width: 100%;
+                min-height: 200px;
+            }
+            
+            /* Table Scroll */
+            .bidang-table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -1rem;
+                padding: 0 1rem;
+            }
+            
+            /* Better Touch Scrolling */
+            .bidang-table {
+                min-width: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Smaller Charts on Mobile */
+            .summary-chart-container {
+                height: 160px;
+                min-height: 160px;
+            }
+            
+            /* Compact Table */
+            .bidang-table {
+                min-width: 400px;
+            }
+            
+            /* Better Spacing */
+            .bidang-card {
+                margin-bottom: 0.75rem;
+            }
+            
+            /* Scrollable Horizontal */
+            .info-cards {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-snap-type: x mandatory;
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 0.75rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            .info-card {
+                flex: 0 0 calc(100% - 1rem);
+                scroll-snap-align: start;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .summary-chart-container {
+                height: 140px;
+                min-height: 140px;
+            }
+            
+            .bidang-table {
+                min-width: 350px;
+            }
+        }
+        
+        /* Landscape Mode Optimization */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .header {
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.5rem;
+            }
+            
+            .info-cards {
+                margin-bottom: 0.75rem;
+            }
+            
+            .summary-charts {
+                margin-bottom: 0.75rem;
+            }
+            
+            .filter-section {
+                margin-bottom: 0.75rem;
+            }
+        }
+        
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Larger touch targets for filters */
+            select,
+            button {
+                min-height: 44px;
+            }
+            
+            /* Remove hover effects */
+            .info-card:hover,
+            .bidang-card:hover {
+                transform: none;
+            }
+            
+            /* Better tap feedback */
+            .info-card:active,
+            .bidang-card:active {
+                transform: scale(0.98);
+            }
+            
+            /* Smooth scrolling */
+            * {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
     </style>
 
 </head>

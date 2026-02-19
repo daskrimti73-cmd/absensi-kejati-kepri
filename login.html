@@ -366,15 +366,55 @@
         }
 
         /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .login-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 28px 24px;
+                border-radius: 16px;
+                margin: 10px;
+            }
+            
+            .login-title {
+                font-size: 24px;
+                letter-spacing: 2px;
+            }
+            
+            .login-subtitle {
+                font-size: 10.5px;
+                margin-bottom: 20px;
+            }
+            
+            .avatar {
+                width: 90px;
+                height: 90px;
+                padding: 14px;
+            }
+            
+            .avatar-logo {
+                width: 65px;
+                height: 65px;
+            }
+        }
+        
         @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+            
             .login-container {
                 padding: 24px 20px;
-                border-radius: 18px;
+                border-radius: 14px;
+                margin: 5px;
             }
 
             .login-title {
                 font-size: 22px;
-                letter-spacing: 2.5px;
+                letter-spacing: 2px;
             }
 
             .login-subtitle {
@@ -384,15 +424,15 @@
             }
 
             .avatar {
-                width: 85px;
-                height: 85px;
-                padding: 13px;
+                width: 80px;
+                height: 80px;
+                padding: 12px;
                 margin-bottom: 12px;
             }
 
             .avatar-logo {
-                width: 60px;
-                height: 60px;
+                width: 56px;
+                height: 56px;
             }
 
             .login-form {
@@ -431,6 +471,28 @@
             .create-account {
                 font-size: 9px;
                 padding: 8px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .login-container {
+                padding: 20px 16px;
+            }
+            
+            .login-title {
+                font-size: 20px;
+                letter-spacing: 1.5px;
+            }
+            
+            .avatar {
+                width: 70px;
+                height: 70px;
+                padding: 10px;
+            }
+            
+            .avatar-logo {
+                width: 50px;
+                height: 50px;
             }
         }
     </style>
