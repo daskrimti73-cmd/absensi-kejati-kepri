@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v3.7.0</title>
+    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v3.8.0</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -296,10 +296,9 @@
         /* Treemap Styling */
         .treemap-container {
             display: flex;
-            gap: 8px;
-            height: 450px; /* Increased for better visibility */
+            gap: 4px;
+            height: 280px;
             width: 100%;
-            flex-wrap: nowrap; /* Prevent wrapping */
         }
         
         .treemap-item {
@@ -309,85 +308,38 @@
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             text-align: center;
-            padding: 1.5rem;
+            padding: 1rem;
             position: relative;
             overflow: hidden;
-            line-height: 1.4;
-            border-radius: var(--radius-lg);
+            line-height: 1.3;
+            border-radius: var(--radius-md);
             transition: var(--transition);
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-sm);
             min-width: 0;
             word-break: break-word;
         }
         
         .treemap-item:hover {
-            transform: scale(1.02);
-            box-shadow: var(--shadow-xl);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
             z-index: 10;
         }
         
         .treemap-item-label {
-            font-size: 0.8rem; /* Slightly larger for readability */
-            margin-bottom: 0.75rem;
+            font-size: 0.625rem;
+            margin-bottom: 0.5rem;
             opacity: 0.95;
             word-wrap: break-word;
             max-width: 100%;
             font-weight: 600;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
         .treemap-item-value {
-            font-size: 2.25rem; /* Larger for emphasis */
+            font-size: 1.5rem;
             font-weight: 800;
             font-family: 'Poppins', sans-serif;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-        
-        /* Treemap Responsive */
-        @media (max-width: 1024px) {
-            .treemap-container {
-                height: 380px;
-            }
-            .treemap-item-value {
-                font-size: 2rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .treemap-container {
-                height: 320px;
-                gap: 6px;
-            }
-            .treemap-item {
-                padding: 1rem;
-            }
-            .treemap-item-label {
-                font-size: 0.7rem;
-                margin-bottom: 0.5rem;
-            }
-            .treemap-item-value {
-                font-size: 1.75rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .treemap-container {
-                height: 280px;
-                flex-direction: column;
-                gap: 4px;
-            }
-            .treemap-item {
-                padding: 0.75rem;
-            }
-            .treemap-item-label {
-                font-size: 0.625rem;
-                margin-bottom: 0.25rem;
-            }
-            .treemap-item-value {
-                font-size: 1.5rem;
-            }
         }
         
         /* ============================================
@@ -811,22 +763,18 @@
             }
             
             .treemap-container {
-                height: 300px; /* Increased from 200px */
-                gap: 5px;
+                height: 200px;
+                gap: 4px;
                 width: 100%;
             }
             
             .treemap-item-label {
-                font-size: 0.625rem;
-                margin-bottom: 0.5rem;
+                font-size: 0.5rem;
+                margin-bottom: 0.25rem;
             }
             
             .treemap-item-value {
-                font-size: 1.5rem; /* Increased from 1rem */
-            }
-            
-            .treemap-item {
-                padding: 1.25rem;
+                font-size: 1rem;
             }
             
             .treemap-item:hover {
@@ -1006,21 +954,17 @@
             }
             
             .treemap-container {
-                height: 250px; /* Increased from 180px */
-                gap: 4px;
+                height: 180px;
+                gap: 3px;
             }
             
             .treemap-item-label {
-                font-size: 0.5rem;
-                margin-bottom: 0.25rem;
+                font-size: 0.4375rem;
+                margin-bottom: 0.125rem;
             }
             
             .treemap-item-value {
-                font-size: 1.25rem; /* Increased from 0.875rem */
-            }
-            
-            .treemap-item {
-                padding: 1rem;
+                font-size: 0.875rem;
             }
             
             .filter-section {
@@ -1102,149 +1046,16 @@
             }
             
             .treemap-container {
-                height: 200px; /* Increased from 160px */
-                gap: 3px;
+                height: 160px;
+                gap: 2px;
             }
             
             .treemap-item-label {
-                font-size: 0.4375rem;
+                font-size: 0.375rem;
             }
             
             .treemap-item-value {
-                font-size: 1rem; /* Increased from 0.75rem */
-            }
-            
-            .treemap-item {
-                padding: 0.75rem;
-            }
-        }
-        
-        /* ============================================
-           ENHANCED MOBILE RESPONSIVE FOR CHARTS
-           ============================================ */
-        
-        /* Better Chart Responsiveness */
-        @media (max-width: 768px) {
-            /* Chart Canvas */
-            canvas {
-                max-width: 100% !important;
-                height: auto !important;
-            }
-            
-            /* Chart Containers */
-            .summary-chart-container,
-            .bidang-chart-container {
-                position: relative;
-                width: 100%;
-                min-height: 200px;
-            }
-            
-            /* Table Scroll */
-            .bidang-table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                margin: 0 -1rem;
-                padding: 0 1rem;
-            }
-            
-            /* Better Touch Scrolling */
-            .bidang-table {
-                min-width: 500px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            /* Smaller Charts on Mobile */
-            .summary-chart-container {
-                height: 160px;
-                min-height: 160px;
-            }
-            
-            /* Compact Table */
-            .bidang-table {
-                min-width: 400px;
-            }
-            
-            /* Better Spacing */
-            .bidang-card {
-                margin-bottom: 0.75rem;
-            }
-            
-            /* Scrollable Horizontal */
-            .info-cards {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                scroll-snap-type: x mandatory;
-                display: flex;
-                flex-wrap: nowrap;
-                gap: 0.75rem;
-                padding-bottom: 0.5rem;
-            }
-            
-            .info-card {
-                flex: 0 0 calc(100% - 1rem);
-                scroll-snap-align: start;
-            }
-        }
-        
-        @media (max-width: 360px) {
-            .summary-chart-container {
-                height: 140px;
-                min-height: 140px;
-            }
-            
-            .bidang-table {
-                min-width: 350px;
-            }
-        }
-        
-        /* Landscape Mode Optimization */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .container {
-                padding: 0.5rem;
-            }
-            
-            .header {
-                margin-bottom: 0.75rem;
-                padding-bottom: 0.5rem;
-            }
-            
-            .info-cards {
-                margin-bottom: 0.75rem;
-            }
-            
-            .summary-charts {
-                margin-bottom: 0.75rem;
-            }
-            
-            .filter-section {
-                margin-bottom: 0.75rem;
-            }
-        }
-        
-        /* Touch Device Optimizations */
-        @media (hover: none) and (pointer: coarse) {
-            /* Larger touch targets for filters */
-            select,
-            button {
-                min-height: 44px;
-            }
-            
-            /* Remove hover effects */
-            .info-card:hover,
-            .bidang-card:hover {
-                transform: none;
-            }
-            
-            /* Better tap feedback */
-            .info-card:active,
-            .bidang-card:active {
-                transform: scale(0.98);
-            }
-            
-            /* Smooth scrolling */
-            * {
-                -webkit-overflow-scrolling: touch;
+                font-size: 0.75rem;
             }
         }
     </style>
@@ -1297,8 +1108,8 @@
             <!-- Treemap: Bidang Pegawai -->
             <div class="summary-chart-card">
                 <h3 class="summary-chart-title">Bidang Pegawai</h3>
-                <div class="treemap-container" id="customTreemap">
-                    <!-- Custom treemap will be generated here -->
+                <div class="summary-chart-container">
+                    <canvas id="treemapChart"></canvas>
                 </div>
             </div>
             
@@ -1408,12 +1219,7 @@
                         <!-- Global Year Filter -->
                         <div style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--gray-300);">
                             <label style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                                </svg>
+                                <span style="font-size: 1.5rem;">📅</span>
                                 Tahun:
                             </label>
                             <select id="globalYearSelect" style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 120px; transition: all 0.3s;">
@@ -1515,8 +1321,8 @@
         // ============================================
         // SUPABASE CONFIGURATION
         // ============================================
-        const SUPABASE_URL = 'https://imiwlmuvelhihyfuumkw.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltaXdsbXV2ZWxoaWh5ZnV1bWt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NzgxMDksImV4cCI6MjA4NjQ1NDEwOX0.OJVW8to47hCJ83fZSHeuPoBdOh7M15CQOYv0Ds56ncs';
+        const SUPABASE_URL = 'https://iudtxznbakaqzygpkaxf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
         const USE_SUPABASE = true; // Set false untuk disable Supabase
         
         let supabaseClient = null;
@@ -1794,14 +1600,13 @@
             if (!supabaseClient) return null;
             
             try {
-                console.log(`🔍 Checking for rekapitulasi data: ${bulan} ${tahun} (bidang: GABUNGAN)`);
+                console.log(`Checking for rekapitulasi data: ${bulan} ${tahun}`);
                 
                 const { data, error } = await supabaseClient
                     .from('rekapitulasi')
                     .select('*')
                     .eq('bulan', bulan)
                     .eq('tahun', parseInt(tahun))
-                    .eq('bidang', 'GABUNGAN')  // PENTING: Filter untuk GABUNGAN saja
                     .single();
                 
                 if (error) {
@@ -1913,9 +1718,9 @@
             let finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal;
             let pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha;
             
-            if (rekapData && rekapData.wfo !== null && rekapData.wfo !== undefined) {
+            if (rekapData && rekapData.total > 0) {
                 // Use rekapitulasi data from database
-                console.log('✅ Using REKAPITULASI data for donut chart');
+                console.log('Using REKAPITULASI data for donut chart');
                 finalWfo = rekapData.wfo;
                 finalDinas = rekapData.dinas_luar;
                 finalUndangan = rekapData.undangan;
@@ -1923,11 +1728,11 @@
                 finalIjin = rekapData.ijin;
                 finalCuti = rekapData.cuti;
                 finalAlpha = rekapData.tidak_absen;
-                finalTotal = finalWfo + finalDinas + finalUndangan + finalSakit + finalIjin + finalCuti + finalAlpha;
+                finalTotal = rekapData.total;
                 
                 // PRIORITAS: Gunakan persentase dari Excel jika ada
                 if (rekapData.wfo_pct !== null) {
-                    console.log('✅ Using PERCENTAGE from Excel (not calculated)');
+                    console.log('Using PERCENTAGE from Excel (not calculated)');
                     pctWfo = rekapData.wfo_pct.toFixed(1);
                     pctDinas = (rekapData.dinas_luar_pct || 0).toFixed(1);
                     pctUndangan = (rekapData.undangan_pct || 0).toFixed(1);
@@ -1935,7 +1740,6 @@
                     pctIjin = (rekapData.ijin_pct || 0).toFixed(1);
                     pctCuti = (rekapData.cuti_pct || 0).toFixed(1);
                     pctAlpha = (rekapData.tidak_absen_pct || 0).toFixed(1);
-                    console.log(`📊 Persentase dari Excel: WFO=${pctWfo}%, Dinas=${pctDinas}%, Cuti=${pctCuti}%, Alpha=${pctAlpha}%`);
                 } else {
                     // Fallback: Hitung dari angka mentah
                     console.log(' Calculating percentage from raw numbers');
@@ -2014,19 +1818,88 @@
             const pemulihanAset = sortedData.find(item => item.name === 'PEMULIHAN ASET');
             const koordinator = sortedData.find(item => item.name === 'KOORDINATOR');
             
-            // Build HTML - STEP 1: Pembinaan only (matching reference image)
+            // Build HTML matching screenshot proportions
             let html = '<div style="display: flex; gap: 8px; height: 100%; width: 100%;">';
             
-            // Pembinaan (33) - Vertical rectangle, full height, ~22% width
+            // Column 1: Pembinaan (33) - ~14% width
             if (pembinaan) {
-                html += `<div class="treemap-item" style="flex: 0 0 22%; background: ${pembinaan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
+                html += `<div class="treemap-item" style="flex: 0 0 14%; background: ${pembinaan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[pembinaan.name] || pembinaan.name}</div>
                     <div class="treemap-item-value">${pembinaan.value}</div>
                 </div>`;
             }
             
-            // Placeholder for other items (will add step by step)
-            html += '<div style="flex: 1; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999;">Other bidang will be added here</div>';
+            // Column 2: Tata Usaha (22) - ~13% width
+            if (tataUsaha) {
+                html += `<div class="treemap-item" style="flex: 0 0 13%; background: ${tataUsaha.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
+                    <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[tataUsaha.name] || tataUsaha.name}</div>
+                    <div class="treemap-item-value">${tataUsaha.value}</div>
+                </div>`;
+            }
+            
+            // Column 3: Pidsus (20) + Intelijen (15) - ~15% width, stacked vertically
+            html += `<div style="flex: 0 0 15%; display: flex; flex-direction: column; gap: 8px;">`;
+            
+            if (pidsus) {
+                html += `<div class="treemap-item" style="flex: 0 0 57%; background: ${pidsus.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
+                    <div class="treemap-item-label" style="margin-bottom: 0.5rem; font-size: 0.7rem;">${bidangNamaLengkap[pidsus.name] || pidsus.name}</div>
+                    <div class="treemap-item-value" style="font-size: 1.75rem;">${pidsus.value}</div>
+                </div>`;
+            }
+            
+            if (intelijen) {
+                html += `<div class="treemap-item" style="flex: 1; background: ${intelijen.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
+                    <div class="treemap-item-label" style="margin-bottom: 0.5rem; font-size: 0.7rem;">${bidangNamaLengkap[intelijen.name] || intelijen.name}</div>
+                    <div class="treemap-item-value" style="font-size: 1.75rem;">${intelijen.value}</div>
+                </div>`;
+            }
+            
+            html += '</div>'; // Close column 3
+            
+            // Column 4: Pidum (19) - ~13% width
+            if (pidum) {
+                html += `<div class="treemap-item" style="flex: 0 0 13%; background: ${pidum.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
+                    <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[pidum.name] || pidum.name}</div>
+                    <div class="treemap-item-value">${pidum.value}</div>
+                </div>`;
+            }
+            
+            // Column 5: Pengawasan (16) + Small items - ~32% width
+            html += `<div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">`;
+            
+            if (pengawasan) {
+                html += `<div class="treemap-item" style="flex: 0 0 63%; background: ${pengawasan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
+                    <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[pengawasan.name] || pengawasan.name}</div>
+                    <div class="treemap-item-value">${pengawasan.value}</div>
+                </div>`;
+            }
+            
+            // Bottom: Small items (Datun 8, Pemulihan Aset 5, Koordinator 4)
+            html += '<div style="flex: 1; display: flex; gap: 8px;">';
+            
+            if (datun) {
+                html += `<div class="treemap-item" style="flex: 0 0 47%; background: ${datun.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
+                    <div class="treemap-item-label" style="font-size: 0.55rem; margin-bottom: 0.25rem;">${bidangNamaLengkap[datun.name] || datun.name}</div>
+                    <div class="treemap-item-value" style="font-size: 1.25rem;">${datun.value}</div>
+                </div>`;
+            }
+            
+            if (pemulihanAset) {
+                html += `<div class="treemap-item" style="flex: 0 0 29%; background: ${pemulihanAset.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
+                    <div class="treemap-item-label" style="font-size: 0.5rem; margin-bottom: 0.25rem; line-height: 1.2;">${bidangNamaLengkap[pemulihanAset.name] || pemulihanAset.name}</div>
+                    <div class="treemap-item-value" style="font-size: 1.25rem;">${pemulihanAset.value}</div>
+                </div>`;
+            }
+            
+            if (koordinator) {
+                html += `<div class="treemap-item" style="flex: 1; background: ${koordinator.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
+                    <div class="treemap-item-label" style="font-size: 0.5rem; margin-bottom: 0.25rem; line-height: 1.2;">${bidangNamaLengkap[koordinator.name] || koordinator.name}</div>
+                    <div class="treemap-item-value" style="font-size: 1.25rem;">${koordinator.value}</div>
+                </div>`;
+            }
+            
+            html += '</div>'; // Close small items row
+            html += '</div>'; // Close column 5
             
             html += '</div>'; // Close main flex container
             
@@ -2358,89 +2231,10 @@
         }
 
         // Initialize when DOM is ready
-        // ============================================
-        // DYNAMIC YEAR FILTER LOADER
-        // ============================================
-        async function loadAvailableYears() {
-            try {
-                // Query distinct years from database
-                const { data, error } = await supabaseClient
-                    .from('absensi')
-                    .select('tahun')
-                    .order('tahun', { ascending: false });
-                
-                if (error) {
-                    console.error('Error loading years:', error);
-                    return;
-                }
-                
-                // Get unique years
-                const uniqueYears = [...new Set(data.map(item => item.tahun))].sort((a, b) => b - a);
-                
-                if (uniqueYears.length === 0) {
-                    console.log('No years found in database, using defaults');
-                    return;
-                }
-                
-                console.log('Available years from database:', uniqueYears);
-                
-                // Update standard mode year filter
-                const tahunFilter = document.getElementById('tahunFilter');
-                if (tahunFilter) {
-                    const currentValue = tahunFilter.value;
-                    tahunFilter.innerHTML = uniqueYears.map(year => 
-                        `<option value="${year}" ${year == currentValue ? 'selected' : ''}>${year}</option>`
-                    ).join('');
-                }
-                
-                // Update comparison mode year filter
-                const globalYearSelect = document.getElementById('globalYearSelect');
-                if (globalYearSelect) {
-                    const currentValue = globalYearSelect.value;
-                    globalYearSelect.innerHTML = uniqueYears.map(year => 
-                        `<option value="${year}" ${year == currentValue ? 'selected' : ''}>${year}</option>`
-                    ).join('');
-                }
-                
-                console.log('✅ Year filters updated dynamically');
-                
-            } catch (err) {
-                console.error('Error in loadAvailableYears:', err);
-            }
-        }
-        
         document.addEventListener('DOMContentLoaded', function() {
-            const timestamp = Date.now();
-            console.log('═══════════════════════════════════════════════════');
-            console.log('Dashboard Version: 5.2.0 - SVG ICONS FINAL FIX');
-            console.log('Build Timestamp:', timestamp);
-            console.log('═══════════════════════════════════════════════════');
+            console.log('Dashboard Version: 4.0.0 - GABUNGAN MODE');
             console.log('Dashboard now reads from GABUNGAN sheet (not sum of all bidang)');
             console.log('CHECK IN calculation: Total - Tidak Absen (includes ISOMAN)');
-            console.log('✨ All emoji replaced with professional SVG icons (v2)');
-            console.log('🔄 If you still see emoji, your browser cache is VERY strong!');
-            console.log('💡 Solution: Close ALL tabs, Clear cache (Ctrl+Shift+Delete), Restart browser');
-            console.log('═══════════════════════════════════════════════════');
-            
-            // Force clear cache aggressively
-            if ('caches' in window) {
-                caches.keys().then(function(names) {
-                    names.forEach(name => caches.delete(name));
-                    console.log('✅ Cache cleared:', names.length, 'caches deleted');
-                });
-            }
-            
-            // Force reload period cards with delay to ensure DOM is ready
-            setTimeout(function() {
-                console.log('🔄 Regenerating period cards with SVG icons...');
-                updatePeriodCards();
-                console.log('✅ Period cards regenerated');
-            }, 200);
-            
-            // Load available years from database
-            loadAvailableYears();
-            
-            // Then update dashboard
             updateBidangDashboard();
         });
         
@@ -2497,14 +2291,13 @@
             
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             const colors = ['#1a5f2a', '#2d8f4e', '#0891b2', '#7c3aed', '#dc2626', '#ea580c', '#0d9488', '#6366f1', '#d97706', '#be185d', '#065f46', '#7e22ce'];
-            // Using SVG calendar icon for all periods - v2 with larger size
-            const calendarIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
-
+            const icons = ['📅', '📆', '🗓️', '📋', '📊', '📈', '📉', '📌', '📎', '🔖', '📇', '🗂️'];
 
             
             for (let i = 1; i <= count; i++) {
                 const defaultMonth = months[(11 - count + i) % 12]; // Smart default: recent months
                 const color = colors[i - 1];
+                const icon = icons[i - 1];
                 
                 const card = document.createElement('div');
                 card.style.cssText = `
@@ -2519,10 +2312,10 @@
                 `;
                 
                 card.innerHTML = `
-                    <div style="position: absolute; top: 10px; right: 10px; opacity: 0.08; color: ${color}; transform: scale(2);">${calendarIcon}</div>
+                    <div style="position: absolute; top: -20px; right: -20px; font-size: 5rem; opacity: 0.05;">${icon}</div>
                     <h4 style="color: ${color}; font-weight: 800; margin-bottom: 1.25rem; font-size: 1rem; text-transform: uppercase; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 0.5rem; position: relative; z-index: 1;">
-                        <span style="color: ${color}; display: inline-flex; align-items: center;">${calendarIcon}</span>
-                        <span>PERIODE ${i}</span>
+                        <span style="font-size: 1.5rem;">${icon}</span>
+                        Periode ${i}
                     </h4>
                     <select id="bulanCompare${i}" style="width: 100%; padding: 0.875rem; border: 2px solid ${color}40; border-radius: var(--radius-lg); font-weight: 600; font-size: 0.9375rem; transition: all 0.3s; position: relative; z-index: 1;">
                         ${months.map(m => `<option value="${m}" ${m === defaultMonth ? 'selected' : ''}>${m}</option>`).join('')}
