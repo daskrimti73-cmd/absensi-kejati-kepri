@@ -1836,7 +1836,7 @@
             // Grid: 7 columns x 3 rows
             let html = '<div style="display: grid; grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; height: 100%; width: 100%;">';
             
-            // Pembinaan (33) - Column 1, Row 1-3 (full height)
+            // Pembinaan (33) - Column 1, Row 1-3 (full height - panjang vertikal)
             if (pembinaan) {
                 html += `<div class="treemap-item" style="grid-column: 1; grid-row: 1 / 4; background: ${pembinaan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[pembinaan.name] || pembinaan.name}</div>
@@ -1844,15 +1844,15 @@
                 </div>`;
             }
             
-            // Tata Usaha (22) - Column 2, Row 1-3 (full height)
+            // Tata Usaha (22) - Column 2, Row 1-2 (lebih persegi, tidak full height)
             if (tataUsaha) {
-                html += `<div class="treemap-item" style="grid-column: 2; grid-row: 1 / 4; background: ${tataUsaha.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
+                html += `<div class="treemap-item" style="grid-column: 2; grid-row: 1 / 3; background: ${tataUsaha.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[tataUsaha.name] || tataUsaha.name}</div>
                     <div class="treemap-item-value">${tataUsaha.value}</div>
                 </div>`;
             }
             
-            // Pidsus (20) - Column 3, Row 1-2
+            // Pidsus (20) - Column 3, Row 1-2 (persegi)
             if (pidsus) {
                 html += `<div class="treemap-item" style="grid-column: 3; grid-row: 1 / 3; background: ${pidsus.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[pidsus.name] || pidsus.name}</div>
@@ -1860,7 +1860,7 @@
                 </div>`;
             }
             
-            // Intelijen (15) - Column 3, Row 3
+            // Intelijen (15) - Column 3, Row 3 (kotak kecil)
             if (intelijen) {
                 html += `<div class="treemap-item" style="grid-column: 3; grid-row: 3; background: ${intelijen.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.25rem; font-size: 0.7rem;">${bidangNamaLengkap[intelijen.name] || intelijen.name}</div>
@@ -1868,9 +1868,9 @@
                 </div>`;
             }
             
-            // Pidum (19) - Column 4, Row 1-3 (full height)
+            // Pidum (19) - Column 4, Row 1-2 (lebih persegi, tidak full height)
             if (pidum) {
-                html += `<div class="treemap-item" style="grid-column: 4; grid-row: 1 / 4; background: ${pidum.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
+                html += `<div class="treemap-item" style="grid-column: 4; grid-row: 1 / 3; background: ${pidum.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[pidum.name] || pidum.name}</div>
                     <div class="treemap-item-value">${pidum.value}</div>
                 </div>`;
