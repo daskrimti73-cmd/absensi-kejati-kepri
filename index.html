@@ -1836,8 +1836,8 @@
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
             // Build HTML with proportional sizing based on values
-            // Using flexbox with calculated percentages
-            let html = '<div style="display: flex; gap: 4px; height: 100%; width: 100%;">';
+            // Using flexbox with calculated percentages and minimal gap
+            let html = '<div style="display: flex; gap: 2px; height: 100%; width: 100%;">';
             
             // Pembinaan (33) - Proportional width based on value
             const pembinaanWidth = pembinaan ? (pembinaan.value / total * 100) : 0;
@@ -1852,13 +1852,13 @@
             const rightTotal = total - (pembinaan?.value || 0);
             const rightWidth = 100 - pembinaanWidth;
             
-            html += `<div style="flex: 0 0 ${rightWidth}%; display: flex; flex-direction: column; gap: 4px;">`;
+            html += `<div style="flex: 0 0 ${rightWidth}%; display: flex; flex-direction: column; gap: 2px;">`;
             
             // Row 1: Tata Usaha, Pidum, Pengawasan
             const row1Total = (tataUsaha?.value || 0) + (pidum?.value || 0) + (pengawasan?.value || 0);
             const row1Height = (row1Total / rightTotal * 100);
             
-            html += `<div style="flex: 0 0 ${row1Height}%; display: flex; gap: 4px;">`;
+            html += `<div style="flex: 0 0 ${row1Height}%; display: flex; gap: 2px;">`;
             
             if (tataUsaha) {
                 const width = (tataUsaha.value / row1Total * 100);
@@ -1890,7 +1890,7 @@
             const row2Total = rightTotal - row1Total;
             const row2Height = 100 - row1Height;
             
-            html += `<div style="flex: 0 0 ${row2Height}%; display: flex; gap: 4px;">`;
+            html += `<div style="flex: 0 0 ${row2Height}%; display: flex; gap: 2px;">`;
             
             if (pidsus) {
                 const width = (pidsus.value / row2Total * 100);
@@ -1912,13 +1912,13 @@
             const smallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0) + (koordinator?.value || 0);
             const smallWidth = (smallTotal / row2Total * 100);
             
-            html += `<div style="flex: 0 0 ${smallWidth}%; display: flex; flex-direction: column; gap: 4px;">`;
+            html += `<div style="flex: 0 0 ${smallWidth}%; display: flex; flex-direction: column; gap: 2px;">`;
             
             // Top row: Datun + Pemulihan Aset
             const topSmallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0);
             const topSmallHeight = (topSmallTotal / smallTotal * 100);
             
-            html += `<div style="flex: 0 0 ${topSmallHeight}%; display: flex; gap: 4px;">`;
+            html += `<div style="flex: 0 0 ${topSmallHeight}%; display: flex; gap: 2px;">`;
             
             if (datun) {
                 const width = (datun.value / topSmallTotal * 100);
