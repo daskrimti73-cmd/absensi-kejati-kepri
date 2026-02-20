@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v3.6.0</title>
+    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v3.7.0</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1985,7 +1985,7 @@
             // Sort by value descending
             const sortedData = [...bidangData].sort((a, b) => b.value - a.value);
             
-            // Color palette (same as before - JANGAN DIUBAH)
+            // Color palette (JANGAN DIUBAH)
             const treemapColors = [
                 '#073B4C', // dark navy - Pembinaan (largest)
                 '#7B68A6', // purple - Pidsus
@@ -2006,10 +2006,6 @@
             // Calculate total for proportions
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Custom layout matching reference image proportions
-            // Layout: Pembinaan (large left) | Tata Usaha + Pidsus (middle) | Pidum + Intelijen (middle-right) | Pengawasan + small items (right)
-            let html = '<div style="display: flex; gap: 8px; height: 100%; width: 100%;">';
-            
             // Find specific bidang by name
             const pembinaan = sortedData.find(item => item.name === 'PEMBINAAN');
             const tataUsaha = sortedData.find(item => item.name === 'TATA USAHA');
@@ -2021,79 +2017,120 @@
             const pemulihanAset = sortedData.find(item => item.name === 'PEMULIHAN ASET');
             const koordinator = sortedData.find(item => item.name === 'KOORDINATOR');
             
-            // Column 1: Pembinaan (33) - Large box, full height, ~30% width
+            // Calculate proportional widths based on actual values (matching reference image layout)
+            // Layout: Pembinaan | Tata Usaha | Pidsus+Intelijen | Pidum | Pengawasan+Small
+            const pembinaanWidth = pembinaan ? (pembinaan.value / total * 100) : 0;
+            const tataUsahaWidth = tataUsaha ? (tataUsaha.value / total * 100) : 0;
+            const pidumWidth = pidum ? (pidum.value / total * 100) : 0;
+            
+            // Column 3: Pidsus + Intelijen stacked
+            const col3Total = (pidsus?.value || 0) + (intelijen?.value || 0);
+            const col3Width = (col3Total / total * 100);
+            const pidsusHeight = pidsus && col3Total > 0 ? (pidsus.value / col3Total) : 0.5;
+            const intelijenHeight = intelijen && col3Total > 0 ? (intelijen.value / col3Total) : 0.5;
+            
+            // Column 5: Pengawasan + Small items
+            const smallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0) + (koordinator?.value || 0);
+            const col5Total = (pengawasan?.value || 0) + smallTotal;
+            const col5Width = (col5Total / total * 100);
+            const pengawasanHeight = pengawasan && col5Total > 0 ? (pengawasan.value / col5Total) : 0.6;
+            const smallHeight = col5Total > 0 ? (smallTotal / col5Total) : 0.4;
+            
+            // Small items proportional widths
+            const datunWidth = datun && smallTotal > 0 ? (datun.value / smallTotal) : 0.33;
+            const pemulihanWidth = pemulihanAset && smallTotal > 0 ? (pemulihanAset.value / smallTotal) : 0.33;
+            const koordinatorWidth = koordinator && smallTotal > 0 ? (koordinator.value / smallTotal) : 0.33;
+            
+            // Build HTML with proportional sizing matching reference image
+            let html = '<div style="display: flex; gap: 8px; height: 100%; width: 100%;">';
+            
+            // Column 1: Pembinaan (33) - Full height, proportional width
             if (pembinaan) {
-                html += `<div class="treemap-item" style="flex: 0 0 30%; background: ${pembinaan.color};">
+                html += `<div class="treemap-item" style="flex: 0 0 ${pembinaanWidth}%; background: ${pembinaan.color};">
                     <div class="treemap-item-label">${bidangNamaLengkap[pembinaan.name] || pembinaan.name}</div>
                     <div class="treemap-item-value">${pembinaan.value}</div>
                 </div>`;
             }
             
-            // Column 2: Tata Usaha (22) top + Pidsus (20) bottom - ~20% width
-            html += `<div style="flex: 0 0 20%; display: flex; flex-direction: column; gap: 8px;">`;
+            // Column 2: Tata Usaha (22) - Full height, proportional width
             if (tataUsaha) {
-                html += `<div class="treemap-item" style="flex: 1; background: ${tataUsaha.color};">
+                html += `<div class="treemap-item" style="flex: 0 0 ${tataUsahaWidth}%; background: ${tataUsaha.color};">
                     <div class="treemap-item-label">${bidangNamaLengkap[tataUsaha.name] || tataUsaha.name}</div>
                     <div class="treemap-item-value">${tataUsaha.value}</div>
                 </div>`;
             }
-            if (pidsus) {
-                html += `<div class="treemap-item" style="flex: 1; background: ${pidsus.color};">
-                    <div class="treemap-item-label">${bidangNamaLengkap[pidsus.name] || pidsus.name}</div>
-                    <div class="treemap-item-value">${pidsus.value}</div>
-                </div>`;
-            }
-            html += '</div>';
             
-            // Column 3: Pidum (19) top + Intelijen (17) bottom - ~18% width
-            html += `<div style="flex: 0 0 18%; display: flex; flex-direction: column; gap: 8px;">`;
+            // Column 3: Pidsus (20) top + Intelijen (15) bottom - Proportional width and heights
+            if (pidsus || intelijen) {
+                html += `<div style="flex: 0 0 ${col3Width}%; display: flex; flex-direction: column; gap: 8px;">`;
+                
+                if (pidsus) {
+                    html += `<div class="treemap-item" style="flex: ${pidsusHeight}; background: ${pidsus.color};">
+                        <div class="treemap-item-label">${bidangNamaLengkap[pidsus.name] || pidsus.name}</div>
+                        <div class="treemap-item-value">${pidsus.value}</div>
+                    </div>`;
+                }
+                
+                if (intelijen) {
+                    html += `<div class="treemap-item" style="flex: ${intelijenHeight}; background: ${intelijen.color};">
+                        <div class="treemap-item-label">${bidangNamaLengkap[intelijen.name] || intelijen.name}</div>
+                        <div class="treemap-item-value">${intelijen.value}</div>
+                    </div>`;
+                }
+                
+                html += '</div>';
+            }
+            
+            // Column 4: Pidum (19) - Full height, proportional width
             if (pidum) {
-                html += `<div class="treemap-item" style="flex: 1; background: ${pidum.color};">
+                html += `<div class="treemap-item" style="flex: 0 0 ${pidumWidth}%; background: ${pidum.color};">
                     <div class="treemap-item-label">${bidangNamaLengkap[pidum.name] || pidum.name}</div>
                     <div class="treemap-item-value">${pidum.value}</div>
                 </div>`;
             }
-            if (intelijen) {
-                html += `<div class="treemap-item" style="flex: 1; background: ${intelijen.color};">
-                    <div class="treemap-item-label">${bidangNamaLengkap[intelijen.name] || intelijen.name}</div>
-                    <div class="treemap-item-value">${intelijen.value}</div>
-                </div>`;
-            }
-            html += '</div>';
             
-            // Column 4: Pengawasan (16) top + Small items (Datun, Pemulihan Aset, Koordinator) bottom - ~32% width
-            html += `<div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">`;
-            if (pengawasan) {
-                html += `<div class="treemap-item" style="flex: 2; background: ${pengawasan.color};">
-                    <div class="treemap-item-label">${bidangNamaLengkap[pengawasan.name] || pengawasan.name}</div>
-                    <div class="treemap-item-value">${pengawasan.value}</div>
-                </div>`;
+            // Column 5: Pengawasan (16) + Small items (Datun 8, Pemulihan Aset 5, Koordinator 4)
+            if (pengawasan || datun || pemulihanAset || koordinator) {
+                html += `<div style="flex: 0 0 ${col5Width}%; display: flex; flex-direction: column; gap: 8px;">`;
+                
+                if (pengawasan) {
+                    html += `<div class="treemap-item" style="flex: ${pengawasanHeight}; background: ${pengawasan.color};">
+                        <div class="treemap-item-label">${bidangNamaLengkap[pengawasan.name] || pengawasan.name}</div>
+                        <div class="treemap-item-value">${pengawasan.value}</div>
+                    </div>`;
+                }
+                
+                // Bottom: Small items with proportional widths (3 vertical boxes)
+                if (datun || pemulihanAset || koordinator) {
+                    html += `<div style="flex: ${smallHeight}; display: flex; gap: 8px;">`;
+                    
+                    if (datun) {
+                        html += `<div class="treemap-item" style="flex: ${datunWidth}; background: ${datun.color}; padding: 0.75rem;">
+                            <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[datun.name] || datun.name}</div>
+                            <div class="treemap-item-value" style="font-size: 1.25rem;">${datun.value}</div>
+                        </div>`;
+                    }
+                    
+                    if (pemulihanAset) {
+                        html += `<div class="treemap-item" style="flex: ${pemulihanWidth}; background: ${pemulihanAset.color}; padding: 0.75rem;">
+                            <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[pemulihanAset.name] || pemulihanAset.name}</div>
+                            <div class="treemap-item-value" style="font-size: 1.25rem;">${pemulihanAset.value}</div>
+                        </div>`;
+                    }
+                    
+                    if (koordinator) {
+                        html += `<div class="treemap-item" style="flex: ${koordinatorWidth}; background: ${koordinator.color}; padding: 0.75rem;">
+                            <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[koordinator.name] || koordinator.name}</div>
+                            <div class="treemap-item-value" style="font-size: 1.25rem;">${koordinator.value}</div>
+                        </div>`;
+                    }
+                    
+                    html += '</div>'; // Close small items flex
+                }
+                
+                html += '</div>'; // Close column 5
             }
             
-            // Bottom: Small items in 3-column grid
-            html += '<div style="flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">';
-            
-            if (datun) {
-                html += `<div class="treemap-item" style="background: ${datun.color}; padding: 0.75rem;">
-                    <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[datun.name] || datun.name}</div>
-                    <div class="treemap-item-value" style="font-size: 1.25rem;">${datun.value}</div>
-                </div>`;
-            }
-            if (pemulihanAset) {
-                html += `<div class="treemap-item" style="background: ${pemulihanAset.color}; padding: 0.75rem;">
-                    <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[pemulihanAset.name] || pemulihanAset.name}</div>
-                    <div class="treemap-item-value" style="font-size: 1.25rem;">${pemulihanAset.value}</div>
-                </div>`;
-            }
-            if (koordinator) {
-                html += `<div class="treemap-item" style="background: ${koordinator.color}; padding: 0.75rem;">
-                    <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[koordinator.name] || koordinator.name}</div>
-                    <div class="treemap-item-value" style="font-size: 1.25rem;">${koordinator.value}</div>
-                </div>`;
-            }
-            
-            html += '</div>'; // Close grid
-            html += '</div>'; // Close column 4
             html += '</div>'; // Close main flex container
             
             container.innerHTML = html;
