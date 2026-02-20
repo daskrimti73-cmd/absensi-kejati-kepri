@@ -1109,7 +1109,7 @@
             <div class="summary-chart-card">
                 <h3 class="summary-chart-title">Bidang Pegawai</h3>
                 <div class="summary-chart-container">
-                    <canvas id="treemapChart"></canvas>
+                    <div id="customTreemap" class="treemap-container"></div>
                 </div>
             </div>
             
@@ -1633,7 +1633,9 @@
         
         async function updateSummaryCharts(bulan, tahun) {
             if (bulan === 'semua') {
-                if (treemapChart) { treemapChart.destroy(); treemapChart = null; }
+                // Clear treemap container
+                const container = document.getElementById('customTreemap');
+                if (container) container.innerHTML = '';
                 document.getElementById('infoHariKerja').textContent = '-';
                 document.getElementById('infoCheckIn').textContent = '-';
                 return;
@@ -1781,7 +1783,6 @@
             generateAbsenceDonut(finalAlpha, finalTotal - finalAlpha);
         }
         
-        let treemapChart = null;
         
         function generateTreemap(bidangData) {
             const container = document.getElementById('customTreemap');
