@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v3.5.0</title>
+    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v3.6.0</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -296,10 +296,10 @@
         /* Treemap Styling */
         .treemap-container {
             display: flex;
-            gap: 6px;
-            height: 400px; /* Increased from 280px */
+            gap: 8px;
+            height: 450px; /* Increased for better visibility */
             width: 100%;
-            flex-wrap: wrap;
+            flex-wrap: nowrap; /* Prevent wrapping */
         }
         
         .treemap-item {
@@ -309,28 +309,28 @@
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 0.875rem; /* Increased from 0.75rem */
+            font-size: 0.875rem;
             text-align: center;
-            padding: 1.5rem; /* Increased from 1rem */
+            padding: 1.5rem;
             position: relative;
             overflow: hidden;
             line-height: 1.4;
-            border-radius: var(--radius-lg); /* Increased from md */
+            border-radius: var(--radius-lg);
             transition: var(--transition);
-            box-shadow: var(--shadow-md); /* Increased from sm */
+            box-shadow: var(--shadow-md);
             min-width: 0;
             word-break: break-word;
         }
         
         .treemap-item:hover {
-            transform: scale(1.03); /* Reduced from 1.05 for stability */
-            box-shadow: var(--shadow-xl); /* Increased from lg */
+            transform: scale(1.02);
+            box-shadow: var(--shadow-xl);
             z-index: 10;
         }
         
         .treemap-item-label {
-            font-size: 0.75rem; /* Increased from 0.625rem */
-            margin-bottom: 0.75rem; /* Increased from 0.5rem */
+            font-size: 0.8rem; /* Slightly larger for readability */
+            margin-bottom: 0.75rem;
             opacity: 0.95;
             word-wrap: break-word;
             max-width: 100%;
@@ -339,10 +339,55 @@
         }
         
         .treemap-item-value {
-            font-size: 2rem; /* Increased from 1.5rem */
+            font-size: 2.25rem; /* Larger for emphasis */
             font-weight: 800;
             font-family: 'Poppins', sans-serif;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Treemap Responsive */
+        @media (max-width: 1024px) {
+            .treemap-container {
+                height: 380px;
+            }
+            .treemap-item-value {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .treemap-container {
+                height: 320px;
+                gap: 6px;
+            }
+            .treemap-item {
+                padding: 1rem;
+            }
+            .treemap-item-label {
+                font-size: 0.7rem;
+                margin-bottom: 0.5rem;
+            }
+            .treemap-item-value {
+                font-size: 1.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .treemap-container {
+                height: 280px;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .treemap-item {
+                padding: 0.75rem;
+            }
+            .treemap-item-label {
+                font-size: 0.625rem;
+                margin-bottom: 0.25rem;
+            }
+            .treemap-item-value {
+                font-size: 1.5rem;
+            }
         }
         
         /* ============================================
@@ -1252,8 +1297,8 @@
             <!-- Treemap: Bidang Pegawai -->
             <div class="summary-chart-card">
                 <h3 class="summary-chart-title">Bidang Pegawai</h3>
-                <div class="summary-chart-container">
-                    <canvas id="treemapChart"></canvas>
+                <div class="treemap-container" id="customTreemap">
+                    <!-- Custom treemap will be generated here -->
                 </div>
             </div>
             
@@ -1935,120 +1980,123 @@
         let treemapChart = null;
         
         function generateTreemap(bidangData) {
-            const ctx = document.getElementById('treemapChart').getContext('2d');
+            const container = document.getElementById('customTreemap');
             
-            if (treemapChart) {
-                treemapChart.destroy();
-            }
+            // Sort by value descending
+            const sortedData = [...bidangData].sort((a, b) => b.value - a.value);
             
-            // Prepare data for chartjs-chart-treemap
-            const treeData = bidangData.map(item => ({
-                name: bidangNamaLengkap[item.name] || item.name,
-                value: item.value,
-                color: item.color
-            }));
-            
-            // Color palette from Coolors
+            // Color palette (same as before - JANGAN DIUBAH)
             const treemapColors = [
-                '#EF476F', // pink
-                '#F78C6B', // salmon/orange
-                '#FFD166', // yellow
-                '#83D483', // light green
-                '#06D6A0', // mint/teal
-                '#0CB0A9', // teal
-                '#118AB2', // blue
-                '#0C637F', // dark teal
-                '#073B4C'  // dark navy
+                '#073B4C', // dark navy - Pembinaan (largest)
+                '#7B68A6', // purple - Pidsus
+                '#F78C6B', // salmon - Tata Usaha
+                '#E85D75', // pink - Pidum
+                '#FF6B6B', // coral - Pengawasan
+                '#0CB0A9', // teal - Intelijen
+                '#FF9F40', // orange - Datun
+                '#FFD166', // yellow - Pemulihan Aset
+                '#FFA500'  // orange - Koordinator
             ];
             
-            // Sort by value descending and assign colors
-            const sortedData = [...treeData].sort((a, b) => b.value - a.value);
+            // Assign colors
             sortedData.forEach((item, i) => {
-                item.color = treemapColors[i] || item.color;
+                item.color = treemapColors[i] || '#999';
             });
             
-            // Abbreviation map for small boxes
-            const shortNames = {
-                'Perdata dan Tata Usaha Negara': 'DATUN',
-                'Pemulihan Aset': 'P. Aset',
-                'Koordinator': 'Koord.',
-                'Pengawasan': 'Pwasan',
-                'Intelijen': 'Intelijen',
-                'Pidana Khusus': 'Pidsus',
-                'Pidana Umum': 'Pidum'
-            };
+            // Calculate total for proportions
+            const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            treemapChart = new Chart(ctx, {
-                type: 'treemap',
-                data: {
-                    datasets: [{
-                        tree: sortedData,
-                        key: 'value',
-                        labels: {
-                            display: true,
-                            align: 'left',
-                            position: 'bottom',
-                            font: (ctx) => {
-                                if (ctx.type !== 'data') return { size: 10 };
-                                const item = ctx.raw;
-                                const w = item.w || 0;
-                                const h = item.h || 0;
-                                const area = w * h;
-                                if (area > 8000) return { size: 13, weight: 'normal', family: 'Inter, sans-serif' };
-                                if (area > 3000) return { size: 11, weight: 'normal', family: 'Inter, sans-serif' };
-                                return { size: 9, weight: 'normal', family: 'Inter, sans-serif' };
-                            },
-                            color: 'rgba(255, 255, 255, 0.9)',
-                            formatter: (ctx) => {
-                                if (ctx.type !== 'data') return '';
-                                const item = ctx.raw;
-                                if (!item._data) return '';
-                                const w = item.w || 0;
-                                const h = item.h || 0;
-                                const area = w * h;
-                                const name = item._data.name;
-                                const val = item._data.value;
-                                // Use short name for small boxes
-                                if (area < 3000) {
-                                    const short = shortNames[name] || name;
-                                    return `${short}, ${val}`;
-                                }
-                                return `${name}, ${val}`;
-                            },
-                            overflow: 'fit'
-                        },
-                        backgroundColor: (ctx) => {
-                            if (ctx.type !== 'data') return 'transparent';
-                            const item = ctx.raw;
-                            return item._data ? item._data.color : '#999';
-                        },
-                        borderColor: 'rgba(255, 255, 255, 0.4)',
-                        borderWidth: 2,
-                        spacing: 2,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                title: (items) => {
-                                    if (items.length === 0) return '';
-                                    const item = items[0].raw;
-                                    return item._data ? item._data.name : '';
-                                },
-                                label: (item) => {
-                                    const data = item.raw._data;
-                                    return data ? `Jumlah: ${data.value} pegawai` : '';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+            // Custom layout matching reference image proportions
+            // Layout: Pembinaan (large left) | Tata Usaha + Pidsus (middle) | Pidum + Intelijen (middle-right) | Pengawasan + small items (right)
+            let html = '<div style="display: flex; gap: 8px; height: 100%; width: 100%;">';
+            
+            // Find specific bidang by name
+            const pembinaan = sortedData.find(item => item.name === 'PEMBINAAN');
+            const tataUsaha = sortedData.find(item => item.name === 'TATA USAHA');
+            const pidsus = sortedData.find(item => item.name === 'PIDSUS');
+            const pidum = sortedData.find(item => item.name === 'PIDUM');
+            const pengawasan = sortedData.find(item => item.name === 'PENGAWASAN');
+            const intelijen = sortedData.find(item => item.name === 'INTELIJEN');
+            const datun = sortedData.find(item => item.name === 'DATUN');
+            const pemulihanAset = sortedData.find(item => item.name === 'PEMULIHAN ASET');
+            const koordinator = sortedData.find(item => item.name === 'KOORDINATOR');
+            
+            // Column 1: Pembinaan (33) - Large box, full height, ~30% width
+            if (pembinaan) {
+                html += `<div class="treemap-item" style="flex: 0 0 30%; background: ${pembinaan.color};">
+                    <div class="treemap-item-label">${bidangNamaLengkap[pembinaan.name] || pembinaan.name}</div>
+                    <div class="treemap-item-value">${pembinaan.value}</div>
+                </div>`;
+            }
+            
+            // Column 2: Tata Usaha (22) top + Pidsus (20) bottom - ~20% width
+            html += `<div style="flex: 0 0 20%; display: flex; flex-direction: column; gap: 8px;">`;
+            if (tataUsaha) {
+                html += `<div class="treemap-item" style="flex: 1; background: ${tataUsaha.color};">
+                    <div class="treemap-item-label">${bidangNamaLengkap[tataUsaha.name] || tataUsaha.name}</div>
+                    <div class="treemap-item-value">${tataUsaha.value}</div>
+                </div>`;
+            }
+            if (pidsus) {
+                html += `<div class="treemap-item" style="flex: 1; background: ${pidsus.color};">
+                    <div class="treemap-item-label">${bidangNamaLengkap[pidsus.name] || pidsus.name}</div>
+                    <div class="treemap-item-value">${pidsus.value}</div>
+                </div>`;
+            }
+            html += '</div>';
+            
+            // Column 3: Pidum (19) top + Intelijen (17) bottom - ~18% width
+            html += `<div style="flex: 0 0 18%; display: flex; flex-direction: column; gap: 8px;">`;
+            if (pidum) {
+                html += `<div class="treemap-item" style="flex: 1; background: ${pidum.color};">
+                    <div class="treemap-item-label">${bidangNamaLengkap[pidum.name] || pidum.name}</div>
+                    <div class="treemap-item-value">${pidum.value}</div>
+                </div>`;
+            }
+            if (intelijen) {
+                html += `<div class="treemap-item" style="flex: 1; background: ${intelijen.color};">
+                    <div class="treemap-item-label">${bidangNamaLengkap[intelijen.name] || intelijen.name}</div>
+                    <div class="treemap-item-value">${intelijen.value}</div>
+                </div>`;
+            }
+            html += '</div>';
+            
+            // Column 4: Pengawasan (16) top + Small items (Datun, Pemulihan Aset, Koordinator) bottom - ~32% width
+            html += `<div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">`;
+            if (pengawasan) {
+                html += `<div class="treemap-item" style="flex: 2; background: ${pengawasan.color};">
+                    <div class="treemap-item-label">${bidangNamaLengkap[pengawasan.name] || pengawasan.name}</div>
+                    <div class="treemap-item-value">${pengawasan.value}</div>
+                </div>`;
+            }
+            
+            // Bottom: Small items in 3-column grid
+            html += '<div style="flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">';
+            
+            if (datun) {
+                html += `<div class="treemap-item" style="background: ${datun.color}; padding: 0.75rem;">
+                    <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[datun.name] || datun.name}</div>
+                    <div class="treemap-item-value" style="font-size: 1.25rem;">${datun.value}</div>
+                </div>`;
+            }
+            if (pemulihanAset) {
+                html += `<div class="treemap-item" style="background: ${pemulihanAset.color}; padding: 0.75rem;">
+                    <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[pemulihanAset.name] || pemulihanAset.name}</div>
+                    <div class="treemap-item-value" style="font-size: 1.25rem;">${pemulihanAset.value}</div>
+                </div>`;
+            }
+            if (koordinator) {
+                html += `<div class="treemap-item" style="background: ${koordinator.color}; padding: 0.75rem;">
+                    <div class="treemap-item-label" style="font-size: 0.625rem;">${bidangNamaLengkap[koordinator.name] || koordinator.name}</div>
+                    <div class="treemap-item-value" style="font-size: 1.25rem;">${koordinator.value}</div>
+                </div>`;
+            }
+            
+            html += '</div>'; // Close grid
+            html += '</div>'; // Close column 4
+            html += '</div>'; // Close main flex container
+            
+            container.innerHTML = html;
         }
         
         function generateAttendanceDonut(wfo, dinas, undangan, sakit, ijin, cuti, alpha, total, 
