@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v4.1.0</title>
+    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v4.2.0</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1832,91 +1832,125 @@
             const pemulihanAset = sortedData.find(item => item.name === 'PEMULIHAN ASET');
             const koordinator = sortedData.find(item => item.name === 'KOORDINATOR');
             
-            // Build HTML with CSS Grid layout EXACTLY matching reference image
-            // Grid: 4 main columns with Pembinaan spanning 2 rows
-            let html = '<div style="display: grid; grid-template-columns: 1fr 1.5fr 1.3fr 1.2fr; grid-template-rows: 1fr 1fr; gap: 4px; height: 100%; width: 100%;">';
+            // Calculate total for proportions
+            const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
-            // Row 1, Column 1-4: Pembinaan | Tata Usaha | Pidum | Pengawasan
-            // Row 2, Column 1-4: Pembinaan | Pidsus | Intelijen | (Datun + Pemulihan Aset + Koordinator)
+            // Build HTML with proportional sizing based on values
+            // Using flexbox with calculated percentages
+            let html = '<div style="display: flex; gap: 4px; height: 100%; width: 100%;">';
             
-            // Pembinaan (33) - Column 1, Row 1-2 (spans 2 rows, tall rectangle)
+            // Pembinaan (33) - Proportional width based on value
+            const pembinaanWidth = pembinaan ? (pembinaan.value / total * 100) : 0;
             if (pembinaan) {
-                html += `<div class="treemap-item" style="grid-column: 1; grid-row: 1 / 3; background: ${pembinaan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
+                html += `<div class="treemap-item" style="flex: 0 0 ${pembinaanWidth}%; background: ${pembinaan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 2rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem;">${bidangNamaLengkap[pembinaan.name] || pembinaan.name}</div>
                     <div class="treemap-item-value">${pembinaan.value}</div>
                 </div>`;
             }
             
-            // Tata Usaha (22) - Column 2, Row 1
+            // Right side: All other boxes in a grid
+            const rightTotal = total - (pembinaan?.value || 0);
+            const rightWidth = 100 - pembinaanWidth;
+            
+            html += `<div style="flex: 0 0 ${rightWidth}%; display: flex; flex-direction: column; gap: 4px;">`;
+            
+            // Row 1: Tata Usaha, Pidum, Pengawasan
+            const row1Total = (tataUsaha?.value || 0) + (pidum?.value || 0) + (pengawasan?.value || 0);
+            const row1Height = (row1Total / rightTotal * 100);
+            
+            html += `<div style="flex: 0 0 ${row1Height}%; display: flex; gap: 4px;">`;
+            
             if (tataUsaha) {
-                html += `<div class="treemap-item" style="grid-column: 2; grid-row: 1; background: ${tataUsaha.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
+                const width = (tataUsaha.value / row1Total * 100);
+                html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${tataUsaha.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem; font-size: 0.75rem;">${bidangNamaLengkap[tataUsaha.name] || tataUsaha.name}</div>
                     <div class="treemap-item-value">${tataUsaha.value}</div>
                 </div>`;
             }
             
-            // Pidum (19) - Column 3, Row 1
             if (pidum) {
-                html += `<div class="treemap-item" style="grid-column: 3; grid-row: 1; background: ${pidum.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
+                const width = (pidum.value / row1Total * 100);
+                html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${pidum.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem; font-size: 0.75rem;">${bidangNamaLengkap[pidum.name] || pidum.name}</div>
                     <div class="treemap-item-value">${pidum.value}</div>
                 </div>`;
             }
             
-            // Pengawasan (16) - Column 4, Row 1
             if (pengawasan) {
-                html += `<div class="treemap-item" style="grid-column: 4; grid-row: 1; background: ${pengawasan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
+                const width = (pengawasan.value / row1Total * 100);
+                html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${pengawasan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem; font-size: 0.75rem;">${bidangNamaLengkap[pengawasan.name] || pengawasan.name}</div>
                     <div class="treemap-item-value">${pengawasan.value}</div>
                 </div>`;
             }
             
-            // Pidsus (20) - Column 2, Row 2
+            html += '</div>'; // Close row 1
+            
+            // Row 2: Pidsus, Intelijen, (Datun + Pemulihan Aset + Koordinator)
+            const row2Total = rightTotal - row1Total;
+            const row2Height = 100 - row1Height;
+            
+            html += `<div style="flex: 0 0 ${row2Height}%; display: flex; gap: 4px;">`;
+            
             if (pidsus) {
-                html += `<div class="treemap-item" style="grid-column: 2; grid-row: 2; background: ${pidsus.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
+                const width = (pidsus.value / row2Total * 100);
+                html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${pidsus.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem; font-size: 0.75rem;">${bidangNamaLengkap[pidsus.name] || pidsus.name}</div>
                     <div class="treemap-item-value">${pidsus.value}</div>
                 </div>`;
             }
             
-            // Intelijen (15) - Column 3, Row 2
             if (intelijen) {
-                html += `<div class="treemap-item" style="grid-column: 3; grid-row: 2; background: ${intelijen.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
+                const width = (intelijen.value / row2Total * 100);
+                html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${intelijen.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
                     <div class="treemap-item-label" style="margin-bottom: 0.5rem; font-size: 0.75rem;">${bidangNamaLengkap[intelijen.name] || intelijen.name}</div>
                     <div class="treemap-item-value">${intelijen.value}</div>
                 </div>`;
             }
             
-            // Column 4, Row 2: Nested grid for Datun, Pemulihan Aset, Koordinator
-            // Datun and Pemulihan Aset should be taller (60%), Koordinator shorter (40%)
-            html += `<div style="grid-column: 4; grid-row: 2; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1.5fr 1fr; gap: 4px;">`;
+            // Small items column: Datun, Pemulihan Aset, Koordinator
+            const smallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0) + (koordinator?.value || 0);
+            const smallWidth = (smallTotal / row2Total * 100);
             
-            // Datun (8) - Top left (taller box)
+            html += `<div style="flex: 0 0 ${smallWidth}%; display: flex; flex-direction: column; gap: 4px;">`;
+            
+            // Top row: Datun + Pemulihan Aset
+            const topSmallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0);
+            const topSmallHeight = (topSmallTotal / smallTotal * 100);
+            
+            html += `<div style="flex: 0 0 ${topSmallHeight}%; display: flex; gap: 4px;">`;
+            
             if (datun) {
-                html += `<div class="treemap-item" style="grid-column: 1; grid-row: 1; background: ${datun.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
+                const width = (datun.value / topSmallTotal * 100);
+                html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${datun.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
                     <div class="treemap-item-label" style="font-size: 0.55rem; margin-bottom: 0.25rem; line-height: 1.1;">${bidangNamaLengkap[datun.name] || datun.name}</div>
                     <div class="treemap-item-value" style="font-size: 1.25rem;">${datun.value}</div>
                 </div>`;
             }
             
-            // Pemulihan Aset (5) - Top right (taller box)
             if (pemulihanAset) {
-                html += `<div class="treemap-item" style="grid-column: 2; grid-row: 1; background: ${pemulihanAset.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
+                const width = (pemulihanAset.value / topSmallTotal * 100);
+                html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${pemulihanAset.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
                     <div class="treemap-item-label" style="font-size: 0.5rem; margin-bottom: 0.25rem; line-height: 1.1;">${bidangNamaLengkap[pemulihanAset.name] || pemulihanAset.name}</div>
                     <div class="treemap-item-value" style="font-size: 1.25rem;">${pemulihanAset.value}</div>
                 </div>`;
             }
             
-            // Koordinator (4) - Bottom (spans 2 columns, shorter box)
+            html += '</div>'; // Close top small row
+            
+            // Bottom: Koordinator
+            const bottomSmallHeight = 100 - topSmallHeight;
             if (koordinator) {
-                html += `<div class="treemap-item" style="grid-column: 1 / 3; grid-row: 2; background: ${koordinator.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
+                html += `<div class="treemap-item" style="flex: 0 0 ${bottomSmallHeight}%; background: ${koordinator.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
                     <div class="treemap-item-label" style="font-size: 0.5rem; margin-bottom: 0.25rem; line-height: 1.1;">${bidangNamaLengkap[koordinator.name] || koordinator.name}</div>
                     <div class="treemap-item-value" style="font-size: 1.25rem;">${koordinator.value}</div>
                 </div>`;
             }
             
-            html += '</div>'; // Close nested grid
-            html += '</div>'; // Close main grid container
+            html += '</div>'; // Close small items column
+            html += '</div>'; // Close row 2
+            html += '</div>'; // Close right side
+            html += '</div>'; // Close main container
             
             container.innerHTML = html;
         }
