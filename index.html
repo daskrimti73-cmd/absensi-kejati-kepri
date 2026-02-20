@@ -1787,8 +1787,24 @@
         function generateTreemap(bidangData) {
             const container = document.getElementById('customTreemap');
             
+            console.log('generateTreemap called with:', bidangData);
+            console.log('Container element:', container);
+            
+            if (!container) {
+                console.error('customTreemap container not found!');
+                return;
+            }
+            
+            if (!bidangData || bidangData.length === 0) {
+                console.error('bidangData is empty!');
+                container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">No data available</div>';
+                return;
+            }
+            
             // Sort by value descending
             const sortedData = [...bidangData].sort((a, b) => b.value - a.value);
+            
+            console.log('Sorted data:', sortedData);
             
             // Color palette (JANGAN DIUBAH)
             const treemapColors = [
