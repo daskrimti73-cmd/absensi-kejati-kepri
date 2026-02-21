@@ -2410,37 +2410,37 @@
                         return;
                     }
                     
-                    // Fetch from rekapitulasi table
-                    const { data: rekapData, error: rekapError } = await supabaseClient
-                        .from('rekapitulasi')
+                    // Fetch from absensi table with bidang=GABUNGAN (same as dashboard)
+                    const { data: gabunganData, error: gabunganError } = await supabaseClient
+                        .from('absensi')
                         .select('*')
                         .eq('tahun', tahun)
                         .eq('bulan', bulan)
-                        .single();
+                        .eq('bidang', 'GABUNGAN');
                     
-                    if (rekapError || !rekapData) {
-                        alert(`Data tidak ditemukan untuk ${bulan} ${tahun}. Pastikan data sudah di-upload.`);
+                    if (gabunganError || !gabunganData || gabunganData.length === 0) {
+                        alert(`Data GABUNGAN tidak ditemukan untuk ${bulan} ${tahun}. Pastikan data sudah di-upload.`);
                         document.getElementById('comparisonLoading').style.display = 'none';
                         return;
                     }
                     
-                    // Use rekapitulasi data
+                    // Sum all rows (all dates) from GABUNGAN sheet
                     const totals = {
-                        wfo: rekapData.wfo || 0,
-                        dinas_luar: rekapData.dinas_luar || 0,
-                        undangan: rekapData.undangan || 0,
-                        sakit: rekapData.sakit || 0,
-                        ijin: rekapData.ijin || 0,
-                        cuti: rekapData.cuti || 0,
-                        isoman: rekapData.isoman || 0,
-                        tidak_absen: rekapData.tidak_absen || 0
+                        wfo: gabunganData.reduce((sum, row) => sum + (row.wfo || 0), 0),
+                        dinas_luar: gabunganData.reduce((sum, row) => sum + (row.dinas_luar || 0), 0),
+                        undangan: gabunganData.reduce((sum, row) => sum + (row.undangan || 0), 0),
+                        sakit: gabunganData.reduce((sum, row) => sum + (row.sakit || 0), 0),
+                        ijin: gabunganData.reduce((sum, row) => sum + (row.ijin || 0), 0),
+                        cuti: gabunganData.reduce((sum, row) => sum + (row.cuti || 0), 0),
+                        isoman: gabunganData.reduce((sum, row) => sum + (row.isoman || 0), 0),
+                        tidak_absen: gabunganData.reduce((sum, row) => sum + (row.tidak_absen || 0), 0)
                     };
                     
                     periods.push({
                         label: `${bulan} ${tahun}`,
                         bulan,
                         tahun,
-                        data: rekapData,
+                        data: gabunganData,
                         totals: totals
                     });
                 }
@@ -2570,15 +2570,16 @@
             const ctx3 = document.getElementById('comparisonTrendChart').getContext('2d');
             if (comparisonCharts.trend) comparisonCharts.trend.destroy();
             
-            // Get data directly from rekapitulasi (stored in period.data)
+            // Calculate from totals (same as dashboard: Total - Tidak Absen)
             const checkInTotals = [];
             const totalAll = [];
             const attendanceRates = [];
             
             periods.forEach(period => {
-                // period.data contains rekapitulasi row
-                const total = period.data.total || 0;
-                const checkIn = total - (period.data.tidak_absen || 0);
+                const total = period.totals.wfo + period.totals.dinas_luar + period.totals.undangan + 
+                             period.totals.sakit + period.totals.ijin + period.totals.cuti + 
+                             period.totals.isoman + period.totals.tidak_absen;
+                const checkIn = total - period.totals.tidak_absen;
                 const rate = total > 0 ? ((checkIn / total) * 100) : 0;
                 checkInTotals.push(checkIn);
                 totalAll.push(total);
