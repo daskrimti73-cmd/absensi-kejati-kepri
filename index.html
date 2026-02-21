@@ -1608,6 +1608,7 @@
                     .select('*')
                     .eq('bulan', bulan)
                     .eq('tahun', parseInt(tahun))
+                    .eq('bidang', 'GABUNGAN')
                     .single();
                 
                 if (error) {
