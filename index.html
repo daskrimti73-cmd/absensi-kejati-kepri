@@ -2410,31 +2410,38 @@
                         return;
                     }
                     
-                    const { data, error } = await supabaseClient
-                        .from('absensi')
+                    // Fetch from rekapitulasi table
+                    const { data: rekapData, error: rekapError } = await supabaseClient
+                        .from('rekapitulasi')
                         .select('*')
                         .eq('tahun', tahun)
-                        .eq('bulan', bulan);
+                        .eq('bulan', bulan)
+                        .single();
                     
-                    if (error) {
-                        console.error('Error fetching data:', error);
-                        alert(`Error loading data: ${error.message}`);
+                    if (rekapError || !rekapData) {
+                        alert(`Data tidak ditemukan untuk ${bulan} ${tahun}. Pastikan data sudah di-upload.`);
                         document.getElementById('comparisonLoading').style.display = 'none';
                         return;
                     }
                     
-                    if (!data || data.length === 0) {
-                        alert(`Tidak ada data untuk ${bulan} ${tahun}`);
-                        document.getElementById('comparisonLoading').style.display = 'none';
-                        return;
-                    }
+                    // Use rekapitulasi data
+                    const totals = {
+                        wfo: rekapData.wfo || 0,
+                        dinas_luar: rekapData.dinas_luar || 0,
+                        undangan: rekapData.undangan || 0,
+                        sakit: rekapData.sakit || 0,
+                        ijin: rekapData.ijin || 0,
+                        cuti: rekapData.cuti || 0,
+                        isoman: rekapData.isoman || 0,
+                        tidak_absen: rekapData.tidak_absen || 0
+                    };
                     
                     periods.push({
                         label: `${bulan} ${tahun}`,
                         bulan,
                         tahun,
-                        data,
-                        totals: calculateComparisonTotals(data)
+                        data: rekapData,
+                        totals: totals
                     });
                 }
                 
@@ -2569,9 +2576,9 @@
             const attendanceRates = [];
             
             periods.forEach(period => {
-                // period.data now contains rekapitulasi row
-                const checkIn = period.data.check_in || 0;
-                const total = period.data.total_pegawai || 0;
+                // period.data contains rekapitulasi row
+                const total = period.data.total || 0;
+                const checkIn = total - (period.data.tidak_absen || 0);
                 const rate = total > 0 ? ((checkIn / total) * 100) : 0;
                 checkInTotals.push(checkIn);
                 totalAll.push(total);
