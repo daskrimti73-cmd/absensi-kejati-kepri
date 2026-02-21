@@ -2717,14 +2717,23 @@
             gradientTotal.addColorStop(1, 'rgba(212, 168, 75, 0.0)');
             
             // --- Build datasets ---
+            // Store original values for labels
+            const originalCheckIn = [...checkInTotals];
+            const originalTotal = [...totalAll];
+            
+            // Create flat data (all same value) for horizontal line
+            const flatValue = 100;
+            const flatData = new Array(checkInTotals.length).fill(flatValue);
+            
             const datasets3 = [
                 {
                     label: 'Total Pegawai',
-                    data: totalAll,
+                    data: flatData,
+                    originalData: originalTotal, // Store original for labels
                     borderColor: '#d4a84b',
                     backgroundColor: gradientTotal,
-                    tension: 0.4,
-                    fill: true,
+                    tension: 0,
+                    fill: false,
                     borderWidth: 2.5,
                     borderDash: [6, 4],
                     pointStyle: 'circle',
@@ -2737,11 +2746,12 @@
                 },
                 {
                     label: 'Check In',
-                    data: checkInTotals,
+                    data: flatData,
+                    originalData: originalCheckIn, // Store original for labels
                     borderColor: '#059669',
                     backgroundColor: gradientCheckIn,
-                    tension: 0.4,
-                    fill: true,
+                    tension: 0,
+                    fill: false,
                     borderWidth: 3,
                     pointStyle: 'circle',
                     pointRadius: 6,
@@ -2768,7 +2778,7 @@
                         if (meta.hidden) return;
                         
                         meta.data.forEach(function(element, index) {
-                            const value = dataset.data[index];
+                            const value = dataset.originalData[index]; // Use original data for display
                             const x = element.x;
                             let y = element.y - 16;
                             
@@ -2899,7 +2909,8 @@
                                     return periods[idx] ? periods[idx].label : items[0].label;
                                 },
                                 label: function(context) {
-                                    return ` ${context.dataset.label}: ${context.parsed.y.toLocaleString()} orang`;
+                                    const originalValue = context.dataset.originalData[context.dataIndex];
+                                    return ` ${context.dataset.label}: ${originalValue.toLocaleString()} orang`;
                                 },
                                 footer: function(items) {
                                     if (!items.length) return '';
@@ -2913,7 +2924,9 @@
                     scales: {
                         y: { 
                             beginAtZero: true,
-                            max: yAxisMax,
+                            max: 120,
+                            min: 80,
+                            display: false, // Hide Y-axis since all values are same
                             ticks: { 
                                 font: { size: 11, family: 'Inter, sans-serif', weight: '500' },
                                 color: '#9ca3af',
