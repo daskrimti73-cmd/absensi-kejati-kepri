@@ -2659,42 +2659,47 @@
                 if (totalPeriods === 2) {
                     // For 2 periods: simple comparison
                     const diff = lastRate - prevRate;
-                    if (diff > 0) {
+                    const absDiff = Math.abs(diff);
+                    
+                    if (absDiff < 0.05) {
+                        // Consider as stable if difference is less than 0.05%
+                        insightEl.querySelector('div').style.background = '#f0f9ff';
+                        insightEl.querySelector('div').style.borderColor = '#bae6fd';
+                        insightText.style.color = '#0369a1';
+                        insightMessage = `Tingkat kehadiran relatif stabil antara ${prevMonth} (${prevRate.toFixed(1)}%) dan ${lastMonth} (${lastRate.toFixed(1)}%).`;
+                    } else if (diff > 0) {
                         insightEl.querySelector('div').style.background = '#f0fdf4';
                         insightEl.querySelector('div').style.borderColor = '#bbf7d0';
                         insightText.style.color = '#166534';
-                        insightMessage = `Tingkat kehadiran naik ${diff.toFixed(1)}% dari ${prevMonth} ke ${lastMonth}. Terus pertahankan!`;
-                    } else if (diff < 0) {
+                        insightMessage = `Tingkat kehadiran meningkat ${absDiff.toFixed(1)}% dari ${prevMonth} (${prevRate.toFixed(1)}%) ke ${lastMonth} (${lastRate.toFixed(1)}%). Terus pertahankan!`;
+                    } else {
                         insightEl.querySelector('div').style.background = '#fef2f2';
                         insightEl.querySelector('div').style.borderColor = '#fecaca';
                         insightText.style.color = '#991b1b';
-                        insightMessage = `Tingkat kehadiran turun ${Math.abs(diff).toFixed(1)}% dari ${prevMonth} ke ${lastMonth}. Perlu perhatian lebih.`;
-                    } else {
-                        insightEl.querySelector('div').style.background = '#f5f5f5';
-                        insightEl.querySelector('div').style.borderColor = '#d4d4d4';
-                        insightText.style.color = '#525252';
-                        insightMessage = `Tingkat kehadiran stabil dari ${prevMonth} ke ${lastMonth}.`;
+                        insightMessage = `Tingkat kehadiran menurun ${absDiff.toFixed(1)}% dari ${prevMonth} (${prevRate.toFixed(1)}%) ke ${lastMonth} (${lastRate.toFixed(1)}%). Perlu perhatian lebih.`;
                     }
                 } else {
                     // For 3+ periods: comprehensive summary
                     const tertinggi = `${trendLabels[maxIdx]} (${maxRate.toFixed(1)}%)`;
                     const terendah = `${trendLabels[minIdx]} (${minRate.toFixed(1)}%)`;
+                    const absDiff = Math.abs(overallDiff);
                     
-                    if (overallDiff > 0) {
+                    if (absDiff < 0.05) {
+                        // Consider as stable if difference is less than 0.05%
+                        insightEl.querySelector('div').style.background = '#f0f9ff';
+                        insightEl.querySelector('div').style.borderColor = '#bae6fd';
+                        insightText.style.color = '#0369a1';
+                        insightMessage = `Dari ${totalPeriods} periode (${firstMonth} - ${lastMonth}), tingkat kehadiran relatif stabil. Tertinggi: ${tertinggi}. Terendah: ${terendah}.`;
+                    } else if (overallDiff > 0) {
                         insightEl.querySelector('div').style.background = '#f0fdf4';
                         insightEl.querySelector('div').style.borderColor = '#bbf7d0';
                         insightText.style.color = '#166534';
-                        insightMessage = `Dari ${totalPeriods} periode (${firstMonth} - ${lastMonth}), kehadiran naik ${overallDiff.toFixed(1)}%. Tertinggi: ${tertinggi}. Terendah: ${terendah}.`;
-                    } else if (overallDiff < 0) {
+                        insightMessage = `Dari ${totalPeriods} periode (${firstMonth} - ${lastMonth}), tingkat kehadiran meningkat ${absDiff.toFixed(1)}%. Tertinggi: ${tertinggi}. Terendah: ${terendah}.`;
+                    } else {
                         insightEl.querySelector('div').style.background = '#fef2f2';
                         insightEl.querySelector('div').style.borderColor = '#fecaca';
                         insightText.style.color = '#991b1b';
-                        insightMessage = `Dari ${totalPeriods} periode (${firstMonth} - ${lastMonth}), kehadiran turun ${Math.abs(overallDiff).toFixed(1)}%. Tertinggi: ${tertinggi}. Terendah: ${terendah}.`;
-                    } else {
-                        insightEl.querySelector('div').style.background = '#f5f5f5';
-                        insightEl.querySelector('div').style.borderColor = '#d4d4d4';
-                        insightText.style.color = '#525252';
-                        insightMessage = `Dari ${totalPeriods} periode (${firstMonth} - ${lastMonth}), kehadiran stabil. Tertinggi: ${tertinggi}. Terendah: ${terendah}.`;
+                        insightMessage = `Dari ${totalPeriods} periode (${firstMonth} - ${lastMonth}), tingkat kehadiran menurun ${absDiff.toFixed(1)}%. Tertinggi: ${tertinggi}. Terendah: ${terendah}.`;
                     }
                 }
                 
