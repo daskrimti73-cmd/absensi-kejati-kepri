@@ -2724,7 +2724,6 @@
             // --- Build datasets ---
             // Store original values for labels
             const originalCheckIn = [...checkInTotals];
-            const originalTotal = [...totalAll];
             
             // Create flat data (all same value) for horizontal line
             const flatValue = 100;
@@ -2732,29 +2731,11 @@
             
             const datasets3 = [
                 {
-                    label: 'Total Pegawai',
-                    data: flatData,
-                    originalData: originalTotal, // Store original for labels
-                    borderColor: '#d4a84b',
-                    backgroundColor: gradientTotal,
-                    tension: 0,
-                    fill: false,
-                    borderWidth: 2.5,
-                    borderDash: [6, 4],
-                    pointStyle: 'circle',
-                    pointRadius: 6,
-                    pointHoverRadius: 9,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#d4a84b',
-                    pointBorderWidth: 2.5,
-                    order: 1
-                },
-                {
                     label: 'Check In',
                     data: flatData,
                     originalData: originalCheckIn, // Store original for labels
                     borderColor: '#059669',
-                    backgroundColor: gradientCheckIn,
+                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
                     tension: 0,
                     fill: false,
                     borderWidth: 3,
@@ -2787,16 +2768,8 @@
                             const x = element.x;
                             let y = element.y - 16;
                             
-                            // Offset labels to avoid overlap
-                            const isCheckIn = dataset.label === 'Check In';
-                            if (!isCheckIn) y = element.y - 28; // Total label higher
-                            
-                            // Check for overlap and adjust
-                            for (const pos of labelPositions) {
-                                if (Math.abs(pos.x - x) < 40 && Math.abs(pos.y - y) < 16) {
-                                    y = pos.y - 18;
-                                }
-                            }
+                            // Simple positioning for single line
+                            let y = element.y - 16;
                             
                             labelPositions.push({ x, y });
                             
@@ -2811,7 +2784,7 @@
                             const pillY = y - pillH + 3;
                             
                             // Pill background
-                            ctx.fillStyle = isCheckIn ? 'rgba(5, 150, 105, 0.1)' : 'rgba(212, 168, 75, 0.1)';
+                            ctx.fillStyle = 'rgba(5, 150, 105, 0.1)';
                             ctx.beginPath();
                             const r = 5;
                             ctx.moveTo(pillX + r, pillY);
