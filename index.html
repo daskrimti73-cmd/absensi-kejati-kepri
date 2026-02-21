@@ -2563,27 +2563,20 @@
             const ctx3 = document.getElementById('comparisonTrendChart').getContext('2d');
             if (comparisonCharts.trend) comparisonCharts.trend.destroy();
             
-            // Calculate attendance data
+            // Get data directly from rekapitulasi (stored in period.data)
             const checkInTotals = [];
             const totalAll = [];
             const attendanceRates = [];
             
             periods.forEach(period => {
-                const total = period.totals.wfo + period.totals.dinas_luar + period.totals.undangan + 
-                             period.totals.sakit + period.totals.ijin + period.totals.cuti + 
-                             period.totals.isoman + period.totals.tidak_absen;
-                const checkIn = total - period.totals.tidak_absen;
+                // period.data now contains rekapitulasi row
+                const checkIn = period.data.check_in || 0;
+                const total = period.data.total_pegawai || 0;
                 const rate = total > 0 ? ((checkIn / total) * 100) : 0;
                 checkInTotals.push(checkIn);
                 totalAll.push(total);
                 attendanceRates.push(rate);
             });
-            
-            // Show alert with data for verification
-            const dataInfo = periods.map((p, i) => 
-                `${p.label}: Check In = ${checkInTotals[i]}, Total = ${totalAll[i]}`
-            ).join('\n');
-            alert('Data Trend Kehadiran:\n\n' + dataInfo + '\n\nCek console untuk detail lengkap.');
             
             // Short month labels
             const shortMonthMap = {
