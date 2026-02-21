@@ -2724,6 +2724,7 @@
             // --- Build datasets ---
             // Store original values for labels
             const originalCheckIn = [...checkInTotals];
+            const originalTotal = [...totalAll];
             
             // Create flat data (all same value) for horizontal line
             const flatValue = 100;
@@ -2746,6 +2747,23 @@
                     pointBorderColor: '#059669',
                     pointBorderWidth: 3,
                     order: 0
+                },
+                {
+                    label: 'Total Pegawai',
+                    data: flatData,
+                    originalData: originalTotal, // Store original for labels
+                    borderColor: '#d4a84b',
+                    backgroundColor: 'rgba(212, 168, 75, 0.1)',
+                    tension: 0,
+                    fill: false,
+                    borderWidth: 3,
+                    pointStyle: 'circle',
+                    pointRadius: 6,
+                    pointHoverRadius: 10,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#d4a84b',
+                    pointBorderWidth: 3,
+                    order: 1
                 }
             ];
             
@@ -2768,8 +2786,15 @@
                             const x = element.x;
                             let y = element.y - 16;
                             
-                            // Simple positioning for single line
-                            let y = element.y - 16;
+                            // Check for overlap with previous labels at same x position
+                            const overlapping = labelPositions.filter(pos => 
+                                Math.abs(pos.x - x) < 5 && Math.abs(pos.y - y) < 25
+                            );
+                            
+                            // Adjust y position if overlapping
+                            if (overlapping.length > 0) {
+                                y = overlapping[overlapping.length - 1].y - 28;
+                            }
                             
                             labelPositions.push({ x, y });
                             
@@ -2783,8 +2808,8 @@
                             const pillX = x - pillW / 2;
                             const pillY = y - pillH + 3;
                             
-                            // Pill background
-                            ctx.fillStyle = 'rgba(5, 150, 105, 0.1)';
+                            // Pill background with dataset color
+                            ctx.fillStyle = dataset.borderColor === '#059669' ? 'rgba(5, 150, 105, 0.1)' : 'rgba(212, 168, 75, 0.1)';
                             ctx.beginPath();
                             const r = 5;
                             ctx.moveTo(pillX + r, pillY);
