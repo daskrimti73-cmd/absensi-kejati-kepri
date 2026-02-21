@@ -101,9 +101,9 @@
         </div>
         
         <div>
+            <button onclick="checkAllDatabase()">🗄️ CHECK ALL DATABASE (START HERE!)</button>
             <button onclick="testQuery()">🔍 Test Query Absensi</button>
             <button onclick="testRekapitulasi()">📊 Test Query Rekapitulasi</button>
-            <button onclick="listAllData()">📋 List All Data (September 2025)</button>
             <button onclick="clearResult()">🗑️ Clear</button>
         </div>
         
@@ -126,6 +126,94 @@
         
         function clearResult() {
             document.getElementById('result').innerHTML = '';
+        }
+        
+        async function checkAllDatabase() {
+            clearResult();
+            
+            log('='.repeat(60), 'info');
+            log('🗄️ CHECKING ALL DATABASE', 'success');
+            log('='.repeat(60), 'info');
+            log('', 'info');
+            
+            try {
+                // Check total rows in absensi table
+                log('⏳ Checking absensi table...', 'warning');
+                const { data: allAbsensi, error: err1 } = await supabaseClient
+                    .from('absensi')
+                    .select('*');
+                
+                if (err1) {
+                    log('❌ ERROR querying absensi:', 'error');
+                    log(JSON.stringify(err1, null, 2), 'error');
+                    return;
+                }
+                
+                log(`✅ Total rows in absensi: ${allAbsensi.length}`, 'success');
+                log('', 'info');
+                
+                if (allAbsensi.length === 0) {
+                    log('⚠️ DATABASE IS EMPTY!', 'error');
+                    log('', 'info');
+                    log('💡 This means:', 'warning');
+                    log('   1. No data has been uploaded yet', 'warning');
+                    log('   2. OR all data was deleted', 'warning');
+                    log('   3. OR you are connected to wrong database', 'warning');
+                    log('', 'info');
+                    log('🔧 Solution: Upload data via admin panel', 'info');
+                    return;
+                }
+                
+                // Group by year and month
+                const grouped = {};
+                allAbsensi.forEach(row => {
+                    const key = `${row.tahun}-${row.bulan}`;
+                    if (!grouped[key]) {
+                        grouped[key] = { total: 0, bidang: {} };
+                    }
+                    grouped[key].total++;
+                    
+                    const bidang = row.bidang || 'Unknown';
+                    if (!grouped[key].bidang[bidang]) {
+                        grouped[key].bidang[bidang] = 0;
+                    }
+                    grouped[key].bidang[bidang]++;
+                });
+                
+                log('📊 Data by Month:', 'success');
+                Object.entries(grouped).sort().forEach(([key, info]) => {
+                    log(`\n📅 ${key}`, 'info');
+                    log(`   Total: ${info.total} rows`, 'success');
+                    Object.entries(info.bidang).sort((a, b) => b[1] - a[1]).forEach(([bidang, count]) => {
+                        log(`      - ${bidang}: ${count} rows`, 'info');
+                    });
+                });
+                
+                log('', 'info');
+                log('⏳ Checking rekapitulasi table...', 'warning');
+                const { data: allRekap, error: err2 } = await supabaseClient
+                    .from('rekapitulasi')
+                    .select('*');
+                
+                if (err2) {
+                    log('❌ ERROR querying rekapitulasi:', 'error');
+                    log(JSON.stringify(err2, null, 2), 'error');
+                } else {
+                    log(`✅ Total rows in rekapitulasi: ${allRekap.length}`, 'success');
+                    if (allRekap.length > 0) {
+                        log('', 'info');
+                        log('📊 Rekapitulasi data:', 'info');
+                        allRekap.forEach(row => {
+                            log(`   ${row.bulan} ${row.tahun} - ${row.bidang || 'N/A'}`, 'success');
+                        });
+                    }
+                }
+                
+            } catch (err) {
+                log('❌ EXCEPTION:', 'error');
+                log(err.message, 'error');
+                log(err.stack, 'error');
+            }
         }
         
         async function testQuery() {
@@ -238,67 +326,13 @@
                 log(err.message, 'error');
             }
         }
-        
-        async function listAllData() {
-            clearResult();
-            
-            log('='.repeat(60), 'info');
-            log('📋 LISTING ALL DATA FOR SEPTEMBER 2025', 'success');
-            log('='.repeat(60), 'info');
-            log('', 'info');
-            
-            try {
-                const { data, error } = await supabaseClient
-                    .from('absensi')
-                    .select('bidang, COUNT(*)')
-                    .eq('tahun', 2025)
-                    .eq('bulan', 'September');
-                
-                if (error) {
-                    log('❌ ERROR:', 'error');
-                    log(JSON.stringify(error, null, 2), 'error');
-                    return;
-                }
-                
-                // Group by bidang manually
-                const { data: allData, error: err2 } = await supabaseClient
-                    .from('absensi')
-                    .select('*')
-                    .eq('tahun', 2025)
-                    .eq('bulan', 'September');
-                
-                if (err2) {
-                    log('❌ ERROR:', 'error');
-                    log(JSON.stringify(err2, null, 2), 'error');
-                    return;
-                }
-                
-                const grouped = {};
-                allData.forEach(row => {
-                    const bidang = row.bidang || 'Unknown';
-                    if (!grouped[bidang]) grouped[bidang] = 0;
-                    grouped[bidang]++;
-                });
-                
-                log(`✅ Total rows: ${allData.length}`, 'success');
-                log('', 'info');
-                log('📊 Breakdown by bidang:', 'info');
-                Object.entries(grouped).sort((a, b) => b[1] - a[1]).forEach(([bidang, count]) => {
-                    log(`   ${bidang}: ${count} rows`, 'success');
-                });
-                
-            } catch (err) {
-                log('❌ EXCEPTION:', 'error');
-                log(err.message, 'error');
-            }
-        }
-        
+
         // Auto-run on load
         window.addEventListener('load', () => {
             log('✅ Supabase client initialized', 'success');
             log('🔗 URL: ' + SUPABASE_URL, 'info');
             log('', 'info');
-            log('👉 Click "Test Query Absensi" to start debugging', 'warning');
+            log('👉 Click "CHECK ALL DATABASE" button to start!', 'warning');
         });
     </script>
 </body>
