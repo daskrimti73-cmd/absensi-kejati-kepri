@@ -1608,7 +1608,6 @@
                     .select('*')
                     .eq('bulan', bulan)
                     .eq('tahun', parseInt(tahun))
-                    .eq('bidang', 'GABUNGAN')
                     .single();
                 
                 if (error) {
@@ -2417,7 +2416,7 @@
                         .select('*')
                         .eq('tahun', tahun)
                         .eq('bulan', bulan)
-                        .eq('bidang', 'GABUNGAN');  // Only fetch GABUNGAN bidang
+                        ;  // Only fetch GABUNGAN bidang
                     
                     if (error) {
                         console.error('Error fetching data:', error);
