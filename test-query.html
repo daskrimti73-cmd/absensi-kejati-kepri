@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Query - Debug Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #252526;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #4ec9b0;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-size: 12px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        .warning { color: #dcdcaa; }
+        .info { color: #9cdcfe; }
+        input, select {
+            padding: 8px;
+            margin: 5px;
+            background: #3c3c3c;
+            border: 1px solid #555;
+            color: #d4d4d4;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Supabase Query Debugger</h1>
+        <p>Tool untuk mengecek data di Supabase</p>
+        
+        <div style="margin: 20px 0;">
+            <label>Tahun: </label>
+            <input type="number" id="tahun" value="2025" style="width: 100px;">
+            
+            <label>Bulan: </label>
+            <select id="bulan">
+                <option value="Januari">Januari</option>
+                <option value="Februari">Februari</option>
+                <option value="Maret">Maret</option>
+                <option value="April">April</option>
+                <option value="Mei">Mei</option>
+                <option value="Juni">Juni</option>
+                <option value="Juli">Juli</option>
+                <option value="Agustus">Agustus</option>
+                <option value="September" selected>September</option>
+                <option value="Oktober">Oktober</option>
+                <option value="November">November</option>
+                <option value="Desember">Desember</option>
+            </select>
+            
+            <label>Bidang: </label>
+            <select id="bidang">
+                <option value="GABUNGAN" selected>GABUNGAN</option>
+                <option value="PEMBINAAN">PEMBINAAN</option>
+                <option value="INTELIJEN">INTELIJEN</option>
+                <option value="PIDUM">PIDUM</option>
+                <option value="PIDSUS">PIDSUS</option>
+                <option value="DATUN">DATUN</option>
+                <option value="PENGAWASAN">PENGAWASAN</option>
+                <option value="TATA USAHA">TATA USAHA</option>
+                <option value="KOORDINATOR">KOORDINATOR</option>
+                <option value="PEMULIHAN ASET">PEMULIHAN ASET</option>
+            </select>
+        </div>
+        
+        <div>
+            <button onclick="testQuery()">🔍 Test Query Absensi</button>
+            <button onclick="testRekapitulasi()">📊 Test Query Rekapitulasi</button>
+            <button onclick="listAllData()">📋 List All Data (September 2025)</button>
+            <button onclick="clearResult()">🗑️ Clear</button>
+        </div>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://iudtxznbakaqzygpkaxf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1ZHR4em5iYWthcXp5Z3BrYXhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODQ3MjIsImV4cCI6MjA4NTY2MDcyMn0.eF_idmb2tF_SJtOJ7Sf9ipcT7w5Zhxt30uzMqtptxmc';
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        function log(message, type = 'info') {
+            const result = document.getElementById('result');
+            const className = type;
+            const timestamp = new Date().toLocaleTimeString();
+            result.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            result.scrollTop = result.scrollHeight;
+        }
+        
+        function clearResult() {
+            document.getElementById('result').innerHTML = '';
+        }
+        
+        async function testQuery() {
+            clearResult();
+            const tahun = parseInt(document.getElementById('tahun').value);
+            const bulan = document.getElementById('bulan').value;
+            const bidang = document.getElementById('bidang').value;
+            
+            log('='.repeat(60), 'info');
+            log('🔍 TESTING QUERY ABSENSI', 'success');
+            log('='.repeat(60), 'info');
+            log(`📌 Parameters:`, 'info');
+            log(`   Tahun: ${tahun} (type: ${typeof tahun})`, 'info');
+            log(`   Bulan: "${bulan}" (type: ${typeof bulan})`, 'info');
+            log(`   Bidang: "${bidang}" (type: ${typeof bidang})`, 'info');
+            log('', 'info');
+            
+            try {
+                log('⏳ Executing query...', 'warning');
+                
+                const { data, error } = await supabaseClient
+                    .from('absensi')
+                    .select('*')
+                    .eq('tahun', tahun)
+                    .eq('bulan', bulan)
+                    .eq('bidang', bidang)
+                    .order('tanggal', { ascending: true });
+                
+                if (error) {
+                    log('❌ ERROR:', 'error');
+                    log(JSON.stringify(error, null, 2), 'error');
+                    return;
+                }
+                
+                if (!data || data.length === 0) {
+                    log('⚠️ NO DATA FOUND!', 'warning');
+                    log('', 'info');
+                    log('💡 Possible reasons:', 'warning');
+                    log('   1. Data belum diupload untuk bulan ini', 'warning');
+                    log('   2. Format bulan tidak match (cek case sensitivity)', 'warning');
+                    log('   3. Bidang tidak match (cek spelling)', 'warning');
+                    return;
+                }
+                
+                log(`✅ SUCCESS! Found ${data.length} rows`, 'success');
+                log('', 'info');
+                log('📊 Sample data (first 3 rows):', 'info');
+                log(JSON.stringify(data.slice(0, 3), null, 2), 'info');
+                log('', 'info');
+                log('📈 Statistics:', 'success');
+                
+                const totalWfo = data.reduce((sum, row) => sum + (row.wfo || 0), 0);
+                const totalDinas = data.reduce((sum, row) => sum + (row.dinas_luar || 0), 0);
+                const totalUndangan = data.reduce((sum, row) => sum + (row.undangan || 0), 0);
+                const totalSakit = data.reduce((sum, row) => sum + (row.sakit || 0), 0);
+                const totalIjin = data.reduce((sum, row) => sum + (row.ijin || 0), 0);
+                const totalCuti = data.reduce((sum, row) => sum + (row.cuti || 0), 0);
+                const totalAlpha = data.reduce((sum, row) => sum + (row.tidak_absen || 0), 0);
+                
+                log(`   WFO: ${totalWfo}`, 'success');
+                log(`   Dinas Luar: ${totalDinas}`, 'success');
+                log(`   Undangan: ${totalUndangan}`, 'success');
+                log(`   Sakit: ${totalSakit}`, 'success');
+                log(`   Ijin: ${totalIjin}`, 'success');
+                log(`   Cuti: ${totalCuti}`, 'success');
+                log(`   Tidak Absen: ${totalAlpha}`, 'success');
+                log(`   TOTAL: ${totalWfo + totalDinas + totalUndangan + totalSakit + totalIjin + totalCuti + totalAlpha}`, 'success');
+                
+            } catch (err) {
+                log('❌ EXCEPTION:', 'error');
+                log(err.message, 'error');
+                log(err.stack, 'error');
+            }
+        }
+        
+        async function testRekapitulasi() {
+            clearResult();
+            const tahun = parseInt(document.getElementById('tahun').value);
+            const bulan = document.getElementById('bulan').value;
+            
+            log('='.repeat(60), 'info');
+            log('📊 TESTING QUERY REKAPITULASI', 'success');
+            log('='.repeat(60), 'info');
+            log(`📌 Parameters: ${bulan} ${tahun}`, 'info');
+            log('', 'info');
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('rekapitulasi')
+                    .select('*')
+                    .eq('bulan', bulan)
+                    .eq('tahun', tahun)
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        log('⚠️ No rekapitulasi data found (this is OK)', 'warning');
+                    } else {
+                        log('❌ ERROR:', 'error');
+                        log(JSON.stringify(error, null, 2), 'error');
+                    }
+                    return;
+                }
+                
+                log('✅ SUCCESS! Rekapitulasi data found:', 'success');
+                log(JSON.stringify(data, null, 2), 'success');
+                
+            } catch (err) {
+                log('❌ EXCEPTION:', 'error');
+                log(err.message, 'error');
+            }
+        }
+        
+        async function listAllData() {
+            clearResult();
+            
+            log('='.repeat(60), 'info');
+            log('📋 LISTING ALL DATA FOR SEPTEMBER 2025', 'success');
+            log('='.repeat(60), 'info');
+            log('', 'info');
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('absensi')
+                    .select('bidang, COUNT(*)')
+                    .eq('tahun', 2025)
+                    .eq('bulan', 'September');
+                
+                if (error) {
+                    log('❌ ERROR:', 'error');
+                    log(JSON.stringify(error, null, 2), 'error');
+                    return;
+                }
+                
+                // Group by bidang manually
+                const { data: allData, error: err2 } = await supabaseClient
+                    .from('absensi')
+                    .select('*')
+                    .eq('tahun', 2025)
+                    .eq('bulan', 'September');
+                
+                if (err2) {
+                    log('❌ ERROR:', 'error');
+                    log(JSON.stringify(err2, null, 2), 'error');
+                    return;
+                }
+                
+                const grouped = {};
+                allData.forEach(row => {
+                    const bidang = row.bidang || 'Unknown';
+                    if (!grouped[bidang]) grouped[bidang] = 0;
+                    grouped[bidang]++;
+                });
+                
+                log(`✅ Total rows: ${allData.length}`, 'success');
+                log('', 'info');
+                log('📊 Breakdown by bidang:', 'info');
+                Object.entries(grouped).sort((a, b) => b[1] - a[1]).forEach(([bidang, count]) => {
+                    log(`   ${bidang}: ${count} rows`, 'success');
+                });
+                
+            } catch (err) {
+                log('❌ EXCEPTION:', 'error');
+                log(err.message, 'error');
+            }
+        }
+        
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            log('✅ Supabase client initialized', 'success');
+            log('🔗 URL: ' + SUPABASE_URL, 'info');
+            log('', 'info');
+            log('👉 Click "Test Query Absensi" to start debugging', 'warning');
+        });
+    </script>
+</body>
+</html>

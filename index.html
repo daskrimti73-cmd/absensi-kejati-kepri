@@ -6,7 +6,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v4.2.0</title>
+    <meta http-equiv="Last-Modified" content="Fri, 21 Feb 2025 04:30:00 GMT">
+    <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v4.2.1</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -296,7 +297,7 @@
         /* Treemap Styling */
         .treemap-container {
             display: flex;
-            gap: 4px;
+            gap: 8px;
             height: 280px;
             width: 100%;
         }
@@ -1836,8 +1837,8 @@
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
             
             // Build HTML with proportional sizing based on values
-            // Using flexbox with calculated percentages and minimal gap
-            let html = '<div style="display: flex; gap: 2px; height: 100%; width: 100%;">';
+            // Using flexbox with calculated percentages and no gap (berdempetan)
+            let html = '<div style="display: flex; gap: 0px; height: 100%; width: 100%;">';
             
             // Pembinaan (33) - Proportional width based on value
             const pembinaanWidth = pembinaan ? (pembinaan.value / total * 100) : 0;
@@ -1852,13 +1853,13 @@
             const rightTotal = total - (pembinaan?.value || 0);
             const rightWidth = 100 - pembinaanWidth;
             
-            html += `<div style="flex: 0 0 ${rightWidth}%; display: flex; flex-direction: column; gap: 2px;">`;
+            html += `<div style="flex: 0 0 ${rightWidth}%; display: flex; flex-direction: column; gap: 0px;">`;
             
             // Row 1: Tata Usaha, Pidum, Pengawasan
             const row1Total = (tataUsaha?.value || 0) + (pidum?.value || 0) + (pengawasan?.value || 0);
             const row1Height = (row1Total / rightTotal * 100);
             
-            html += `<div style="flex: 0 0 ${row1Height}%; display: flex; gap: 2px;">`;
+            html += `<div style="flex: 0 0 ${row1Height}%; display: flex; gap: 0px;">`;
             
             if (tataUsaha) {
                 const width = (tataUsaha.value / row1Total * 100);
@@ -1890,7 +1891,7 @@
             const row2Total = rightTotal - row1Total;
             const row2Height = 100 - row1Height;
             
-            html += `<div style="flex: 0 0 ${row2Height}%; display: flex; gap: 2px;">`;
+            html += `<div style="flex: 0 0 ${row2Height}%; display: flex; gap: 0px;">`;
             
             if (pidsus) {
                 const width = (pidsus.value / row2Total * 100);
@@ -1912,13 +1913,13 @@
             const smallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0) + (koordinator?.value || 0);
             const smallWidth = (smallTotal / row2Total * 100);
             
-            html += `<div style="flex: 0 0 ${smallWidth}%; display: flex; flex-direction: column; gap: 2px;">`;
+            html += `<div style="flex: 0 0 ${smallWidth}%; display: flex; flex-direction: column; gap: 0px;">`;
             
             // Top row: Datun + Pemulihan Aset
             const topSmallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0);
             const topSmallHeight = (topSmallTotal / smallTotal * 100);
             
-            html += `<div style="flex: 0 0 ${topSmallHeight}%; display: flex; gap: 2px;">`;
+            html += `<div style="flex: 0 0 ${topSmallHeight}%; display: flex; gap: 0px;">`;
             
             if (datun) {
                 const width = (datun.value / topSmallTotal * 100);
