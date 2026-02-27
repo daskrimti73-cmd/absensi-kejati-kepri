@@ -246,6 +246,12 @@
                     rekapData[entry.key] = value;
                     console.log(`  âœ… ${entry.patterns[0]}: ${value}`);
                 }
+
+                // PENTING: Stop setelah TOTAL dibaca, jangan lanjut ke section berikutnya
+                if (entry.key === 'total') {
+                    console.log('  [STOP] TOTAL ditemukan, stop membaca angka.');
+                    break;
+                }
             }
 
             // ============================================
@@ -281,6 +287,9 @@
                         console.log(`  âœ… ${entry.patterns[0]}: ${pctValue}%`);
                     }
                     persentaseFound = true;
+
+                    // Stop jika label = TOTAL
+                    if (entry.key === 'total') break;
                 }
             }
 
@@ -2164,7 +2173,8 @@
                     </label>
                 </div>
                 <p class="help-text" style="margin-top: 12px; font-size: 0.8rem; color: #64748b; line-height: 1.5;">
-                    ðŸ’¡ Replace: Hapus semua data bulan ini lalu upload baru | Append: Tambah data tanpa hapus yang lama
+                    ðŸ’¡ Replace: Hapus semua data bulan ini lalu upload baru | Append: Tambah data tanpa hapus yang
+                    lama
                 </p>
             </div>
 
