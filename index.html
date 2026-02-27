@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,12 +9,14 @@
     <meta http-equiv="Expires" content="0">
     <meta http-equiv="Last-Modified" content="Fri, 21 Feb 2025 04:30:00 GMT">
     <title>Dashboard Absensi Mobile - Kejaksaan Tinggi Kepulauan Riau v4.3.0-FIXED</title>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+        rel="stylesheet">
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -23,7 +26,7 @@
            Dashboard Absensi Mobile - Modern & Clean Design
            Fixed: Horizontal scroll on mobile
            ============================================ */
-        
+
         :root {
             /* Primary Colors - Professional Green Palette */
             --primary-50: #ecfdf5;
@@ -36,7 +39,7 @@
             --primary-700: #047857;
             --primary-800: #065f46;
             --primary-900: #064e3b;
-            
+
             /* Neutral Colors - Modern Gray Scale */
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
@@ -48,7 +51,7 @@
             --gray-700: #374151;
             --gray-800: #1f2937;
             --gray-900: #111827;
-            
+
             /* Accent Colors - Professional Palette */
             --blue-500: #3b82f6;
             --blue-600: #2563eb;
@@ -62,37 +65,37 @@
             --amber-500: #f59e0b;
             --indigo-500: #6366f1;
             --emerald-500: #10b981;
-            
+
             /* Shadows - Subtle & Modern */
             --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
             --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            
+
             /* Border Radius */
             --radius-sm: 0.375rem;
             --radius-md: 0.5rem;
             --radius-lg: 0.75rem;
             --radius-xl: 1rem;
             --radius-2xl: 1.5rem;
-            
+
             /* Transitions */
             --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         html {
             overflow-x: hidden;
             width: 100%;
             position: relative;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f9fafb 100%);
@@ -105,17 +108,21 @@
             max-width: 100vw;
             position: relative;
         }
-        
+
         /* Prevent all children from causing horizontal scroll */
         * {
             max-width: 100%;
         }
-        
-        img, canvas, iframe, video, svg {
+
+        img,
+        canvas,
+        iframe,
+        video,
+        svg {
             max-width: 100%;
             height: auto;
         }
-        
+
         .container {
             max-width: 1280px;
             margin: 0 auto;
@@ -127,7 +134,7 @@
             width: 100%;
             overflow-x: hidden;
         }
-        
+
         /* ============================================
            HEADER SECTION
            ============================================ */
@@ -138,7 +145,7 @@
             border-bottom: 2px solid var(--gray-100);
             position: relative;
         }
-        
+
         .header::after {
             content: '';
             position: absolute;
@@ -150,13 +157,13 @@
             background: linear-gradient(90deg, var(--primary-500), var(--primary-600));
             border-radius: 2px;
         }
-        
+
         .header img {
             width: 80px;
             height: 80px;
             margin-bottom: 1rem;
         }
-        
+
         .header h1 {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
@@ -168,13 +175,13 @@
             font-weight: 800;
             letter-spacing: -0.025em;
         }
-        
+
         .header p {
             color: var(--gray-600);
             font-size: 1.125rem;
             font-weight: 500;
         }
-        
+
         /* ============================================
            INFO CARDS SECTION
            ============================================ */
@@ -185,7 +192,7 @@
             margin-bottom: 3rem;
             width: 100%;
         }
-        
+
         .info-card {
             background: white;
             border-radius: var(--radius-xl);
@@ -201,7 +208,7 @@
             min-width: 0;
             width: 100%;
         }
-        
+
         .info-card::before {
             content: '';
             position: absolute;
@@ -211,21 +218,32 @@
             height: 100%;
             transition: var(--transition);
         }
-        
+
         .info-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-xl);
         }
-        
-        .info-card.blue::before { background: linear-gradient(180deg, var(--blue-500), var(--blue-600)); }
-        .info-card.purple::before { background: linear-gradient(180deg, var(--purple-500), var(--purple-600)); }
-        .info-card.red::before { background: linear-gradient(180deg, var(--red-500), var(--red-600)); }
-        .info-card.orange::before { background: linear-gradient(180deg, var(--orange-500), var(--orange-600)); }
-        
+
+        .info-card.blue::before {
+            background: linear-gradient(180deg, var(--blue-500), var(--blue-600));
+        }
+
+        .info-card.purple::before {
+            background: linear-gradient(180deg, var(--purple-500), var(--purple-600));
+        }
+
+        .info-card.red::before {
+            background: linear-gradient(180deg, var(--red-500), var(--red-600));
+        }
+
+        .info-card.orange::before {
+            background: linear-gradient(180deg, var(--orange-500), var(--orange-600));
+        }
+
         .info-card-content {
             flex: 1;
         }
-        
+
         .info-card-label {
             font-size: 0.75rem;
             color: var(--gray-500);
@@ -234,7 +252,7 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        
+
         .info-card-value {
             font-size: 2rem;
             font-weight: 800;
@@ -242,13 +260,13 @@
             font-family: 'Poppins', sans-serif;
             line-height: 1;
         }
-        
+
         .info-card-icon {
             font-size: 2.5rem;
             opacity: 0.2;
             margin-left: 1rem;
         }
-        
+
         /* ============================================
            SUMMARY CHARTS SECTION
            ============================================ */
@@ -259,7 +277,7 @@
             margin-bottom: 3rem;
             width: 100%;
         }
-        
+
         .summary-chart-card {
             background: white;
             border: 1px solid var(--gray-200);
@@ -270,13 +288,13 @@
             min-width: 0;
             width: 100%;
         }
-        
+
         .summary-chart-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-xl);
             border-color: var(--primary-300);
         }
-        
+
         .summary-chart-title {
             text-align: center;
             color: var(--gray-700);
@@ -288,12 +306,12 @@
             padding-bottom: 1rem;
             border-bottom: 2px solid var(--gray-100);
         }
-        
+
         .summary-chart-container {
             position: relative;
             height: 280px;
         }
-        
+
         /* Treemap Styling */
         .treemap-container {
             display: flex;
@@ -301,7 +319,7 @@
             height: 280px;
             width: 100%;
         }
-        
+
         .treemap-item {
             display: flex;
             flex-direction: column;
@@ -321,13 +339,13 @@
             min-width: 0;
             word-break: break-word;
         }
-        
+
         .treemap-item:hover {
             transform: scale(1.05);
             box-shadow: var(--shadow-lg);
             z-index: 10;
         }
-        
+
         .treemap-item-label {
             font-size: 0.625rem;
             margin-bottom: 0.5rem;
@@ -336,13 +354,13 @@
             max-width: 100%;
             font-weight: 600;
         }
-        
+
         .treemap-item-value {
             font-size: 1.5rem;
             font-weight: 800;
             font-family: 'Poppins', sans-serif;
         }
-        
+
         /* ============================================
            FILTER SECTION
            ============================================ */
@@ -355,7 +373,7 @@
             overflow: hidden;
             box-shadow: var(--shadow-md);
         }
-        
+
         .filter-title {
             background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
             color: white;
@@ -371,7 +389,7 @@
             text-transform: uppercase;
             font-family: 'Inter', sans-serif;
         }
-        
+
         .filter-controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -379,13 +397,13 @@
             padding: 2rem;
             background: var(--gray-50);
         }
-        
+
         .filter-group {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
-        
+
         .filter-group label {
             font-weight: 700;
             color: var(--gray-700);
@@ -396,7 +414,7 @@
             align-items: center;
             gap: 0.375rem;
         }
-        
+
         .filter-group select {
             padding: 0.875rem 1rem;
             font-size: 0.9375rem;
@@ -414,30 +432,30 @@
             font-family: 'Inter', sans-serif;
             transition: var(--transition);
         }
-        
+
         .filter-group select:hover {
             border-color: var(--primary-400);
         }
-        
+
         .filter-group select:focus {
             outline: none;
             border-color: var(--primary-500);
             box-shadow: 0 0 0 3px var(--primary-100);
         }
-        
+
         /* Period Count Selector */
         #periodCountSelect:hover {
             border-color: var(--primary-500);
-            box-shadow: 0 4px 12px rgba(26,95,42,0.15);
+            box-shadow: 0 4px 12px rgba(26, 95, 42, 0.15);
             transform: translateY(-2px);
         }
-        
+
         #periodCountSelect:focus {
             outline: none;
             border-color: var(--primary-600);
-            box-shadow: 0 0 0 4px rgba(26,95,42,0.1);
+            box-shadow: 0 0 0 4px rgba(26, 95, 42, 0.1);
         }
-        
+
         /* ============================================
            DASHBOARD PER BIDANG
            ============================================ */
@@ -445,7 +463,7 @@
             margin-top: 1rem;
             padding-top: 0;
         }
-        
+
         .bidang-dashboard-title {
             text-align: center;
             background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
@@ -460,7 +478,7 @@
             position: relative;
             padding-bottom: 1rem;
         }
-        
+
         .bidang-dashboard-title::after {
             content: '';
             position: absolute;
@@ -472,14 +490,14 @@
             background: linear-gradient(90deg, var(--primary-500), var(--primary-600));
             border-radius: 2px;
         }
-        
+
         .bidang-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
             gap: 2rem;
             margin-bottom: 2rem;
         }
-        
+
         .bidang-card {
             background: white;
             border: 1px solid var(--gray-200);
@@ -488,13 +506,13 @@
             box-shadow: var(--shadow-md);
             transition: var(--transition);
         }
-        
+
         .bidang-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-xl);
             border-color: var(--primary-300);
         }
-        
+
         .bidang-card-header {
             font-size: 1.5rem;
             font-weight: 800;
@@ -506,7 +524,7 @@
             letter-spacing: -0.025em;
             text-align: center;
         }
-        
+
         .bidang-stats {
             display: flex;
             flex-direction: column;
@@ -517,7 +535,7 @@
             padding: 0;
             border-radius: 0;
         }
-        
+
         .bidang-stat-item {
             display: flex;
             align-items: center;
@@ -526,7 +544,7 @@
             border-bottom: none;
             gap: 1rem;
         }
-        
+
         .bidang-stat-label {
             color: var(--gray-700);
             font-weight: 700;
@@ -536,7 +554,7 @@
             min-width: 120px;
             text-align: left;
         }
-        
+
         .bidang-stat-bar {
             flex: 1;
             height: 28px;
@@ -546,7 +564,7 @@
             overflow: hidden;
             box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
         }
-        
+
         .bidang-stat-bar-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--blue-500), var(--blue-600));
@@ -561,7 +579,7 @@
             font-weight: 800;
             box-shadow: var(--shadow-sm);
         }
-        
+
         .bidang-stat-value {
             font-weight: 800;
             color: var(--gray-900);
@@ -570,7 +588,7 @@
             text-align: right;
             font-family: 'Poppins', sans-serif;
         }
-        
+
         .bidang-table {
             width: 100%;
             border-collapse: separate;
@@ -584,7 +602,7 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
-        
+
         .bidang-table thead,
         .bidang-table tbody,
         .bidang-table tr {
@@ -592,7 +610,7 @@
             width: 100%;
             table-layout: fixed;
         }
-        
+
         .bidang-table th {
             background: linear-gradient(180deg, var(--gray-100), var(--gray-200));
             color: var(--gray-700);
@@ -604,7 +622,7 @@
             text-align: center;
             border-bottom: 2px solid var(--gray-300);
         }
-        
+
         .bidang-table td {
             padding: 1rem 0.75rem;
             text-align: center;
@@ -612,15 +630,15 @@
             color: var(--gray-700);
             font-weight: 500;
         }
-        
+
         .bidang-table tbody tr:last-child td {
             border-bottom: none;
         }
-        
+
         .bidang-table tbody tr:hover {
             background: var(--gray-50);
         }
-        
+
         .bidang-table td:first-child {
             background: var(--gray-50);
             font-weight: 700;
@@ -628,11 +646,11 @@
             text-align: left;
             padding-left: 1rem;
         }
-        
+
         .bidang-chart-container {
             display: none;
         }
-        
+
         .bidang-no-data {
             text-align: center;
             padding: 4rem 2rem;
@@ -643,7 +661,7 @@
             border-radius: var(--radius-xl);
             border: 2px dashed var(--gray-300);
         }
-        
+
         /* ============================================
            FOOTER
            ============================================ */
@@ -654,22 +672,22 @@
             border-top: 2px solid var(--gray-100);
             color: var(--gray-600);
         }
-        
+
         .footer p {
             margin: 0.5rem 0;
         }
-        
+
         .footer .copyright {
             font-size: 0.875rem;
             font-weight: 600;
             color: var(--gray-700);
         }
-        
+
         .footer .info {
             font-size: 0.75rem;
             color: var(--gray-500);
         }
-        
+
         .no-data {
             text-align: center;
             padding: 4rem;
@@ -677,7 +695,7 @@
             font-size: 1.125rem;
             font-weight: 600;
         }
-        
+
         /* ============================================
            RESPONSIVE DESIGN
            ============================================ */
@@ -685,173 +703,173 @@
             .summary-charts {
                 grid-template-columns: 1fr;
             }
-            
+
             .info-cards {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-        
+
         @media (max-width: 768px) {
             body {
                 padding: 0.5rem;
             }
-            
+
             .container {
                 padding: 1rem;
                 border-radius: var(--radius-xl);
                 max-width: 100%;
                 width: 100%;
             }
-            
+
             .header {
                 margin-bottom: 1.5rem;
                 padding-bottom: 1rem;
             }
-            
+
             .header h1 {
                 font-size: 1.25rem;
                 word-break: break-word;
             }
-            
+
             .header p {
                 font-size: 0.875rem;
             }
-            
+
             .info-cards {
                 grid-template-columns: 1fr;
                 gap: 0.875rem;
                 margin-bottom: 1.5rem;
             }
-            
+
             .info-card {
                 padding: 1rem;
                 min-width: 0;
             }
-            
+
             .info-card-label {
                 font-size: 0.625rem;
             }
-            
+
             .info-card-value {
                 font-size: 1.5rem;
             }
-            
+
             .info-card-icon {
                 font-size: 2rem;
                 margin-left: 0.75rem;
             }
-            
+
             .summary-charts {
                 gap: 1rem;
                 margin-bottom: 1.5rem;
                 grid-template-columns: 1fr;
             }
-            
+
             .summary-chart-card {
                 padding: 1rem;
                 min-width: 0;
             }
-            
+
             .summary-chart-title {
                 font-size: 0.75rem;
                 margin-bottom: 1rem;
                 padding-bottom: 0.75rem;
             }
-            
+
             .summary-chart-container {
                 height: 200px;
                 width: 100%;
             }
-            
+
             .treemap-container {
                 height: 200px;
                 gap: 16px;
                 width: 100%;
             }
-            
+
             .treemap-item-label {
                 font-size: 0.5rem;
                 margin-bottom: 0.25rem;
             }
-            
+
             .treemap-item-value {
                 font-size: 1rem;
             }
-            
+
             .treemap-item:hover {
                 transform: none;
             }
-            
+
             .filter-section {
                 margin-bottom: 1.5rem;
             }
-            
+
             .filter-title {
                 font-size: 0.75rem;
                 padding: 0.875rem 1rem;
             }
-            
+
             .filter-controls {
                 grid-template-columns: 1fr;
                 gap: 0.875rem;
                 padding: 1rem;
             }
-            
+
             .filter-group {
                 min-width: 0;
             }
-            
+
             .filter-group select {
                 padding: 0.75rem 0.875rem;
                 font-size: 0.875rem;
                 width: 100%;
             }
-            
+
             .bidang-dashboard-title {
                 font-size: 1.25rem;
                 margin-bottom: 1.5rem;
             }
-            
+
             .bidang-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
-            
+
             .bidang-card {
                 padding: 1rem;
                 min-width: 0;
             }
-            
+
             .bidang-card-header {
                 font-size: 1.125rem;
                 margin-bottom: 1rem;
             }
-            
+
             .bidang-stats {
                 gap: 0.75rem;
             }
-            
+
             .bidang-stat-item {
                 flex-wrap: wrap;
             }
-            
+
             .bidang-stat-label {
                 font-size: 0.625rem;
                 min-width: 0;
                 width: 100%;
                 margin-bottom: 0.25rem;
             }
-            
+
             .bidang-stat-bar {
                 height: 20px;
                 width: 100%;
             }
-            
+
             .bidang-stat-bar-fill {
                 font-size: 0.625rem;
                 padding-right: 0.5rem;
             }
-            
+
             .bidang-stat-value {
                 font-size: 0.75rem;
                 min-width: 0;
@@ -859,202 +877,202 @@
                 text-align: left;
                 margin-top: 0.25rem;
             }
-            
+
             .bidang-table {
                 font-size: 0.75rem;
                 display: block;
                 width: 100%;
                 overflow-x: auto;
             }
-            
+
             .bidang-table thead,
             .bidang-table tbody {
                 display: block;
                 width: 100%;
             }
-            
+
             .bidang-table tr {
                 display: table;
                 width: 100%;
                 table-layout: fixed;
             }
-            
+
             .bidang-table th,
             .bidang-table td {
                 padding: 0.625rem 0.375rem;
                 font-size: 0.625rem;
             }
-            
+
             .bidang-table td:first-child {
                 padding-left: 0.5rem;
             }
         }
-        
+
         @media (max-width: 480px) {
             body {
                 padding: 0.25rem;
             }
-            
+
             .container {
                 padding: 0.75rem;
                 border-radius: var(--radius-lg);
             }
-            
+
             .header {
                 margin-bottom: 1rem;
                 padding-bottom: 0.75rem;
             }
-            
+
             .header h1 {
                 font-size: 1.125rem;
             }
-            
+
             .header p {
                 font-size: 0.8125rem;
             }
-            
+
             .info-cards {
                 gap: 0.75rem;
                 margin-bottom: 1rem;
             }
-            
+
             .info-card {
                 padding: 0.875rem;
             }
-            
+
             .info-card-label {
                 font-size: 0.5625rem;
             }
-            
+
             .info-card-value {
                 font-size: 1.25rem;
             }
-            
+
             .info-card-icon {
                 font-size: 1.75rem;
                 margin-left: 0.5rem;
             }
-            
+
             .summary-charts {
                 gap: 0.75rem;
                 margin-bottom: 1rem;
             }
-            
+
             .summary-chart-card {
                 padding: 0.75rem;
             }
-            
+
             .summary-chart-title {
                 font-size: 0.6875rem;
                 margin-bottom: 0.75rem;
                 padding-bottom: 0.5rem;
             }
-            
+
             .summary-chart-container {
                 height: 180px;
             }
-            
+
             .treemap-container {
                 height: 180px;
                 gap: 14px;
             }
-            
+
             .treemap-item-label {
                 font-size: 0.4375rem;
                 margin-bottom: 0.125rem;
             }
-            
+
             .treemap-item-value {
                 font-size: 0.875rem;
             }
-            
+
             .filter-section {
                 margin-bottom: 1rem;
             }
-            
+
             .filter-title {
                 font-size: 0.6875rem;
                 padding: 0.75rem 0.875rem;
             }
-            
+
             .filter-controls {
                 gap: 0.75rem;
                 padding: 0.875rem;
             }
-            
+
             .filter-group select {
                 padding: 0.625rem 0.75rem;
                 font-size: 0.8125rem;
             }
-            
+
             .bidang-dashboard-title {
                 font-size: 1.125rem;
                 margin-bottom: 1rem;
             }
-            
+
             .bidang-grid {
                 gap: 0.875rem;
             }
-            
+
             .bidang-card {
                 padding: 0.875rem;
             }
-            
+
             .bidang-card-header {
                 font-size: 1rem;
                 margin-bottom: 0.875rem;
             }
-            
+
             .bidang-stats {
                 gap: 0.625rem;
             }
-            
+
             .bidang-stat-label {
                 font-size: 0.5625rem;
             }
-            
+
             .bidang-stat-bar {
                 height: 18px;
             }
-            
+
             .bidang-stat-bar-fill {
                 font-size: 0.5625rem;
                 padding-right: 0.375rem;
             }
-            
+
             .bidang-stat-value {
                 font-size: 0.6875rem;
             }
-            
+
             .bidang-table th,
             .bidang-table td {
                 padding: 0.5rem 0.25rem;
                 font-size: 0.5625rem;
             }
         }
-        
+
         @media (max-width: 360px) {
             .container {
                 padding: 0.5rem;
             }
-            
+
             .header h1 {
                 font-size: 1rem;
             }
-            
+
             .info-card-value {
                 font-size: 1.125rem;
             }
-            
+
             .treemap-container {
                 height: 160px;
                 gap: 12px;
             }
-            
+
             .treemap-item-label {
                 font-size: 0.375rem;
             }
-            
+
             .treemap-item-value {
                 font-size: 0.75rem;
             }
@@ -1062,13 +1080,14 @@
     </style>
 
 </head>
+
 <body>
     <div class="container">
         <div class="header">
             <h1>DASHBOARD ABSENSI MOBILE</h1>
             <p>Kejaksaan Tinggi Kepulauan Riau</p>
         </div>
-        
+
         <!-- Info Cards -->
         <div class="info-cards">
             <div class="info-card blue">
@@ -1078,7 +1097,7 @@
                 </div>
                 <div class="info-card-icon"></div>
             </div>
-            
+
             <div class="info-card purple">
                 <div class="info-card-content">
                     <div class="info-card-label">Hari Kerja</div>
@@ -1086,7 +1105,7 @@
                 </div>
                 <div class="info-card-icon"></div>
             </div>
-            
+
             <div class="info-card red">
                 <div class="info-card-content">
                     <div class="info-card-label">Check In</div>
@@ -1094,7 +1113,7 @@
                 </div>
                 <div class="info-card-icon"></div>
             </div>
-            
+
             <div class="info-card orange">
                 <div class="info-card-content">
                     <div class="info-card-label">Total Bidang</div>
@@ -1103,7 +1122,7 @@
                 <div class="info-card-icon"></div>
             </div>
         </div>
-        
+
         <!-- Summary Charts Section -->
         <div class="summary-charts" id="summaryCharts">
             <!-- Treemap: Bidang Pegawai -->
@@ -1113,7 +1132,7 @@
                     <div id="customTreemap" class="treemap-container"></div>
                 </div>
             </div>
-            
+
             <!-- Donut Chart: Persentase Kehadiran -->
             <div class="summary-chart-card">
                 <h3 class="summary-chart-title">Persentase Kehadiran Keseluruhan</h3>
@@ -1121,7 +1140,7 @@
                     <canvas id="attendanceDonutChart"></canvas>
                 </div>
             </div>
-            
+
             <!-- Donut Chart: Tanpa Keterangan -->
             <div class="summary-chart-card">
                 <h3 class="summary-chart-title">Tanpa Keterangan</h3>
@@ -1130,26 +1149,28 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Filter Section -->
         <div class="filter-section">
             <div class="filter-title">
                 <span></span>
                 <span>FILTER DATA ABSENSI</span>
             </div>
-            
+
             <!-- Mode Toggle -->
             <div style="padding: 1.5rem 2rem 0 2rem;">
                 <div style="display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1rem;">
-                    <button id="btnModeNormal" onclick="setViewMode('normal')" style="padding: 0.75rem 1.5rem; background: var(--primary-600); color: white; border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.875rem;">
+                    <button id="btnModeNormal" onclick="setViewMode('normal')"
+                        style="padding: 0.75rem 1.5rem; background: var(--primary-600); color: white; border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.875rem;">
                         Tampilan Standar
                     </button>
-                    <button id="btnModeCompare" onclick="setViewMode('compare')" style="padding: 0.75rem 1.5rem; background: var(--gray-300); color: var(--gray-700); border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.875rem;">
+                    <button id="btnModeCompare" onclick="setViewMode('compare')"
+                        style="padding: 0.75rem 1.5rem; background: var(--gray-300); color: var(--gray-700); border: none; border-radius: var(--radius-lg); font-weight: 700; cursor: pointer; transition: var(--transition); font-size: 0.875rem;">
                          Analisis Perbandingan
                     </button>
                 </div>
             </div>
-            
+
             <!-- Normal Mode Filters -->
             <div id="normalFilters" class="filter-controls">
                 <div class="filter-group">
@@ -1193,17 +1214,20 @@
                     </select>
                 </div>
             </div>
-            
+
             <!-- Compare Mode Filters -->
             <div id="compareFilters" style="display: none; padding: 2rem;">
                 <!-- Period Count Selector -->
-                <div style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 2px solid var(--primary-200);">
+                <div
+                    style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 2px solid var(--primary-200);">
                     <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-                        <label style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <label
+                            style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
                             <span style="font-size: 1.5rem;"></span>
                             Jumlah Periode:
                         </label>
-                        <select id="periodCountSelect" onchange="updatePeriodCards()" style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 150px; transition: all 0.3s;">
+                        <select id="periodCountSelect" onchange="updatePeriodCards()"
+                            style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 150px; transition: all 0.3s;">
                             <option value="2">2 Periode</option>
                             <option value="3">3 Periode</option>
                             <option value="4">4 Periode</option>
@@ -1216,14 +1240,17 @@
                             <option value="11">11 Periode</option>
                             <option value="12">12 Periode</option>
                         </select>
-                        
+
                         <!-- Global Year Filter -->
-                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--gray-300);">
-                            <label style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <div
+                            style="display: flex; align-items: center; gap: 0.75rem; margin-left: 1rem; padding-left: 1rem; border-left: 2px solid var(--gray-300);">
+                            <label
+                                style="font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-800); font-size: 1.125rem; display: flex; align-items: center; gap: 0.5rem;">
                                 <span style="font-size: 1.5rem;">📅</span>
                                 Tahun:
                             </label>
-                            <select id="globalYearSelect" style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 120px; transition: all 0.3s;">
+                            <select id="globalYearSelect"
+                                style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 120px; transition: all 0.3s;">
                                 <option value="2025" selected>2025</option>
                                 <option value="2026">2026</option>
                                 <option value="2027">2027</option>
@@ -1232,7 +1259,7 @@
                                 <option value="2030">2030</option>
                             </select>
                         </div>
-                        
+
                         <div style="flex: 1; text-align: right;">
                             <span style="font-size: 0.875rem; color: var(--gray-600); font-weight: 500;">
                                 Pilih berapa bulan yang ingin dibandingkan
@@ -1240,73 +1267,93 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Dynamic Period Cards Container -->
-                <div id="periodCardsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div id="periodCardsContainer"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                     <!-- Cards will be generated dynamically -->
                 </div>
-                
+
                 <!-- Compare Button -->
-                <button onclick="loadComparisonData()" style="width: 100%; padding: 1.5rem; background: linear-gradient(135deg, var(--primary-600), var(--primary-700)); color: white; border: none; border-radius: var(--radius-xl); font-size: 1.25rem; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 8px 24px rgba(26,95,42,0.3); transition: all 0.3s; font-family: 'Poppins', sans-serif;">
+                <button onclick="loadComparisonData()"
+                    style="width: 100%; padding: 1.5rem; background: linear-gradient(135deg, var(--primary-600), var(--primary-700)); color: white; border: none; border-radius: var(--radius-xl); font-size: 1.25rem; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 8px 24px rgba(26,95,42,0.3); transition: all 0.3s; font-family: 'Poppins', sans-serif;">
                     <span style="font-size: 1.5rem; margin-right: 0.5rem;"></span>
                     Bandingkan Data
                 </button>
             </div>
         </div>
-        
+
         <!-- Normal Dashboard (existing) -->
         <div id="normalDashboard">
-        <!-- Dashboard Per Bidang -->
-        <div class="bidang-dashboard" id="bidangDashboard">
-            <h2 class="bidang-dashboard-title">DASHBOARD PER BIDANG</h2>
-            <div class="bidang-grid" id="bidangGrid">
-                <!-- Cards will be generated dynamically -->
+            <!-- Dashboard Per Bidang -->
+            <div class="bidang-dashboard" id="bidangDashboard">
+                <h2 class="bidang-dashboard-title">DASHBOARD PER BIDANG</h2>
+                <div class="bidang-grid" id="bidangGrid">
+                    <!-- Cards will be generated dynamically -->
+                </div>
             </div>
         </div>
-        </div>
-        
+
         <!-- Comparison Dashboard (new) -->
         <div id="comparisonDashboard" style="display: none;">
-            <div id="comparisonLoading" style="text-align: center; padding: 4rem 2rem; color: var(--gray-500); font-size: 1.125rem; font-weight: 600; display: none;">
+            <div id="comparisonLoading"
+                style="text-align: center; padding: 4rem 2rem; color: var(--gray-500); font-size: 1.125rem; font-weight: 600; display: none;">
                 Memuat data perbandingan...
             </div>
-            
+
             <div id="comparisonContent" style="display: none;">
                 <!-- Stats Cards -->
-                <div id="comparisonStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;"></div>
-                
+                <div id="comparisonStats"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                </div>
+
                 <!-- Charts -->
-                <div style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 1px solid var(--gray-200);">
-                    <h2 style="font-family: 'Poppins', sans-serif; color: var(--gray-800); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700;">Perbandingan Visual - Keseluruhan</h2>
+                <div
+                    style="background: white; padding: 2rem; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: var(--shadow-md); border: 1px solid var(--gray-200);">
+                    <h2
+                        style="font-family: 'Poppins', sans-serif; color: var(--gray-800); margin-bottom: 1.5rem; text-align: center; font-size: 1.5rem; font-weight: 700;">
+                        Perbandingan Visual - Keseluruhan</h2>
                     <canvas id="comparisonOverallChart"></canvas>
                 </div>
-                
-                <div id="trendChartContainer" style="background: white; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.07); border: 1px solid #e5e7eb; overflow: hidden;">
+
+                <div id="trendChartContainer"
+                    style="background: white; border-radius: var(--radius-xl); margin-bottom: 2rem; box-shadow: 0 4px 24px rgba(0,0,0,0.07); border: 1px solid #e5e7eb; overflow: hidden;">
                     <!-- Header -->
-                    <div style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div
+                        style="background: linear-gradient(135deg, #059669 0%, #047857 100%); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
                         <div>
-                            <h2 style="font-family: 'Poppins', sans-serif; color: #ffffff; margin: 0 0 0.25rem 0; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em;">Trend Kehadiran</h2>
-                            <p style="color: rgba(255,255,255,0.8); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">Perbandingan tingkat kehadiran antar periode</p>
+                            <h2
+                                style="font-family: 'Poppins', sans-serif; color: #ffffff; margin: 0 0 0.25rem 0; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em;">
+                                Trend Kehadiran</h2>
+                            <p
+                                style="color: rgba(255,255,255,0.8); font-size: 0.8rem; margin: 0; font-family: 'Inter', sans-serif;">
+                                Perbandingan tingkat kehadiran antar periode</p>
                         </div>
-                        <div id="trendBadge" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 0.4rem 1rem; border-radius: 9999px; color: white; font-size: 0.78rem; font-weight: 600; font-family: 'Inter', sans-serif; display: none;"></div>
+                        <div id="trendBadge"
+                            style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px); padding: 0.4rem 1rem; border-radius: 9999px; color: white; font-size: 0.78rem; font-weight: 600; font-family: 'Inter', sans-serif; display: none;">
+                        </div>
                     </div>
                     <!-- Stats Row -->
-                    <div id="trendStatsRow" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; padding: 1.25rem 2rem; background: #f8fafb; border-bottom: 1px solid #e5e7eb;"></div>
+                    <div id="trendStatsRow"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; padding: 1.25rem 2rem; background: #f8fafb; border-bottom: 1px solid #e5e7eb;">
+                    </div>
                     <!-- Chart -->
                     <div style="padding: 1.5rem 2rem 1rem 2rem; position: relative;">
                         <canvas id="comparisonTrendChart" style="max-height: 380px;"></canvas>
                     </div>
                     <!-- Footer insight -->
                     <div id="trendInsight" style="padding: 0.75rem 2rem 1.25rem; display: none;">
-                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <div
+                            style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 0.75rem 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
                             <span id="trendInsightIcon" style="font-size: 1.1rem;"></span>
-                            <span id="trendInsightText" style="color: #166534; font-size: 0.82rem; font-weight: 500; font-family: 'Inter', sans-serif;"></span>
+                            <span id="trendInsightText"
+                                style="color: #166534; font-size: 0.82rem; font-weight: 500; font-family: 'Inter', sans-serif;"></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="footer">
             <p class="copyright">&copy; 2025 Kejaksaan Tinggi Kepulauan Riau - Sistem Absensi Mobile</p>
         </div>
@@ -1325,9 +1372,9 @@
         const SUPABASE_URL = 'https://imiwlmuvelhihyfuumkw.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltaXdsbXV2ZWxoaWh5ZnV1bWt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4NzgxMDksImV4cCI6MjA4NjQ1NDEwOX0.OJVW8to47hCJ83fZSHeuPoBdOh7M15CQOYv0Ds56ncs';
         const USE_SUPABASE = true; // Set false untuk disable Supabase
-        
+
         let supabaseClient = null;
-        
+
         // Initialize Supabase client
         if (USE_SUPABASE && typeof window.supabase !== 'undefined') {
             try {
@@ -1339,47 +1386,47 @@
         } else {
             console.log(' Supabase disabled or library not loaded');
         }
-        
+
         // Fetch data from Supabase
         async function fetchFromSupabase(tahun, bulan, bidang = null) {
             if (!supabaseClient) {
                 console.log('Supabase client not initialized');
                 return null;
             }
-            
+
             console.log(`Fetching from Supabase: tahun=${tahun} (type: ${typeof tahun}), bulan="${bulan}" (type: ${typeof bulan}), bidang=${bidang || 'semua'}`);
-            
+
             try {
                 let query = supabaseClient
                     .from('absensi')
                     .select('*')
                     .eq('tahun', parseInt(tahun))
                     .eq('bulan', bulan);
-                
+
                 // Add bidang filter if specified
                 if (bidang && bidang !== 'semua') {
                     query = query.eq('bidang', bidang);
                 }
-                
+
                 console.log(`Query: tahun=${parseInt(tahun)}, bulan="${bulan}"${bidang && bidang !== 'semua' ? `, bidang="${bidang}"` : ''}`);
-                
+
                 const { data, error } = await query.order('tanggal', { ascending: true });
-                
+
                 if (error) {
                     console.error('Supabase query error:', error);
                     return null;
                 }
-                
+
                 if (!data || data.length === 0) {
                     console.log(` No Supabase data for ${bulan} ${tahun}${bidang && bidang !== 'semua' ? ` - ${bidang}` : ''}`);
                     console.log('TIP: Cek data di Supabase Table Editor dengan query:');
                     console.log(`   SELECT tahun, bulan, bidang, COUNT(*) FROM absensi WHERE bulan LIKE '%${bulan.substring(0, 3)}%' GROUP BY tahun, bulan, bidang;`);
                     return null;
                 }
-                
+
                 console.log(`Loaded ${data.length} rows from Supabase for ${bulan} ${tahun}${bidang && bidang !== 'semua' ? ` - ${bidang}` : ''}`);
                 console.log('First 3 rows:', data.slice(0, 3));
-                
+
                 // Group by tanggal and sum values if multiple bidang
                 const groupedData = {};
                 data.forEach(row => {
@@ -1407,10 +1454,10 @@
                     groupedData[tanggal].isoman += row.isoman || 0; // ISOMAN support
                     groupedData[tanggal].tidak_absen += row.tidak_absen || 0;
                 });
-                
+
                 // Convert to array and sort by tanggal
                 const sortedData = Object.values(groupedData).sort((a, b) => a.tanggal - b.tanggal);
-                
+
                 // Transform to expected format
                 return {
                     totalPegawai: 142,
@@ -1450,7 +1497,7 @@
             November: 'NOVEMBER',
             Desember: 'DESEMBER'
         };
-        
+
         // Mapping nama bidang lengkap
         const bidangNamaLengkap = {
             'PEMBINAAN': 'Pembinaan',
@@ -1463,7 +1510,7 @@
             'KOORDINATOR': 'Koordinator',
             'PEMULIHAN ASET': 'Pemulihan Aset'
         };
-        
+
         // Jumlah pegawai per bidang (data statis)
         const bidangJumlahPegawai = {
             'PEMBINAAN': 33,
@@ -1482,15 +1529,15 @@
             const bulan = document.getElementById('bulanFilter').value;
             const tahun = document.getElementById('tahunFilter').value;
             const bidang = document.getElementById('bidangFilter').value;
-            
+
             console.log(`getSelectedData called: bulan=${bulan}, tahun=${tahun}, bidang=${bidang}`);
-            
+
             // Special case: "semua bulan" always uses hardcoded
             if (bulan === 'semua') {
                 console.log('Using getAllMonthsData for "semua bulan"');
                 return getAllMonthsData(tahun);
             }
-            
+
             // For main chart: if bidang = "semua", use "GABUNGAN" instead
             // This prevents double-counting data from all bidang
             let bidangToFetch = bidang;
@@ -1498,7 +1545,7 @@
                 bidangToFetch = 'GABUNGAN';
                 console.log('Main chart: Using GABUNGAN bidang for "Semua Bidang" filter');
             }
-            
+
             // Try Supabase first if enabled
             if (USE_SUPABASE && supabaseClient) {
                 console.log('Trying Supabase...');
@@ -1514,13 +1561,13 @@
             } else {
                 console.log(' Supabase disabled or not initialized');
             }
-            
+
             // Fallback to hardcoded data
             console.log(`Using hardcoded data for ${bulan} ${tahun}`);
             if (dataAbsensi[tahun] && dataAbsensi[tahun][bulan]) {
                 return dataAbsensi[tahun][bulan];
             }
-            
+
             console.log(`No data found for ${bulan} ${tahun}`);
             return null;
         }
@@ -1528,12 +1575,12 @@
         // Fungsi untuk menggabungkan data semua bulan
         function getAllMonthsData(tahun) {
             if (!dataAbsensi[tahun]) return null;
-            
+
             const bulanList = ['mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
             const availableMonths = bulanList.filter(b => dataAbsensi[tahun][b]);
-            
+
             if (availableMonths.length === 0) return null;
-            
+
             // Hitung total pegawai (ambil yang terbesar)
             let maxPegawai = 0;
             availableMonths.forEach(bulan => {
@@ -1541,7 +1588,7 @@
                     maxPegawai = dataAbsensi[tahun][bulan].totalPegawai;
                 }
             });
-            
+
             // Gabungkan semua data
             const combinedData = {
                 totalPegawai: maxPegawai,
@@ -1556,12 +1603,12 @@
                 cuti: [],
                 tidakAbsen: []
             };
-            
+
             // Jumlahkan data per bulan
             availableMonths.forEach(bulan => {
                 const monthData = dataAbsensi[tahun][bulan];
                 const sum = arr => arr.reduce((a, b) => a + b, 0);
-                
+
                 combinedData.wfo.push(sum(monthData.wfo));
                 combinedData.dinasLuar.push(sum(monthData.dinasLuar));
                 combinedData.undangan.push(sum(monthData.undangan));
@@ -1570,7 +1617,7 @@
                 combinedData.cuti.push(sum(monthData.cuti));
                 combinedData.tidakAbsen.push(sum(monthData.tidakAbsen));
             });
-            
+
             return combinedData;
         }
 
@@ -1590,7 +1637,7 @@
         // Update Summary Charts (Treemap + Donut Charts)
         let attendanceDonutChart = null;
         let absenceDonutChart = null;
-        
+
         /**
          * Fetch rekapitulasi data from Supabase (OPTIONAL)
          * @param {string} bulan - Nama bulan
@@ -1599,17 +1646,18 @@
          */
         async function fetchRekapitulasi(bulan, tahun) {
             if (!supabaseClient) return null;
-            
+
             try {
                 console.log(`Checking for rekapitulasi data: ${bulan} ${tahun}`);
-                
+
                 const { data, error } = await supabaseClient
                     .from('rekapitulasi')
                     .select('*')
                     .eq('bulan', bulan)
                     .eq('tahun', parseInt(tahun))
-                    .single();
-                
+                    .eq('bidang', 'GABUNGAN')
+                    .maybeSingle();
+
                 if (error) {
                     if (error.code === 'PGRST116') {
                         // No rows found - this is OK
@@ -1619,19 +1667,19 @@
                     console.error(' Error fetching rekapitulasi:', error);
                     return null;
                 }
-                
+
                 if (data) {
                     console.log('Using rekapitulasi data from database:', data);
                     return data;
                 }
-                
+
                 return null;
             } catch (error) {
                 console.error(' Error in fetchRekapitulasi:', error);
                 return null;
             }
         }
-        
+
         async function updateSummaryCharts(bulan, tahun) {
             if (bulan === 'semua') {
                 // Clear treemap container
@@ -1641,15 +1689,15 @@
                 document.getElementById('infoCheckIn').textContent = '-';
                 return;
             }
-            
+
             const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR', 'PEMULIHAN ASET'];
             const bidangColors = ['#118AB2', '#F78C6B', '#06D6A0', '#FFD166', '#0CB0A9', '#EF476F', '#83D483', '#0C637F', '#073B4C'];
-            
+
             let bidangData = [];
             let totalWfoAll = 0, totalDinasAll = 0, totalUndanganAll = 0;
             let totalSakitAll = 0, totalIjinAll = 0, totalCutiAll = 0, totalIsomanAll = 0, totalAlphaAll = 0;
             let uniqueDates = new Set();
-            
+
             // Build treemap with static employee count
             for (let i = 0; i < bidangList.length; i++) {
                 bidangData.push({
@@ -1658,13 +1706,13 @@
                     color: bidangColors[i]
                 });
             }
-            
+
             // FIXED: Read from GABUNGAN sheet instead of summing all bidang manually
             // This ensures data matches the Excel "ALL CLEAN/CLEAN/GABUNGAN" sheet
             console.log(`Fetching GABUNGAN data for ${bulan} ${tahun}...`);
             console.log(` IMPORTANT: Dashboard will read from GABUNGAN, NOT sum all bidang manually!`);
             const gabunganData = await fetchFromSupabase(tahun, bulan, 'GABUNGAN');
-            
+
             if (gabunganData && gabunganData.labels.length > 0) {
                 const sum = arr => arr.reduce((a, b) => a + b, 0);
                 totalWfoAll = sum(gabunganData.wfo);
@@ -1675,7 +1723,7 @@
                 totalCutiAll = sum(gabunganData.cuti);
                 totalIsomanAll = sum(gabunganData.isoman || []); // ISOMAN support
                 totalAlphaAll = sum(gabunganData.tidakAbsen);
-                
+
                 console.log(`GABUNGAN data loaded:`, {
                     rows: gabunganData.labels.length,
                     WFO: totalWfoAll,
@@ -1688,7 +1736,7 @@
                     'Tidak Absen': totalAlphaAll,
                     Total: totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalIsomanAll + totalAlphaAll
                 });
-                
+
                 // Collect unique dates from GABUNGAN
                 gabunganData.labels.forEach(date => uniqueDates.add(date));
             } else {
@@ -1696,31 +1744,31 @@
                 console.error('This means the parser did not upload GABUNGAN sheet correctly.');
                 console.error('Dashboard will show 0/0 for CHECK IN.');
             }
-            
+
             // Update Info Cards
             const hariKerja = uniqueDates.size;
-            
+
             // Total = WFO + Dinas Luar + Undangan + Sakit + Ijin + Cuti + Isoman + Tidak Absen
             const totalKeseluruhan = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalIsomanAll + totalAlphaAll;
-            
+
             // Check In = Total - Tidak Absen (includes ISOMAN)
             const totalCheckIn = totalKeseluruhan - totalAlphaAll;
-            
+
             document.getElementById('infoHariKerja').textContent = hariKerja;
             document.getElementById('infoCheckIn').textContent = `${totalCheckIn}/${totalKeseluruhan}`;
-            
+
             // Generate Treemap
             generateTreemap(bidangData);
-            
+
             // ============================================
             // TRY TO USE REKAPITULASI DATA (OPTIONAL)
             // If not available, use calculated data
             // ============================================
             const rekapData = await fetchRekapitulasi(bulan, tahun);
-            
+
             let finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal;
             let pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha;
-            
+
             if (rekapData && rekapData.total > 0) {
                 // Use rekapitulasi data from database
                 console.log('Using REKAPITULASI data for donut chart');
@@ -1732,7 +1780,7 @@
                 finalCuti = rekapData.cuti;
                 finalAlpha = rekapData.tidak_absen;
                 finalTotal = rekapData.total;
-                
+
                 // PRIORITAS: Gunakan persentase dari Excel jika ada
                 if (rekapData.wfo_pct !== null) {
                     console.log('Using PERCENTAGE from Excel (not calculated)');
@@ -1765,7 +1813,7 @@
                 finalCuti = totalCutiAll;
                 finalAlpha = totalAlphaAll;
                 finalTotal = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalAlphaAll;
-                
+
                 // Hitung persentase
                 pctWfo = ((finalWfo / finalTotal) * 100).toFixed(1);
                 pctDinas = ((finalDinas / finalTotal) * 100).toFixed(1);
@@ -1775,35 +1823,35 @@
                 pctCuti = ((finalCuti / finalTotal) * 100).toFixed(1);
                 pctAlpha = ((finalAlpha / finalTotal) * 100).toFixed(1);
             }
-            
+
             // Generate Attendance Donut Chart (dengan persentase custom)
-            generateAttendanceDonut(finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal, 
-                                   pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha);
-            
+            generateAttendanceDonut(finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal,
+                pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha);
+
             // Generate Absence Donut Chart
             generateAbsenceDonut(finalAlpha, finalTotal - finalAlpha);
         }
-        
-        
+
+
         function generateTreemap(bidangData) {
             const container = document.getElementById('customTreemap');
-            
+
             console.log('generateTreemap called with:', bidangData);
-            
+
             if (!container) {
                 console.error('customTreemap container not found!');
                 return;
             }
-            
+
             if (!bidangData || bidangData.length === 0) {
                 console.error('bidangData is empty!');
                 container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">No data available</div>';
                 return;
             }
-            
+
             // Sort by value descending
             const sortedData = [...bidangData].sort((a, b) => b.value - a.value);
-            
+
             // Color palette (JANGAN DIUBAH)
             const treemapColors = [
                 '#073B4C', // dark navy - Pembinaan
@@ -1816,12 +1864,12 @@
                 '#FFD166', // yellow - Pemulihan Aset
                 '#FFA500'  // orange - Koordinator
             ];
-            
+
             // Assign colors
             sortedData.forEach((item, i) => {
                 item.color = treemapColors[i] || '#999';
             });
-            
+
             // Find specific bidang by name
             const pembinaan = sortedData.find(item => item.name === 'PEMBINAAN');
             const tataUsaha = sortedData.find(item => item.name === 'TATA USAHA');
@@ -1832,14 +1880,14 @@
             const datun = sortedData.find(item => item.name === 'DATUN');
             const pemulihanAset = sortedData.find(item => item.name === 'PEMULIHAN ASET');
             const koordinator = sortedData.find(item => item.name === 'KOORDINATOR');
-            
+
             // Calculate total for proportions
             const total = sortedData.reduce((sum, item) => sum + item.value, 0);
-            
+
             // Build HTML with proportional sizing based on values
             // Using flexbox with calculated percentages and no gap (berdempetan)
             let html = '<div style="display: flex; gap: 0px; height: 100%; width: 100%;">';
-            
+
             // Pembinaan (33) - Proportional width based on value
             const pembinaanWidth = pembinaan ? (pembinaan.value / total * 100) : 0;
             if (pembinaan) {
@@ -1848,19 +1896,19 @@
                     <div class="treemap-item-value">${pembinaan.value}</div>
                 </div>`;
             }
-            
+
             // Right side: All other boxes in a grid
             const rightTotal = total - (pembinaan?.value || 0);
             const rightWidth = 100 - pembinaanWidth;
-            
+
             html += `<div style="flex: 0 0 ${rightWidth}%; display: flex; flex-direction: column; gap: 0px;">`;
-            
+
             // Row 1: Tata Usaha, Pidum, Pengawasan
             const row1Total = (tataUsaha?.value || 0) + (pidum?.value || 0) + (pengawasan?.value || 0);
             const row1Height = (row1Total / rightTotal * 100);
-            
+
             html += `<div style="flex: 0 0 ${row1Height}%; display: flex; gap: 0px;">`;
-            
+
             if (tataUsaha) {
                 const width = (tataUsaha.value / row1Total * 100);
                 html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${tataUsaha.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
@@ -1868,7 +1916,7 @@
                     <div class="treemap-item-value">${tataUsaha.value}</div>
                 </div>`;
             }
-            
+
             if (pidum) {
                 const width = (pidum.value / row1Total * 100);
                 html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${pidum.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
@@ -1876,7 +1924,7 @@
                     <div class="treemap-item-value">${pidum.value}</div>
                 </div>`;
             }
-            
+
             if (pengawasan) {
                 const width = (pengawasan.value / row1Total * 100);
                 html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${pengawasan.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
@@ -1884,15 +1932,15 @@
                     <div class="treemap-item-value">${pengawasan.value}</div>
                 </div>`;
             }
-            
+
             html += '</div>'; // Close row 1
-            
+
             // Row 2: Pidsus, Intelijen, (Datun + Pemulihan Aset + Koordinator)
             const row2Total = rightTotal - row1Total;
             const row2Height = 100 - row1Height;
-            
+
             html += `<div style="flex: 0 0 ${row2Height}%; display: flex; gap: 0px;">`;
-            
+
             if (pidsus) {
                 const width = (pidsus.value / row2Total * 100);
                 html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${pidsus.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
@@ -1900,7 +1948,7 @@
                     <div class="treemap-item-value">${pidsus.value}</div>
                 </div>`;
             }
-            
+
             if (intelijen) {
                 const width = (intelijen.value / row2Total * 100);
                 html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${intelijen.color}; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 1.5rem;">
@@ -1908,19 +1956,19 @@
                     <div class="treemap-item-value">${intelijen.value}</div>
                 </div>`;
             }
-            
+
             // Small items column: Datun, Pemulihan Aset, Koordinator
             const smallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0) + (koordinator?.value || 0);
             const smallWidth = (smallTotal / row2Total * 100);
-            
+
             html += `<div style="flex: 0 0 ${smallWidth}%; display: flex; flex-direction: column; gap: 0px;">`;
-            
+
             // Top row: Datun + Pemulihan Aset
             const topSmallTotal = (datun?.value || 0) + (pemulihanAset?.value || 0);
             const topSmallHeight = (topSmallTotal / smallTotal * 100);
-            
+
             html += `<div style="flex: 0 0 ${topSmallHeight}%; display: flex; gap: 0px;">`;
-            
+
             if (datun) {
                 const width = (datun.value / topSmallTotal * 100);
                 html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${datun.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
@@ -1928,7 +1976,7 @@
                     <div class="treemap-item-value" style="font-size: 1.25rem;">${datun.value}</div>
                 </div>`;
             }
-            
+
             if (pemulihanAset) {
                 const width = (pemulihanAset.value / topSmallTotal * 100);
                 html += `<div class="treemap-item" style="flex: 0 0 ${width}%; background: ${pemulihanAset.color}; padding: 0.75rem; display: flex; flex-direction: column; justify-content: flex-end; align-items: center;">
@@ -1936,9 +1984,9 @@
                     <div class="treemap-item-value" style="font-size: 1.25rem;">${pemulihanAset.value}</div>
                 </div>`;
             }
-            
+
             html += '</div>'; // Close top small row
-            
+
             // Bottom: Koordinator
             const bottomSmallHeight = 100 - topSmallHeight;
             if (koordinator) {
@@ -1947,23 +1995,23 @@
                     <div class="treemap-item-value" style="font-size: 1.25rem;">${koordinator.value}</div>
                 </div>`;
             }
-            
+
             html += '</div>'; // Close small items column
             html += '</div>'; // Close row 2
             html += '</div>'; // Close right side
             html += '</div>'; // Close main container
-            
+
             container.innerHTML = html;
         }
-        
-        function generateAttendanceDonut(wfo, dinas, undangan, sakit, ijin, cuti, alpha, total, 
-                                         pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha) {
+
+        function generateAttendanceDonut(wfo, dinas, undangan, sakit, ijin, cuti, alpha, total,
+            pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha) {
             const ctx = document.getElementById('attendanceDonutChart').getContext('2d');
-            
+
             if (attendanceDonutChart) {
                 attendanceDonutChart.destroy();
             }
-            
+
             // Jika persentase tidak diberikan, hitung dari angka mentah
             if (pctWfo === undefined) {
                 pctWfo = total > 0 ? ((wfo / total) * 100).toFixed(1) : 0;
@@ -1974,7 +2022,7 @@
                 pctCuti = total > 0 ? ((cuti / total) * 100).toFixed(1) : 0;
                 pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
             }
-            
+
             attendanceDonutChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -1995,7 +2043,7 @@
                             labels: {
                                 font: { size: 10 },
                                 padding: 8,
-                                generateLabels: function(chart) {
+                                generateLabels: function (chart) {
                                     const data = chart.data;
                                     return data.labels.map((label, i) => ({
                                         text: `${label} ${[pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha][i]}%`,
@@ -2011,18 +2059,18 @@
                 }
             });
         }
-        
+
         function generateAbsenceDonut(alpha, hadir) {
             const ctx = document.getElementById('absenceDonutChart').getContext('2d');
-            
+
             if (absenceDonutChart) {
                 absenceDonutChart.destroy();
             }
-            
+
             const total = alpha + hadir;
             const pctAlpha = total > 0 ? ((alpha / total) * 100).toFixed(1) : 0;
             const pctHadir = total > 0 ? ((hadir / total) * 100).toFixed(1) : 0;
-            
+
             // Minimum visual size: jika Tanpa Keterangan > 0 tapi terlalu kecil, 
             // beri minimum 5% dari total agar terlihat di donut
             let visualAlpha = alpha;
@@ -2034,7 +2082,7 @@
                     visualHadir = total - minSlice;
                 }
             }
-            
+
             absenceDonutChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -2055,7 +2103,7 @@
                             labels: {
                                 font: { size: 11 },
                                 padding: 12,
-                                generateLabels: function(chart) {
+                                generateLabels: function (chart) {
                                     const data = chart.data;
                                     return data.labels.map((label, i) => ({
                                         text: `${label} ${[pctAlpha, pctHadir][i]}%`,
@@ -2077,32 +2125,32 @@
             const bulan = document.getElementById('bulanFilter').value;
             const tahun = parseInt(document.getElementById('tahunFilter').value);
             const bidangGrid = document.getElementById('bidangGrid');
-            
+
             // Update summary charts first
             await updateSummaryCharts(bulan, tahun);
-            
+
             // Skip if "semua bulan" selected
             if (bulan === 'semua') {
                 bidangGrid.innerHTML = '<div class="bidang-no-data">Dashboard per bidang tersedia untuk bulan tertentu. Silahkan pilih bulan spesifik.</div>';
                 return;
             }
-            
+
             // List of bidang
             const bidangList = ['PEMBINAAN', 'INTELIJEN', 'PIDUM', 'PIDSUS', 'DATUN', 'PENGAWASAN', 'TATA USAHA', 'KOORDINATOR', 'PEMULIHAN ASET'];
-            
+
             bidangGrid.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">Memuat data per bidang...</div>';
-            
+
             try {
                 const cards = [];
-                
+
                 for (const bidang of bidangList) {
                     // Fetch data for this bidang
                     const bidangData = await fetchFromSupabase(tahun, bulan, bidang);
-                    
+
                     if (!bidangData || bidangData.labels.length === 0) {
                         continue; // Skip if no data
                     }
-                    
+
                     // Calculate totals
                     const sum = arr => arr.reduce((a, b) => a + b, 0);
                     const totalWfo = sum(bidangData.wfo);
@@ -2113,7 +2161,7 @@
                     const totalCuti = sum(bidangData.cuti);
                     const totalAlpha = sum(bidangData.tidakAbsen);
                     const grandTotal = totalWfo + totalDinas + totalUndangan + totalSakit + totalIjin + totalCuti + totalAlpha;
-                    
+
                     // Calculate percentages
                     const pctWfo = grandTotal > 0 ? ((totalWfo / grandTotal) * 100).toFixed(1) : 0;
                     const pctDinas = grandTotal > 0 ? ((totalDinas / grandTotal) * 100).toFixed(1) : 0;
@@ -2122,11 +2170,11 @@
                     const pctIjin = grandTotal > 0 ? ((totalIjin / grandTotal) * 100).toFixed(1) : 0;
                     const pctCuti = grandTotal > 0 ? ((totalCuti / grandTotal) * 100).toFixed(1) : 0;
                     const pctAlpha = grandTotal > 0 ? ((totalAlpha / grandTotal) * 100).toFixed(1) : 0;
-                    
+
                     // Create card HTML
                     const cardId = `bidang-${bidang.toLowerCase().replace(/\s+/g, '-')}`;
                     const canvasId = `canvas-${bidang.toLowerCase().replace(/\s+/g, '-')}`;
-                    
+
                     const cardHTML = `
                         <div class="bidang-card" id="${cardId}">
                             <div class="bidang-card-header">${bidangNamaLengkap[bidang] || bidang}</div>
@@ -2226,18 +2274,18 @@
                             </div>
                         </div>
                     `;
-                    
+
                     cards.push({ html: cardHTML, data: bidangData, canvasId: canvasId });
                 }
-                
+
                 if (cards.length === 0) {
                     bidangGrid.innerHTML = '<div class="bidang-no-data">Data per bidang belum tersedia untuk bulan ini.</div>';
                     return;
                 }
-                
+
                 // Render all cards
                 bidangGrid.innerHTML = cards.map(c => c.html).join('');
-                
+
                 // Create charts for each card
                 cards.forEach(card => {
                     const ctx = document.getElementById(card.canvasId).getContext('2d');
@@ -2273,7 +2321,7 @@
                         }
                     });
                 });
-                
+
             } catch (error) {
                 console.error('Error updating bidang dashboard:', error);
                 bidangGrid.innerHTML = '<div class="bidang-no-data"> Terjadi kesalahan saat memuat data. Silahkan refresh halaman.</div>';
@@ -2281,13 +2329,13 @@
         }
 
         // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             console.log('Dashboard Version: 4.0.0 - GABUNGAN MODE');
             console.log('Dashboard now reads from GABUNGAN sheet (not sum of all bidang)');
             console.log('CHECK IN calculation: Total - Tidak Absen (includes ISOMAN)');
             updateBidangDashboard();
         });
-        
+
         // ============================================
         // COMPARISON MODE FUNCTIONS (NEW)
         // ============================================
@@ -2295,20 +2343,20 @@
         let compareCount = 2;
         let comparisonCharts = {};
         const COMPARE_COLORS = ['#10b981', '#3b82f6', '#f97316', '#7c3aed', '#dc2626', '#0891b2', '#d97706', '#be185d', '#0d9488', '#6366f1', '#065f46', '#ea580c'];
-        
+
         function setViewMode(mode) {
             currentViewMode = mode;
-            
+
             // Update button styles
             const btnNormal = document.getElementById('btnModeNormal');
             const btnCompare = document.getElementById('btnModeCompare');
-            
+
             if (mode === 'normal') {
                 btnNormal.style.background = 'var(--primary-600)';
                 btnNormal.style.color = 'white';
                 btnCompare.style.background = 'var(--gray-300)';
                 btnCompare.style.color = 'var(--gray-700)';
-                
+
                 document.getElementById('normalFilters').style.display = 'grid';
                 document.getElementById('compareFilters').style.display = 'none';
                 document.getElementById('normalDashboard').style.display = 'block';
@@ -2318,37 +2366,37 @@
                 btnNormal.style.color = 'var(--gray-700)';
                 btnCompare.style.background = 'var(--primary-600)';
                 btnCompare.style.color = 'white';
-                
+
                 document.getElementById('normalFilters').style.display = 'none';
                 document.getElementById('compareFilters').style.display = 'block';
                 document.getElementById('normalDashboard').style.display = 'none';
                 document.getElementById('comparisonDashboard').style.display = 'block';
-                
+
                 // Initialize comparison mode with dynamic cards
                 initializeComparisonMode();
             }
         }
-        
+
         // ============================================
         // DYNAMIC PERIOD CARDS GENERATION
         // ============================================
         function updatePeriodCards() {
             const count = parseInt(document.getElementById('periodCountSelect').value);
             compareCount = count;
-            
+
             const container = document.getElementById('periodCardsContainer');
             container.innerHTML = '';
-            
+
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             const colors = ['#1a5f2a', '#2d8f4e', '#0891b2', '#7c3aed', '#dc2626', '#ea580c', '#0d9488', '#6366f1', '#d97706', '#be185d', '#065f46', '#7e22ce'];
             const icons = ['📅', '📆', '🗓️', '📋', '📊', '📈', '📉', '📌', '📎', '🔖', '📇', '🗂️'];
 
-            
+
             for (let i = 1; i <= count; i++) {
                 const defaultMonth = months[(11 - count + i) % 12]; // Smart default: recent months
                 const color = colors[i - 1];
                 const icon = icons[i - 1];
-                
+
                 const card = document.createElement('div');
                 card.style.cssText = `
                     background: white;
@@ -2360,7 +2408,7 @@
                     position: relative;
                     overflow: hidden;
                 `;
-                
+
                 card.innerHTML = `
                     <div style="position: absolute; top: -20px; right: -20px; font-size: 5rem; opacity: 0.05;">${icon}</div>
                     <h4 style="color: ${color}; font-weight: 800; margin-bottom: 1.25rem; font-size: 1rem; text-transform: uppercase; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 0.5rem; position: relative; z-index: 1;">
@@ -2371,45 +2419,45 @@
                         ${months.map(m => `<option value="${m}" ${m === defaultMonth ? 'selected' : ''}>${m}</option>`).join('')}
                     </select>
                 `;
-                
+
                 // Add hover effect
-                card.onmouseenter = function() {
+                card.onmouseenter = function () {
                     this.style.transform = 'translateY(-4px)';
                     this.style.boxShadow = `0 8px 24px ${color}25`;
                     this.style.borderColor = color;
                 };
-                card.onmouseleave = function() {
+                card.onmouseleave = function () {
                     this.style.transform = 'translateY(0)';
                     this.style.boxShadow = `0 4px 12px ${color}15`;
                     this.style.borderColor = `${color}20`;
                 };
-                
+
                 container.appendChild(card);
             }
         }
-        
+
         // Initialize with 2 periods on page load
         function initializeComparisonMode() {
             updatePeriodCards();
         }
-        
+
         async function loadComparisonData() {
             document.getElementById('comparisonLoading').style.display = 'block';
             document.getElementById('comparisonContent').style.display = 'none';
-            
+
             try {
                 const periods = [];
-                
+
                 for (let i = 1; i <= compareCount; i++) {
                     const tahun = parseInt(document.getElementById('globalYearSelect').value);
                     const bulan = document.getElementById(`bulanCompare${i}`).value;
-                    
+
                     if (!supabaseClient) {
                         alert('Supabase client not initialized');
                         document.getElementById('comparisonLoading').style.display = 'none';
                         return;
                     }
-                    
+
                     // Fetch from absensi table with bidang=GABUNGAN (same as dashboard)
                     const { data: gabunganData, error: gabunganError } = await supabaseClient
                         .from('absensi')
@@ -2417,13 +2465,13 @@
                         .eq('tahun', tahun)
                         .eq('bulan', bulan)
                         .eq('bidang', 'GABUNGAN');
-                    
+
                     if (gabunganError || !gabunganData || gabunganData.length === 0) {
                         alert(`Data GABUNGAN tidak ditemukan untuk ${bulan} ${tahun}. Pastikan data sudah di-upload.`);
                         document.getElementById('comparisonLoading').style.display = 'none';
                         return;
                     }
-                    
+
                     // Sum all rows (all dates) from GABUNGAN sheet
                     const totals = {
                         wfo: gabunganData.reduce((sum, row) => sum + (row.wfo || 0), 0),
@@ -2435,7 +2483,7 @@
                         isoman: gabunganData.reduce((sum, row) => sum + (row.isoman || 0), 0),
                         tidak_absen: gabunganData.reduce((sum, row) => sum + (row.tidak_absen || 0), 0)
                     };
-                    
+
                     periods.push({
                         label: `${bulan} ${tahun}`,
                         bulan,
@@ -2444,20 +2492,20 @@
                         totals: totals
                     });
                 }
-                
+
                 renderComparisonStats(periods);
                 renderComparisonCharts(periods);
-                
+
                 document.getElementById('comparisonLoading').style.display = 'none';
                 document.getElementById('comparisonContent').style.display = 'block';
-                
+
             } catch (error) {
                 console.error('Error loading comparison:', error);
                 alert('Error loading data: ' + error.message);
                 document.getElementById('comparisonLoading').style.display = 'none';
             }
         }
-        
+
         function calculateComparisonTotals(data) {
             return data.reduce((acc, row) => ({
                 wfo: acc.wfo + row.wfo,
@@ -2470,11 +2518,11 @@
                 tidak_absen: acc.tidak_absen + row.tidak_absen
             }), { wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, isoman: 0, tidak_absen: 0 });
         }
-        
+
         function renderComparisonStats(periods) {
             const container = document.getElementById('comparisonStats');
             container.innerHTML = '';
-            
+
             const metrics = [
                 { label: 'WFO (Hadir)', key: 'wfo' },
                 { label: 'Dinas Luar', key: 'dinas_luar' },
@@ -2485,22 +2533,22 @@
                 { label: 'Isoman', key: 'isoman' }, // ISOMAN support
                 { label: 'Tidak Absen', key: 'tidak_absen' }
             ];
-            
+
             periods.forEach((period, idx) => {
                 const card = document.createElement('div');
                 card.style.cssText = 'background: white; padding: 2rem; border-radius: var(--radius-xl); border: 1px solid var(--gray-200); box-shadow: var(--shadow-md);';
-                
+
                 let html = `<h3 style="font-family: Poppins, sans-serif; color: var(--gray-800); font-size: 1.125rem; margin-bottom: 1.5rem; font-weight: 700; text-align: center; padding-bottom: 1rem; border-bottom: 2px solid var(--gray-100);">${period.label}</h3>`;
-                
+
                 metrics.forEach(metric => {
                     const value = period.totals[metric.key];
                     let trendHTML = '';
-                    
+
                     if (idx > 0) {
                         const prevValue = periods[idx - 1].totals[metric.key];
                         const diff = value - prevValue;
                         const diffPercent = prevValue > 0 ? ((diff / prevValue) * 100).toFixed(1) : 0;
-                        
+
                         if (diff > 0) {
                             trendHTML = `<span style="display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; background: #d1fae5; color: #065f46;">+${diffPercent}%</span>`;
                         } else if (diff < 0) {
@@ -2509,7 +2557,7 @@
                             trendHTML = `<span style="display: inline-block; margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; background: var(--gray-200); color: var(--gray-700);">0%</span>`;
                         }
                     }
-                    
+
                     html += `
                         <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.875rem 0; border-bottom: 1px solid var(--gray-100);">
                             <span style="font-weight: 600; color: var(--gray-700); font-size: 0.875rem;">${metric.label}</span>
@@ -2517,17 +2565,17 @@
                         </div>
                     `;
                 });
-                
+
                 card.innerHTML = html;
                 container.appendChild(card);
             });
         }
-        
+
         function renderComparisonCharts(periods) {
             // Overall Chart
             const ctx1 = document.getElementById('comparisonOverallChart').getContext('2d');
             if (comparisonCharts.overall) comparisonCharts.overall.destroy();
-            
+
             const datasets1 = periods.map((period, idx) => ({
                 label: period.label,
                 data: [
@@ -2543,7 +2591,7 @@
                 borderColor: COMPARE_COLORS[idx],
                 borderWidth: 2
             }));
-            
+
             comparisonCharts.overall = new Chart(ctx1, {
                 type: 'bar',
                 data: {
@@ -2565,27 +2613,27 @@
                     }
                 }
             });
-            
+
             // === TREND KEHADIRAN CHART - Professional Redesign ===
             const ctx3 = document.getElementById('comparisonTrendChart').getContext('2d');
             if (comparisonCharts.trend) comparisonCharts.trend.destroy();
-            
+
             // Calculate from totals (same as dashboard: Total - Tidak Absen)
             const checkInTotals = [];
             const totalAll = [];
             const attendanceRates = [];
-            
+
             periods.forEach(period => {
-                const total = period.totals.wfo + period.totals.dinas_luar + period.totals.undangan + 
-                             period.totals.sakit + period.totals.ijin + period.totals.cuti + 
-                             period.totals.isoman + period.totals.tidak_absen;
+                const total = period.totals.wfo + period.totals.dinas_luar + period.totals.undangan +
+                    period.totals.sakit + period.totals.ijin + period.totals.cuti +
+                    period.totals.isoman + period.totals.tidak_absen;
                 const checkIn = total - period.totals.tidak_absen;
                 const rate = total > 0 ? ((checkIn / total) * 100) : 0;
                 checkInTotals.push(checkIn);
                 totalAll.push(total);
                 attendanceRates.push(rate);
             });
-            
+
             // Short month labels
             const shortMonthMap = {
                 'Januari': 'Jan', 'Februari': 'Feb', 'Maret': 'Mar', 'April': 'Apr',
@@ -2596,15 +2644,15 @@
                 const parts = p.label.split(' ');
                 return shortMonthMap[parts[0]] || parts[0];
             });
-            
+
             // --- Populate Stats Row ---
             const statsRow = document.getElementById('trendStatsRow');
             if (statsRow) {
-                const avgRate = attendanceRates.length > 0 ? (attendanceRates.reduce((a,b) => a+b, 0) / attendanceRates.length) : 0;
+                const avgRate = attendanceRates.length > 0 ? (attendanceRates.reduce((a, b) => a + b, 0) / attendanceRates.length) : 0;
                 const latestCheckIn = checkInTotals.length > 0 ? checkInTotals[checkInTotals.length - 1] : 0;
                 const latestTotal = totalAll.length > 0 ? totalAll[totalAll.length - 1] : 0;
                 const tidakAbsenLatest = latestTotal - latestCheckIn;
-                
+
                 // Growth calculation
                 let growthHTML = '';
                 if (checkInTotals.length >= 2) {
@@ -2614,7 +2662,7 @@
                     const isUp = growth >= 0;
                     growthHTML = `<span style="font-size: 0.72rem; font-weight: 700; color: ${isUp ? '#059669' : '#dc2626'}; background: ${isUp ? '#ecfdf5' : '#fef2f2'}; padding: 2px 8px; border-radius: 6px; margin-left: 4px;">${isUp ? '+' : ''}${growth}%</span>`;
                 }
-                
+
                 statsRow.innerHTML = `
                     <div style="text-align: center; padding: 0.75rem; background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid #e5e7eb;">
                         <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; font-weight: 600; margin-bottom: 0.35rem; font-family: Inter, sans-serif;">Rata-rata Kehadiran</div>
@@ -2626,14 +2674,14 @@
                     </div>
                 `;
             }
-            
+
             // --- Badge ---
             const badge = document.getElementById('trendBadge');
             if (badge && periods.length > 0) {
                 badge.textContent = `${periods.length} Periode`;
                 badge.style.display = 'inline-block';
             }
-            
+
             // --- Insight Footer ---
             const insightEl = document.getElementById('trendInsight');
             const insightIcon = document.getElementById('trendInsightIcon');
@@ -2646,21 +2694,21 @@
                 const firstMonth = trendLabels[0];
                 const prevMonth = trendLabels[trendLabels.length - 2];
                 const totalPeriods = attendanceRates.length;
-                
+
                 // Find highest and lowest rates
                 const maxRate = Math.max(...attendanceRates);
                 const minRate = Math.min(...attendanceRates);
                 const maxIdx = attendanceRates.indexOf(maxRate);
                 const minIdx = attendanceRates.indexOf(minRate);
                 const overallDiff = lastRate - firstRate;
-                
+
                 let insightMessage = '';
-                
+
                 if (totalPeriods === 2) {
                     // For 2 periods: simple comparison
                     const diff = lastRate - prevRate;
                     const absDiff = Math.abs(diff);
-                    
+
                     if (absDiff < 0.1) {
                         // Consider as stable if difference is less than 0.1%
                         insightEl.querySelector('div').style.background = '#f0f9ff';
@@ -2685,7 +2733,7 @@
                     const tertinggi = `${trendLabels[maxIdx]} (${maxRate.toFixed(1)}%)`;
                     const terendah = `${trendLabels[minIdx]} (${minRate.toFixed(1)}%)`;
                     const absDiff = Math.abs(overallDiff);
-                    
+
                     if (absDiff < 0.1) {
                         // Consider as stable if difference is less than 0.1%
                         insightEl.querySelector('div').style.background = '#f0f9ff';
@@ -2706,31 +2754,31 @@
                         insightMessage = `Tren menurun: penurunan ${diffText}% selama ${totalPeriods} periode. Tertinggi: ${tertinggi}, Terendah: ${terendah}.`;
                     }
                 }
-                
+
                 insightText.textContent = insightMessage;
                 insightEl.style.display = 'block';
             }
-            
+
             // --- Create professional gradients ---
             const gradientCheckIn = ctx3.createLinearGradient(0, 0, 0, 380);
             gradientCheckIn.addColorStop(0, 'rgba(5, 150, 105, 0.25)');
             gradientCheckIn.addColorStop(0.6, 'rgba(5, 150, 105, 0.08)');
             gradientCheckIn.addColorStop(1, 'rgba(5, 150, 105, 0.01)');
-            
+
             const gradientTotal = ctx3.createLinearGradient(0, 0, 0, 380);
             gradientTotal.addColorStop(0, 'rgba(212, 168, 75, 0.15)');
             gradientTotal.addColorStop(0.6, 'rgba(212, 168, 75, 0.04)');
             gradientTotal.addColorStop(1, 'rgba(212, 168, 75, 0.0)');
-            
+
             // --- Build datasets ---
             // Store original values for labels
             const originalCheckIn = [...checkInTotals];
             const originalTotal = [...totalAll];
-            
+
             // Create flat data (all same value) for horizontal line
             const flatValue = 100;
             const flatData = new Array(checkInTotals.length).fill(flatValue);
-            
+
             const datasets3 = [
                 {
                     label: 'Check In',
@@ -2767,38 +2815,38 @@
                     order: 1
                 }
             ];
-            
+
             // --- Custom plugin: data labels with smart positioning ---
             const dataLabelPlugin = {
                 id: 'trendDataLabels',
-                afterDatasetsDraw: function(chart) {
+                afterDatasetsDraw: function (chart) {
                     const ctx = chart.ctx;
                     const datasets = chart.data.datasets;
-                    
+
                     // Collect all label positions to avoid overlap
                     const labelPositions = [];
-                    
-                    datasets.forEach(function(dataset, i) {
+
+                    datasets.forEach(function (dataset, i) {
                         const meta = chart.getDatasetMeta(i);
                         if (meta.hidden) return;
-                        
-                        meta.data.forEach(function(element, index) {
+
+                        meta.data.forEach(function (element, index) {
                             const value = dataset.originalData[index]; // Use original data for display
                             const x = element.x;
                             let y = element.y - 16;
-                            
+
                             // Check for overlap with previous labels at same x position
-                            const overlapping = labelPositions.filter(pos => 
+                            const overlapping = labelPositions.filter(pos =>
                                 Math.abs(pos.x - x) < 5 && Math.abs(pos.y - y) < 25
                             );
-                            
+
                             // Adjust y position if overlapping
                             if (overlapping.length > 0) {
                                 y = overlapping[overlapping.length - 1].y - 28;
                             }
-                            
+
                             labelPositions.push({ x, y });
-                            
+
                             // Draw pill background
                             const text = value.toLocaleString();
                             ctx.save();
@@ -2808,7 +2856,7 @@
                             const pillH = 20;
                             const pillX = x - pillW / 2;
                             const pillY = y - pillH + 3;
-                            
+
                             // Pill background with dataset color
                             ctx.fillStyle = dataset.borderColor === '#059669' ? 'rgba(5, 150, 105, 0.1)' : 'rgba(212, 168, 75, 0.1)';
                             ctx.beginPath();
@@ -2824,7 +2872,7 @@
                             ctx.quadraticCurveTo(pillX, pillY, pillX + r, pillY);
                             ctx.closePath();
                             ctx.fill();
-                            
+
                             // Text
                             ctx.fillStyle = dataset.borderColor;
                             ctx.textAlign = 'center';
@@ -2835,12 +2883,12 @@
                     });
                 }
             };
-            
+
             // Calculate max value for consistent Y-axis scale
             const allTrendValues = datasets3.flatMap(ds => ds.data);
             const maxTrendValue = Math.max(...allTrendValues);
             const yAxisMax = Math.ceil(maxTrendValue * 1.15); // Add 15% padding
-            
+
             // --- Render Chart ---
             comparisonCharts.trend = new Chart(ctx3, {
                 type: 'line',
@@ -2907,16 +2955,16 @@
                             caretPadding: 8,
                             usePointStyle: true,
                             callbacks: {
-                                title: function(items) {
+                                title: function (items) {
                                     if (!items.length) return '';
                                     const idx = items[0].dataIndex;
                                     return periods[idx] ? periods[idx].label : items[0].label;
                                 },
-                                label: function(context) {
+                                label: function (context) {
                                     const originalValue = context.dataset.originalData[context.dataIndex];
                                     return ` ${context.dataset.label}: ${originalValue.toLocaleString()} orang`;
                                 },
-                                footer: function(items) {
+                                footer: function (items) {
                                     if (!items.length) return '';
                                     const idx = items[0].dataIndex;
                                     const rate = attendanceRates[idx];
@@ -2926,16 +2974,16 @@
                         }
                     },
                     scales: {
-                        y: { 
+                        y: {
                             beginAtZero: true,
                             max: 120,
                             min: 80,
                             display: false, // Hide Y-axis since all values are same
-                            ticks: { 
+                            ticks: {
                                 font: { size: 11, family: 'Inter, sans-serif', weight: '500' },
                                 color: '#9ca3af',
                                 padding: 12,
-                                callback: function(value) {
+                                callback: function (value) {
                                     return value.toLocaleString();
                                 }
                             },
@@ -2946,8 +2994,8 @@
                             },
                             border: { display: false }
                         },
-                        x: { 
-                            ticks: { 
+                        x: {
+                            ticks: {
                                 font: { size: 12, family: 'Inter, sans-serif', weight: '600' },
                                 color: '#374151',
                                 padding: 10,
@@ -2967,4 +3015,5 @@
         }
     </script>
 </body>
+
 </html>
