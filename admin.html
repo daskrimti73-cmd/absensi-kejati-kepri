@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="id">
 
 <head>
@@ -24,9 +24,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- LOGIN PROTECTION (Auto-grant — login page removed from flow) -->
+    <!-- LOGIN PROTECTION (Auto-grant â€” login page removed from flow) -->
     <script>
-        // Auto-set session — no login page needed
+        // Auto-set session â€” no login page needed
         (function () {
             const isLoggedIn = sessionStorage.getItem('adminLoggedIn');
             const loginTime = sessionStorage.getItem('loginTime');
@@ -38,11 +38,11 @@
                 sessionStorage.setItem('loginTime', currentTime.toString());
             }
 
-            // Check session expiry (8 hours) — auto-renew
+            // Check session expiry (8 hours) â€” auto-renew
             if (loginTime) {
                 const hoursPassed = (currentTime - loginTime) / (1000 * 60 * 60);
                 if (hoursPassed >= 8) {
-                    // Session expired — auto-renew
+                    // Session expired â€” auto-renew
                     sessionStorage.setItem('adminLoggedIn', 'true');
                     sessionStorage.setItem('loginTime', currentTime.toString());
                 }
@@ -58,446 +58,273 @@
     <!-- REKAPITULASI PARSER - EMBEDDED -->
     <script>
         // ============================================
-        // REKAPITULASI PARSER v1.0.2 - EMBEDDED
+        // REKAPITULASI PARSER v3.0 - ROBUST
         // ============================================
 
         function parseRekapitulasi(workbook, bulan, tahun) {
-            console.log('📊 Parsing REKAPITULASI sheet v2.0 (with percentage support)...');
+            console.log('ðŸ“Š Parsing REKAPITULASI sheet v3.0 (robust multi-layout)...');
 
             const sheetNames = workbook.SheetNames;
 
             // PRIORITAS: Cari "REKAPITULASI 2" dulu, baru "REKAPITULASI"
             let rekapSheet = sheetNames.find(name => {
-                const nameUpper = name.toUpperCase().trim();
-                return nameUpper.includes('REKAPITULASI 2') ||
-                    nameUpper.includes('REKAPITULASI2') ||
-                    nameUpper.includes('REKAP 2') ||
-                    nameUpper.includes('REKAP2');
+                const n = name.toUpperCase().trim();
+                return n.includes('REKAPITULASI 2') || n.includes('REKAPITULASI2') ||
+                    n.includes('REKAP 2') || n.includes('REKAP2');
             });
-
-            // Jika tidak ada REKAPITULASI 2, cari REKAPITULASI biasa
             if (!rekapSheet) {
                 rekapSheet = sheetNames.find(name => {
-                    const nameUpper = name.toUpperCase().trim();
-                    return nameUpper.includes('REKAPITULASI') || nameUpper.includes('REKAP');
+                    const n = name.toUpperCase().trim();
+                    return n.includes('REKAPITULASI') || n.includes('REKAP');
                 });
             }
-
             if (!rekapSheet) {
-                console.log('⚠️ Sheet REKAPITULASI tidak ditemukan');
+                console.log('âš ï¸ Sheet REKAPITULASI tidak ditemukan');
                 return null;
             }
-
-            console.log(`✅ Found sheet: "${rekapSheet}" (prioritized)`);
+            console.log(`âœ… Found sheet: "${rekapSheet}"`);
 
             const sheet = workbook.Sheets[rekapSheet];
             const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-
-            console.log(`📄 Sheet has ${data.length} rows`);
+            console.log(`ðŸ“„ Sheet has ${data.length} rows`);
 
             const rekapData = {
-                bulan: bulan,
-                tahun: tahun,
-                bidang: 'GABUNGAN', // PENTING: Kolom bidang wajib diisi
-                wfo: 0,
-                dinas_luar: 0,
-                undangan: 0,
-                sakit: 0,
-                ijin: 0,
-                cuti: 0,
-                tidak_absen: 0,
-                total: 0,
-                // Kolom persentase baru
-                wfo_pct: null,
-                dinas_luar_pct: null,
-                undangan_pct: null,
-                sakit_pct: null,
-                ijin_pct: null,
-                cuti_pct: null,
-                tidak_absen_pct: null
+                bulan, tahun,
+                bidang: 'GABUNGAN',
+                wfo: 0, dinas_luar: 0, undangan: 0, sakit: 0, ijin: 0, cuti: 0, tidak_absen: 0, total: 0,
+                wfo_pct: null, dinas_luar_pct: null, undangan_pct: null, sakit_pct: null,
+                ijin_pct: null, cuti_pct: null, tidak_absen_pct: null
             };
 
-            // ============================================
-            // STEP 1: COBA BACA PERSENTASE (PRIORITAS 1)
-            // ============================================
-            console.log('\n🔍 STEP 1: Mencari PERSENTASE atau KEHADIRAN KESELURUHAN...');
+            // Label matching
+            const labelMap = [
+                { patterns: ['WFO'], key: 'wfo', pctKey: 'wfo_pct' },
+                { patterns: ['DINAS LUAR', 'DL', 'DINAS'], key: 'dinas_luar', pctKey: 'dinas_luar_pct' },
+                { patterns: ['UNDANGAN'], key: 'undangan', pctKey: 'undangan_pct' },
+                { patterns: ['SAKIT'], key: 'sakit', pctKey: 'sakit_pct' },
+                { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin', pctKey: 'ijin_pct' },
+                { patterns: ['CUTI'], key: 'cuti', pctKey: 'cuti_pct' },
+                { patterns: ['ISOMAN'], key: '_isoman', pctKey: '_isoman_pct' },
+                { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA', 'TANPA KETERANGAN', 'TDK ABSEN'], key: 'tidak_absen', pctKey: 'tidak_absen_pct' },
+                { patterns: ['TOTAL', 'JUMLAH TOTAL'], key: 'total', pctKey: null }
+            ];
 
-            let persentaseFound = false;
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                for (let j = 0; j < row.length; j++) {
-                    const cell = String(row[j] || '').toUpperCase().trim();
-                    // Cari "PERSENTASE KEHADIRAN" atau "KEHADIRAN KESELURUHAN"
-                    if ((cell.includes('PERSENTASE') && cell.includes('KEHADIRAN')) ||
-                        (cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN'))) {
-                        console.log(`✅ Found section at row ${i}: "${cell}"`);
-
-                        // Cari header dan kolom dengan persentase
-                        let headerRow = -1;
-                        let labelCol = -1;
-                        let pctCol = -1; // Kolom yang berisi persentase
-
-                        for (let k = i; k < Math.min(i + 5, data.length); k++) {
-                            const headerRowData = data[k];
-                            for (let m = 0; m < headerRowData.length; m++) {
-                                const headerCell = String(headerRowData[m] || '').toUpperCase().trim();
-                                if (headerCell === 'JENIS' || headerCell === 'JENIS KEHADIRAN') {
-                                    headerRow = k;
-                                    labelCol = m;
-                                    console.log(`✅ Found header "JENIS KEHADIRAN" at row ${k}, col ${m}`);
-
-                                    // Cari kolom yang berisi persentase
-                                    // Strategi: Cek kolom setelah "Jumlah", cari yang berisi % ATAU angka desimal < 1
-                                    // Scan sampai 10 kolom untuk fleksibilitas
-                                    for (let n = m + 1; n < Math.min(m + 10, headerRowData.length); n++) {
-                                        let foundPct = false;
-
-                                        // Cek beberapa baris data untuk menemukan % atau desimal
-                                        for (let testRow = k + 1; testRow < Math.min(k + 10, data.length); testRow++) {
-                                            if (data[testRow] && data[testRow][n] !== undefined && data[testRow][n] !== null && data[testRow][n] !== '') {
-                                                const testValue = data[testRow][n];
-                                                const testValueStr = String(testValue);
-                                                console.log(`  🔍 Testing col ${n}, row ${testRow}: "${testValueStr}" (type: ${typeof testValue})`);
-
-                                                // Cek apakah berisi % (format string "84.62%")
-                                                if (testValueStr.includes('%')) {
-                                                    pctCol = n;
-                                                    foundPct = true;
-                                                    console.log(`  ✅ Found percentage column at index ${pctCol} (format: string with %, value: ${testValueStr})`);
-                                                    break;
-                                                }
-
-                                                // Cek apakah angka desimal antara 0 dan 1 (format: 0.8462)
-                                                // DAN bukan angka yang terlalu kecil (< 0.001) atau terlalu besar (> 0.99)
-                                                if (typeof testValue === 'number' && testValue > 0.001 && testValue <= 1) {
-                                                    // Verifikasi: cek apakah ada beberapa nilai di kolom ini yang semuanya antara 0-1
-                                                    let validCount = 0;
-                                                    for (let vRow = k + 1; vRow < Math.min(k + 8, data.length); vRow++) {
-                                                        const vVal = data[vRow] && data[vRow][n];
-                                                        if (typeof vVal === 'number' && vVal > 0 && vVal <= 1) {
-                                                            validCount++;
-                                                        }
-                                                    }
-
-                                                    // Jika ada minimal 3 nilai yang valid, ini kolom persentase
-                                                    if (validCount >= 3) {
-                                                        pctCol = n;
-                                                        foundPct = true;
-                                                        console.log(`  ✅ Found percentage column at index ${pctCol} (format: decimal, value: ${testValue}, validCount: ${validCount})`);
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        if (foundPct) break;
-                                    }
-                                    break;
-                                }
-                            }
-                            if (headerRow !== -1) break;
-                        }
-
-                        if (headerRow !== -1 && labelCol !== -1) {
-                            console.log(`✅ Found data section at row ${headerRow}, labelCol=${labelCol}`);
-
-                            // STRATEGI BARU: Coba baca dari kolom labelCol+2 dulu (biasanya persentase ada di sini)
-                            // Jika tidak ada, baru gunakan pctCol yang sudah dideteksi
-                            let finalPctCol = pctCol;
-
-                            // Cek apakah kolom labelCol+2 berisi persentase
-                            if (labelCol + 2 < data[headerRow].length) {
-                                let testPctCol = labelCol + 2;
-                                let hasValidPct = false;
-
-                                for (let testRow = headerRow + 1; testRow < Math.min(headerRow + 5, data.length); testRow++) {
-                                    if (data[testRow] && data[testRow][testPctCol]) {
-                                        const testVal = data[testRow][testPctCol];
-                                        const testValStr = String(testVal);
-
-                                        // Cek apakah berisi % atau desimal
-                                        if (testValStr.includes('%') || (typeof testVal === 'number' && testVal > 0 && testVal <= 1)) {
-                                            hasValidPct = true;
-                                            break;
-                                        }
-                                    }
-                                }
-
-                                if (hasValidPct) {
-                                    finalPctCol = testPctCol;
-                                    console.log(`✅ Using column ${finalPctCol} (labelCol+2) for percentage`);
-                                } else if (pctCol !== -1) {
-                                    console.log(`✅ Using detected column ${finalPctCol} for percentage`);
-                                }
-                            }
-
-                            if (finalPctCol === -1) {
-                                console.log('⚠️ Percentage column not found, will calculate manually');
-                            } else {
-                                console.log(`✅ Reading percentage from column ${finalPctCol}`);
-
-                                // Baca persentase
-                                const pctLabelMap = [
-                                    { patterns: ['WFO'], key: 'wfo_pct' },
-                                    { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar_pct' },
-                                    { patterns: ['UNDANGAN'], key: 'undangan_pct' },
-                                    { patterns: ['SAKIT'], key: 'sakit_pct' },
-                                    { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin_pct' },
-                                    { patterns: ['CUTI'], key: 'cuti_pct' },
-                                    { patterns: ['ISOMAN'], key: 'ijin_pct' },
-                                    { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA'], key: 'tidak_absen_pct' }
-                                ];
-
-
-                                for (let k = headerRow + 1; k < Math.min(headerRow + 15, data.length); k++) {
-                                    const pctRow = data[k];
-                                    if (!pctRow || pctRow.length === 0) continue;
-
-                                    const label = String(pctRow[labelCol] || '').toUpperCase().trim();
-                                    if (!label) continue;
-
-                                    console.log(`  🔍 Row ${k}: label="${label}", value at col ${finalPctCol}="${pctRow[finalPctCol]}"`);
-
-                                    for (const { patterns, key } of pctLabelMap) {
-                                        let matched = false;
-                                        for (const pattern of patterns) {
-                                            if (label === pattern || label.includes(pattern)) {
-                                                matched = true;
-                                                break;
-                                            }
-                                        }
-
-                                        if (matched) {
-                                            let pctValue = pctRow[finalPctCol];
-
-                                            // Parse persentase (bisa format "84.4%" atau 0.844 atau "84.62%")
-                                            if (typeof pctValue === 'string') {
-                                                // Hapus % dan parse
-                                                pctValue = pctValue.replace('%', '').trim();
-                                                pctValue = parseFloat(pctValue);
-                                            } else if (typeof pctValue === 'number') {
-                                                if (pctValue < 1) {
-                                                    // Format desimal (0.8462 -> 84.62)
-                                                    pctValue = pctValue * 100;
-                                                }
-                                                // Sudah dalam format persen (84.62)
-                                            }
-
-                                            // Bulatkan ke 1 desimal
-                                            pctValue = parseFloat(pctValue.toFixed(1));
-
-                                            if (!isNaN(pctValue)) {
-                                                // Jika ISOMAN, tambahkan ke IJIN
-                                                if (label.includes('ISOMAN') && rekapData.ijin_pct !== null) {
-                                                    rekapData.ijin_pct += pctValue;
-                                                    rekapData.ijin_pct = parseFloat(rekapData.ijin_pct.toFixed(1));
-                                                    console.log(`  ✅ ISOMAN: ${pctValue}% (added to IJIN, total: ${rekapData.ijin_pct}%)`);
-                                                } else {
-                                                    rekapData[key] = pctValue;
-                                                    console.log(`  ✅ ${patterns[0]}: ${pctValue}%`);
-                                                }
-                                                persentaseFound = true;
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        break;
+            function matchLabel(text) {
+                const upper = String(text || '').toUpperCase().trim();
+                if (!upper) return null;
+                for (const entry of labelMap) {
+                    for (const p of entry.patterns) {
+                        if (upper === p || upper.includes(p)) return entry;
                     }
                 }
-                if (persentaseFound) break;
+                return null;
             }
 
             // ============================================
-            // STEP 3: HITUNG PERSENTASE JIKA TIDAK ADA
+            // LANGKAH 1: Cari section "KEHADIRAN KESELURUHAN"
             // ============================================
-            if (persentaseFound) {
-                console.log('✅ Persentase berhasil dibaca dari Excel!');
-            } else {
-                console.log('⚠️ Persentase tidak ditemukan di Excel, menghitung dari angka mentah...');
-
-                // Hitung persentase dari angka mentah
-                if (rekapData.total > 0) {
-                    rekapData.wfo_pct = parseFloat(((rekapData.wfo / rekapData.total) * 100).toFixed(1));
-                    rekapData.dinas_luar_pct = parseFloat(((rekapData.dinas_luar / rekapData.total) * 100).toFixed(1));
-                    rekapData.undangan_pct = parseFloat(((rekapData.undangan / rekapData.total) * 100).toFixed(1));
-                    rekapData.sakit_pct = parseFloat(((rekapData.sakit / rekapData.total) * 100).toFixed(1));
-                    rekapData.ijin_pct = parseFloat(((rekapData.ijin / rekapData.total) * 100).toFixed(1));
-                    rekapData.cuti_pct = parseFloat(((rekapData.cuti / rekapData.total) * 100).toFixed(1));
-                    rekapData.tidak_absen_pct = parseFloat(((rekapData.tidak_absen / rekapData.total) * 100).toFixed(1));
-
-                    console.log('✅ Persentase berhasil dihitung:');
-                    console.log(`   WFO: ${rekapData.wfo_pct}%`);
-                    console.log(`   DINAS LUAR: ${rekapData.dinas_luar_pct}%`);
-                    console.log(`   UNDANGAN: ${rekapData.undangan_pct}%`);
-                    console.log(`   SAKIT: ${rekapData.sakit_pct}%`);
-                    console.log(`   IJIN: ${rekapData.ijin_pct}%`);
-                    console.log(`   CUTI: ${rekapData.cuti_pct}%`);
-                    console.log(`   TIDAK ABSEN: ${rekapData.tidak_absen_pct}%`);
-                }
-            }
-
-            // ============================================
-            // STEP 2: BACA ANGKA MENTAH (SELALU DIBUTUHKAN)
-            // ============================================
-            console.log('\n🔍 STEP 2: Membaca KEHADIRAN KESELURUHAN (angka mentah)...');
-
+            console.log('\nðŸ” LANGKAH 1: Mencari section...');
             let sectionRow = -1;
             for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                for (let j = 0; j < row.length; j++) {
-                    const cell = String(row[j] || '').toUpperCase().trim();
-                    if (cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN') && !cell.includes('PERSENTASE')) {
+                for (let j = 0; j < (data[i] || []).length; j++) {
+                    const cell = String(data[i][j] || '').toUpperCase().trim();
+                    if ((cell.includes('KEHADIRAN') && cell.includes('KESELURUHAN')) ||
+                        (cell.includes('PERSENTASE') && cell.includes('KEHADIRAN'))) {
                         sectionRow = i;
-                        console.log(`✅ Found "KEHADIRAN KESELURUHAN" at row ${i}`);
+                        console.log(`âœ… Section ditemukan di row ${i}: "${cell}"`);
                         break;
                     }
                 }
                 if (sectionRow !== -1) break;
             }
-
             if (sectionRow === -1) {
-                console.log('⚠️ Section "KEHADIRAN KESELURUHAN" tidak ditemukan');
+                console.log('âŒ Section KEHADIRAN KESELURUHAN tidak ditemukan');
                 return null;
             }
 
-            // Cari header row (Jenis Kehadiran, Jumlah)
-            let headerRow = -1;
-            let labelCol = -1;
-            let valueCol = -1;
+            // ============================================
+            // LANGKAH 2: Cari WFO sebagai anchor utama
+            // ============================================
+            console.log('\nðŸ” LANGKAH 2: Mencari WFO sebagai anchor...');
+            let labelCol = -1, valueCol = -1, pctCol = -1, dataStartRow = -1;
 
-            for (let i = sectionRow; i < Math.min(sectionRow + 10, data.length); i++) {
-                const row = data[i];
+            for (let i = sectionRow; i < Math.min(sectionRow + 20, data.length); i++) {
+                const row = data[i] || [];
                 for (let j = 0; j < row.length; j++) {
-                    const cell = String(row[j] || '').toUpperCase().trim();
-                    if (cell.includes('JENIS') && cell.includes('KEHADIRAN')) {
-                        headerRow = i;
+                    if (String(row[j] || '').toUpperCase().trim() === 'WFO') {
                         labelCol = j;
-                        // Cari kolom "Jumlah"
-                        for (let k = j + 1; k < row.length; k++) {
-                            const nextCell = String(row[k] || '').toUpperCase().trim();
-                            if (nextCell.includes('JUMLAH')) {
+                        dataStartRow = i;
+                        console.log(`âœ… "WFO" di row ${i}, col ${j}`);
+
+                        // STRATEGI A: Cari kolom angka besar terdekat di kanan
+                        for (let k = j + 1; k < Math.min(j + 8, row.length); k++) {
+                            const val = row[k];
+                            const numVal = (typeof val === 'number') ? val : parseInt(String(val).replace(/[^0-9]/g, ''));
+                            if (!isNaN(numVal) && numVal > 10) {
                                 valueCol = k;
+                                console.log(`âœ… ValueCol di col ${k} (nilai: ${numVal})`);
                                 break;
                             }
                         }
-                        console.log(`✅ Found header at row ${i}, labelCol=${labelCol}, valueCol=${valueCol}`);
-                        break;
-                    }
-                }
-                if (headerRow !== -1) break;
-            }
 
-            // Jika tidak ada header "Jenis Kehadiran", coba cari langsung data WFO
-            if (headerRow === -1) {
-                console.log('⚠️ Header "Jenis Kehadiran" tidak ditemukan, mencari data WFO langsung...');
-                for (let i = sectionRow; i < Math.min(sectionRow + 20, data.length); i++) {
-                    const row = data[i];
-                    for (let j = 0; j < row.length; j++) {
-                        const cell = String(row[j] || '').toUpperCase().trim();
-                        if (cell === 'WFO') {
-                            headerRow = i - 1;
-                            labelCol = j;
+                        // STRATEGI B: Cari header "Jumlah" di baris atas
+                        if (valueCol === -1) {
+                            for (let hi = Math.max(sectionRow, i - 3); hi < i; hi++) {
+                                for (let hj = j + 1; hj < (data[hi] || []).length; hj++) {
+                                    const hCell = String(data[hi][hj] || '').toUpperCase().trim();
+                                    if (hCell.includes('JUMLAH') || hCell.includes('JML')) {
+                                        valueCol = hj;
+                                        console.log(`âœ… ValueCol dari header "${hCell}" di col ${hj}`);
+                                        break;
+                                    }
+                                }
+                                if (valueCol !== -1) break;
+                            }
+                        }
+
+                        // STRATEGI C: Fallback ke kolom berikutnya
+                        if (valueCol === -1) {
                             valueCol = j + 1;
-                            console.log(`✅ Found WFO at row ${i}, using labelCol=${labelCol}, valueCol=${valueCol}`);
-                            break;
+                            console.log(`âš ï¸ Fallback: valueCol = ${valueCol}`);
                         }
-                    }
-                    if (headerRow !== -1) break;
-                }
-            }
 
-            if (headerRow === -1 || labelCol === -1 || valueCol === -1) {
-                console.log('❌ Tidak dapat menemukan struktur data');
-                return null;
-            }
-
-            // Baca data dari baris setelah header
-            const labelMap = [
-                { patterns: ['WFO'], key: 'wfo' },
-                { patterns: ['DINAS LUAR', 'DINAS', 'LUAR'], key: 'dinas_luar' },
-                { patterns: ['UNDANGAN'], key: 'undangan' },
-                { patterns: ['SAKIT'], key: 'sakit' },
-                { patterns: ['IJIN', 'IZIN', 'IIJN', 'IJN'], key: 'ijin' },
-                { patterns: ['CUTI'], key: 'cuti' },
-                { patterns: ['ISOMAN'], key: 'ijin' },
-                { patterns: ['TIDAK ABSEN', 'ALPHA', 'ALPA', 'TANPA KETERANGAN'], key: 'tidak_absen' },
-                { patterns: ['TOTAL'], key: 'total' }
-            ];
-
-            for (let i = headerRow + 1; i < Math.min(headerRow + 20, data.length); i++) {
-                const row = data[i];
-                if (!row || row.length === 0) continue;
-
-                const label = String(row[labelCol] || '').toUpperCase().trim();
-                if (!label) continue;
-
-                for (const { patterns, key } of labelMap) {
-                    let matched = false;
-                    for (const pattern of patterns) {
-                        if (label === pattern || label.includes(pattern)) {
-                            matched = true;
-                            break;
-                        }
-                    }
-
-                    if (matched) {
-                        const value = parseInt(row[valueCol]);
-                        if (!isNaN(value)) {
-                            if (label.includes('ISOMAN')) {
-                                rekapData.ijin += value;
-                                console.log(`  ✅ ISOMAN: ${value} (added to IJIN, total IJIN now: ${rekapData.ijin})`);
-                            } else {
-                                rekapData[key] = value;
-                                console.log(`  ✅ ${patterns[0]}: ${value}`);
+                        // Cari kolom PERSENTASE
+                        for (let k = valueCol + 1; k < Math.min(j + 10, row.length); k++) {
+                            const val = row[k];
+                            const valStr = String(val || '');
+                            if (valStr.includes('%')) {
+                                pctCol = k;
+                                console.log(`âœ… PctCol di col ${k} (format: %)`);
+                                break;
+                            }
+                            if (typeof val === 'number' && val > 0 && val <= 1) {
+                                let validCount = 0;
+                                for (let vi = i; vi < Math.min(i + 6, data.length); vi++) {
+                                    const v = data[vi] && data[vi][k];
+                                    if (typeof v === 'number' && v > 0 && v <= 1) validCount++;
+                                }
+                                if (validCount >= 3) {
+                                    pctCol = k;
+                                    console.log(`âœ… PctCol di col ${k} (format: desimal, valid: ${validCount})`);
+                                    break;
+                                }
                             }
                         }
                         break;
                     }
                 }
+                if (labelCol !== -1) break;
             }
 
-            if (rekapData.wfo === 0 && rekapData.total === 0) {
-                console.log('⚠️ Data rekapitulasi tidak valid (WFO dan TOTAL = 0)');
+            if (labelCol === -1 || valueCol === -1) {
+                console.log('âŒ Tidak dapat menemukan kolom label/value');
                 return null;
             }
 
-            console.log('\n📊 Rekapitulasi parsed successfully:');
-            console.log('   Angka mentah:', {
-                wfo: rekapData.wfo,
-                dinas_luar: rekapData.dinas_luar,
-                undangan: rekapData.undangan,
-                sakit: rekapData.sakit,
-                ijin: rekapData.ijin,
-                cuti: rekapData.cuti,
-                tidak_absen: rekapData.tidak_absen,
-                total: rekapData.total
-            });
-            console.log('   Persentase:', {
-                wfo_pct: rekapData.wfo_pct,
-                dinas_luar_pct: rekapData.dinas_luar_pct,
-                undangan_pct: rekapData.undangan_pct,
-                sakit_pct: rekapData.sakit_pct,
-                ijin_pct: rekapData.ijin_pct,
-                cuti_pct: rekapData.cuti_pct,
-                tidak_absen_pct: rekapData.tidak_absen_pct
-            });
+            // ============================================
+            // LANGKAH 3: Baca ANGKA MENTAH
+            // ============================================
+            console.log(`\nðŸ” LANGKAH 3: Baca angka (labelCol=${labelCol}, valueCol=${valueCol})...`);
+
+            for (let i = dataStartRow; i < Math.min(dataStartRow + 20, data.length); i++) {
+                const row = data[i] || [];
+                const label = String(row[labelCol] || '').toUpperCase().trim();
+                if (!label) continue;
+
+                const entry = matchLabel(label);
+                if (!entry) continue;
+
+                const rawValue = row[valueCol];
+                let value = (typeof rawValue === 'number') ? Math.round(rawValue) :
+                    parseInt(String(rawValue).replace(/[^0-9]/g, ''));
+                if (isNaN(value)) value = 0;
+
+                if (entry.key === '_isoman') {
+                    rekapData.ijin += value;
+                    console.log(`  âœ… ISOMAN: ${value} â†’ IJIN total: ${rekapData.ijin}`);
+                } else {
+                    rekapData[entry.key] = value;
+                    console.log(`  âœ… ${entry.patterns[0]}: ${value}`);
+                }
+            }
+
+            // ============================================
+            // LANGKAH 4: Baca PERSENTASE (jika ada)
+            // ============================================
+            let persentaseFound = false;
+            if (pctCol !== -1) {
+                console.log(`\nðŸ” LANGKAH 4: Baca persentase (pctCol=${pctCol})...`);
+                for (let i = dataStartRow; i < Math.min(dataStartRow + 20, data.length); i++) {
+                    const row = data[i] || [];
+                    const label = String(row[labelCol] || '').toUpperCase().trim();
+                    if (!label) continue;
+                    const entry = matchLabel(label);
+                    if (!entry || !entry.pctKey) continue;
+
+                    let pctValue = row[pctCol];
+                    if (pctValue === undefined || pctValue === null || pctValue === '') continue;
+
+                    if (typeof pctValue === 'string') {
+                        pctValue = parseFloat(pctValue.replace('%', '').trim());
+                    } else if (typeof pctValue === 'number' && pctValue > 0 && pctValue <= 1) {
+                        pctValue = pctValue * 100;
+                    }
+                    if (isNaN(pctValue)) continue;
+                    pctValue = parseFloat(pctValue.toFixed(1));
+
+                    if (entry.key === '_isoman') {
+                        rekapData.ijin_pct = (rekapData.ijin_pct || 0) + pctValue;
+                        rekapData.ijin_pct = parseFloat(rekapData.ijin_pct.toFixed(1));
+                        console.log(`  âœ… ISOMAN: ${pctValue}% â†’ IJIN: ${rekapData.ijin_pct}%`);
+                    } else {
+                        rekapData[entry.pctKey] = pctValue;
+                        console.log(`  âœ… ${entry.patterns[0]}: ${pctValue}%`);
+                    }
+                    persentaseFound = true;
+                }
+            }
+
+            // LANGKAH 5: Hitung persentase jika tidak ditemukan
+            if (!persentaseFound && rekapData.total > 0) {
+                console.log('\nâš ï¸ Hitung persentase dari angka mentah...');
+                const t = rekapData.total;
+                rekapData.wfo_pct = parseFloat(((rekapData.wfo / t) * 100).toFixed(1));
+                rekapData.dinas_luar_pct = parseFloat(((rekapData.dinas_luar / t) * 100).toFixed(1));
+                rekapData.undangan_pct = parseFloat(((rekapData.undangan / t) * 100).toFixed(1));
+                rekapData.sakit_pct = parseFloat(((rekapData.sakit / t) * 100).toFixed(1));
+                rekapData.ijin_pct = parseFloat(((rekapData.ijin / t) * 100).toFixed(1));
+                rekapData.cuti_pct = parseFloat(((rekapData.cuti / t) * 100).toFixed(1));
+                rekapData.tidak_absen_pct = parseFloat(((rekapData.tidak_absen / t) * 100).toFixed(1));
+                console.log('âœ… Persentase dihitung');
+            }
+
+            // VALIDASI
+            if (rekapData.wfo === 0 && rekapData.total === 0) {
+                console.log('âŒ Data tidak valid (WFO=0, TOTAL=0)');
+                return null;
+            }
+            if (rekapData.total > 0 && rekapData.wfo > rekapData.total) {
+                console.log(`âš ï¸ Warning: WFO(${rekapData.wfo}) > TOTAL(${rekapData.total})`);
+            }
+
+            console.log('\nðŸ“Š HASIL FINAL:');
+            console.log('   Raw:', { wfo: rekapData.wfo, dinas_luar: rekapData.dinas_luar, undangan: rekapData.undangan, sakit: rekapData.sakit, ijin: rekapData.ijin, cuti: rekapData.cuti, tidak_absen: rekapData.tidak_absen, total: rekapData.total });
+            console.log('   Pct:', { wfo: rekapData.wfo_pct, dl: rekapData.dinas_luar_pct, und: rekapData.undangan_pct, skt: rekapData.sakit_pct, ijn: rekapData.ijin_pct, cuti: rekapData.cuti_pct, ta: rekapData.tidak_absen_pct });
 
             return rekapData;
         }
 
+
         async function uploadRekapitulasi(supabaseClient, rekapData) {
-            console.log('📤 Uploading rekapitulasi...');
-            console.log('📊 Data yang akan diupload:', rekapData);
+            console.log('ðŸ“¤ Uploading rekapitulasi...');
+            console.log('ðŸ“Š Data yang akan diupload:', rekapData);
 
             try {
                 // PENTING: Hapus kolom 'total' karena tidak ada di tabel database
                 const dataToUpload = { ...rekapData };
                 delete dataToUpload.total;
 
-                console.log('📊 Data setelah hapus total:', dataToUpload);
+                console.log('ðŸ“Š Data setelah hapus total:', dataToUpload);
 
                 const { data: existing, error: checkError } = await supabaseClient
                     .from('rekapitulasi')
@@ -507,13 +334,13 @@
                     .eq('bidang', dataToUpload.bidang);  // PENTING: Filter berdasarkan bidang juga
 
                 if (checkError) {
-                    console.error('❌ Error checking:', checkError);
-                    console.error('❌ Error detail:', JSON.stringify(checkError));
+                    console.error('âŒ Error checking:', checkError);
+                    console.error('âŒ Error detail:', JSON.stringify(checkError));
                     return false;
                 }
 
                 if (existing && existing.length > 0) {
-                    console.log('📝 Data sudah ada, melakukan UPDATE...');
+                    console.log('ðŸ“ Data sudah ada, melakukan UPDATE...');
                     const { error: updateError } = await supabaseClient
                         .from('rekapitulasi')
                         .update(dataToUpload)
@@ -522,30 +349,30 @@
                         .eq('bidang', dataToUpload.bidang);  // PENTING: Filter berdasarkan bidang juga
 
                     if (updateError) {
-                        console.error('❌ Error updating:', updateError);
-                        console.error('❌ Error detail:', JSON.stringify(updateError));
+                        console.error('âŒ Error updating:', updateError);
+                        console.error('âŒ Error detail:', JSON.stringify(updateError));
                         return false;
                     }
-                    console.log('✅ Rekapitulasi updated successfully');
+                    console.log('âœ… Rekapitulasi updated successfully');
                 } else {
-                    console.log('📝 Data belum ada, melakukan INSERT...');
+                    console.log('ðŸ“ Data belum ada, melakukan INSERT...');
                     const { error: insertError } = await supabaseClient
                         .from('rekapitulasi')
                         .insert([dataToUpload]);
 
                     if (insertError) {
-                        console.error('❌ Error inserting:', insertError);
-                        console.error('❌ Error detail:', JSON.stringify(insertError));
-                        console.error('❌ Data yang gagal diinsert:', JSON.stringify(dataToUpload));
+                        console.error('âŒ Error inserting:', insertError);
+                        console.error('âŒ Error detail:', JSON.stringify(insertError));
+                        console.error('âŒ Data yang gagal diinsert:', JSON.stringify(dataToUpload));
                         return false;
                     }
-                    console.log('✅ Rekapitulasi inserted successfully');
+                    console.log('âœ… Rekapitulasi inserted successfully');
                 }
 
                 return true;
             } catch (error) {
-                console.error('❌ Unexpected error:', error);
-                console.error('❌ Error stack:', error.stack);
+                console.error('âŒ Unexpected error:', error);
+                console.error('âŒ Error stack:', error.stack);
                 return false;
             }
         }
@@ -1821,7 +1648,7 @@
         /* ================================================================
            PROFESSIONAL UI OVERHAUL v7.0
            Enterprise-Grade Admin Panel Redesign
-           Only CSS — zero logic changes
+           Only CSS â€” zero logic changes
            ================================================================ */
 
         /* === BASE === */
@@ -1837,7 +1664,7 @@
 
         /* === GLOBAL TOP BAR (injected via ::before) === */
         body::before {
-            content: '🏛️  Admin Panel — Kejaksaan Tinggi Kepulauan Riau';
+            content: 'ðŸ›ï¸  Admin Panel â€” Kejaksaan Tinggi Kepulauan Riau';
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2256,7 +2083,7 @@
                             box-shadow: 0 4px 12px rgba(59,130,246,0.3);
                         " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(59,130,246,0.4)';"
                             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(59,130,246,0.3)';">
-                            📂 Pilih File
+                            ðŸ“‚ Pilih File
                         </div>
                         <input type="file" id="excelFile" accept=".xlsx,.xls" required>
                     </div>
@@ -2337,7 +2164,7 @@
                     </label>
                 </div>
                 <p class="help-text" style="margin-top: 12px; font-size: 0.8rem; color: #64748b; line-height: 1.5;">
-                    💡 Replace: Hapus semua data bulan ini lalu upload baru | Append: Tambah data tanpa hapus yang lama
+                    ðŸ’¡ Replace: Hapus semua data bulan ini lalu upload baru | Append: Tambah data tanpa hapus yang lama
                 </p>
             </div>
 
@@ -2546,7 +2373,7 @@
                 <div
                     style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 16px 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">📄 Preview Data Excel</h3>
+                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">ðŸ“„ Preview Data Excel</h3>
                         <p style="margin: 4px 0 0 0; font-size: 0.85rem; opacity: 0.9;">Data yang sudah terupload</p>
                     </div>
                 </div>
@@ -2558,7 +2385,7 @@
                 <div style="max-width: 400px; margin: 0 auto;">
                     <div
                         style="font-size: clamp(48px, 10vw, 80px); margin-bottom: 20px; opacity: 0.3; filter: grayscale(100%);">
-                        📋</div>
+                        ðŸ“‹</div>
                     <p
                         style="font-size: clamp(1rem, 3vw, 1.25rem); font-weight: 700; color: #374151; margin-bottom: 12px; line-height: 1.4;">
                         Pilih tahun dan bulan untuk melihat data
@@ -2612,32 +2439,32 @@
                     caches.delete(name);
                 }
             });
-            console.log('🧹 Cache cleared');
+            console.log('ðŸ§¹ Cache cleared');
         }
 
         // Display version
-        console.log('═══════════════════════════════════════════════════');
-        console.log(`📦 Admin Panel Version: ${APP_VERSION}`);
-        console.log(`🕐 Loaded at: ${new Date().toLocaleString('id-ID')}`);
-        console.log('═══════════════════════════════════════════════════');
-        console.log('✅ GABUNGAN auto-detection: ENABLED');
-        console.log('✅ Multi-sheet support: ENABLED');
-        console.log('✅ Validation after upload: ENABLED');
-        console.log('✅ Smart Excel Parser: ENABLED');
-        console.log('✅ Progress Bar: ENABLED');
-        console.log('✅ Delete Data Feature: ENABLED → UPGRADED to Data Management');
-        console.log('✅ Excel Preview on File Select: ENABLED');
-        console.log('✅ Excel File Storage: ENABLED');
-        console.log('✅ Multi-Sheet Excel Viewer: ENABLED');
-        console.log('✅ Original Excel File Preview: ENABLED');
-        console.log('✅ Year Range: 1990-2100');
-        console.log('✨ Professional Upload Form UI: ENABLED');
-        console.log('✨ Modern Form Design: Grid Layout, Enhanced Styling');
-        console.log('✨ Interactive Drag & Drop: Enhanced Visual Feedback');
-        console.log('✨ Radio Button Cards: Modern Selection Design');
-        console.log('═══════════════════════════════════════════════════');
-        console.log('✅ Upload History: ENABLED');
-        console.log('✨ Professional UI/UX: ENABLED');
+        console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+        console.log(`ðŸ“¦ Admin Panel Version: ${APP_VERSION}`);
+        console.log(`ðŸ• Loaded at: ${new Date().toLocaleString('id-ID')}`);
+        console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+        console.log('âœ… GABUNGAN auto-detection: ENABLED');
+        console.log('âœ… Multi-sheet support: ENABLED');
+        console.log('âœ… Validation after upload: ENABLED');
+        console.log('âœ… Smart Excel Parser: ENABLED');
+        console.log('âœ… Progress Bar: ENABLED');
+        console.log('âœ… Delete Data Feature: ENABLED â†’ UPGRADED to Data Management');
+        console.log('âœ… Excel Preview on File Select: ENABLED');
+        console.log('âœ… Excel File Storage: ENABLED');
+        console.log('âœ… Multi-Sheet Excel Viewer: ENABLED');
+        console.log('âœ… Original Excel File Preview: ENABLED');
+        console.log('âœ… Year Range: 1990-2100');
+        console.log('âœ¨ Professional Upload Form UI: ENABLED');
+        console.log('âœ¨ Modern Form Design: Grid Layout, Enhanced Styling');
+        console.log('âœ¨ Interactive Drag & Drop: Enhanced Visual Feedback');
+        console.log('âœ¨ Radio Button Cards: Modern Selection Design');
+        console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+        console.log('âœ… Upload History: ENABLED');
+        console.log('âœ¨ Professional UI/UX: ENABLED');
 
         // ============================================
         // PROGRESS BAR FUNCTIONS
@@ -2752,7 +2579,7 @@
         function detectDateColumns(headerRow) {
             const dateColumns = [];
 
-            console.log(`🔍 Scanning header row (length: ${headerRow.length}):`, headerRow.slice(0, 15));
+            console.log(`ðŸ” Scanning header row (length: ${headerRow.length}):`, headerRow.slice(0, 15));
 
             for (let i = 0; i < headerRow.length; i++) {
                 const cell = headerRow[i];
@@ -2775,7 +2602,7 @@
                     num = cell;
                 }
 
-                // Method 3: Remove leading zeros ("01" → 1, "02" → 2)
+                // Method 3: Remove leading zeros ("01" â†’ 1, "02" â†’ 2)
                 if (isNaN(num) && /^0\d$/.test(cellStr)) {
                     num = parseInt(cellStr.replace(/^0+/, ''));
                 }
@@ -2802,16 +2629,16 @@
 
                     // Debug: Log first few detections
                     if (dateColumns.length <= 5) {
-                        console.log(`  ✅ Found date ${num} at column ${i} (cell value: "${cellStr}", type: ${typeof cell})`);
+                        console.log(`  âœ… Found date ${num} at column ${i} (cell value: "${cellStr}", type: ${typeof cell})`);
                     }
                 }
             }
 
-            console.log(`📅 Detected ${dateColumns.length} date columns:`,
+            console.log(`ðŸ“… Detected ${dateColumns.length} date columns:`,
                 dateColumns.length > 0 ? dateColumns.map(d => `${d.tanggal}@col${d.index}`).join(', ') : 'NONE FOUND!');
 
             if (dateColumns.length === 0) {
-                console.error(`❌ No date columns found! Header row sample:`, headerRow.slice(0, 20));
+                console.error(`âŒ No date columns found! Header row sample:`, headerRow.slice(0, 20));
             }
 
             return dateColumns;
@@ -2828,7 +2655,7 @@
             const foundLabels = {}; // Track which labels we've found
 
             // Define labels with priority (longer strings first to avoid partial matches)
-            // ✅ ROBUST: Multiple fallback patterns for each field
+            // âœ… ROBUST: Multiple fallback patterns for each field
             const labelPriority = [
                 // TIDAK ABSEN variations
                 { label: 'JUMLAH TIDAK ABSEN', key: 'tidak_absen' },
@@ -2886,11 +2713,11 @@
                 { label: 'ISOLASI MANDIRI', key: 'isoman' }
             ];
 
-            console.log(`  🔍 Scanning ${data.length} rows from BOTTOM to TOP for summary rows...`);
+            console.log(`  ðŸ” Scanning ${data.length} rows from BOTTOM to TOP for summary rows...`);
 
             // IMPORTANT: Scan from BOTTOM to TOP (summary rows usually at bottom)
             // This way we find the real summary rows first, not data rows
-            // ✅ CRITICAL: Must scan ALL rows to find WFO (don't stop early!)
+            // âœ… CRITICAL: Must scan ALL rows to find WFO (don't stop early!)
             for (let rowIdx = data.length - 1; rowIdx >= 0; rowIdx--) {
                 const row = data[rowIdx];
 
@@ -2912,7 +2739,7 @@
                                     label: label
                                 };
                                 foundLabels[key] = true;
-                                console.log(`  ✅ Found "${label}" at row ${rowIdx} → ${key}`);
+                                console.log(`  âœ… Found "${label}" at row ${rowIdx} â†’ ${key}`);
                             }
                             break; // Stop checking other labels for this cell
                         }
@@ -2923,15 +2750,15 @@
                 const requiredKeys = ['wfo', 'dinas_luar', 'undangan', 'ijin', 'cuti', 'tidak_absen'];
                 const foundRequired = requiredKeys.filter(key => foundLabels[key]);
 
-                // ✅ CRITICAL FIX: Must find WFO before stopping!
+                // âœ… CRITICAL FIX: Must find WFO before stopping!
                 // Without WFO, the data is invalid and will cause validation error
                 if (foundRequired.length >= 6 && foundLabels['wfo']) {
-                    console.log(`  ✅ Found all 6 required summary rows (including WFO), stopping scan at row ${rowIdx}`);
+                    console.log(`  âœ… Found all 6 required summary rows (including WFO), stopping scan at row ${rowIdx}`);
                     break;
                 }
             }
 
-            console.log(`  📊 Total summary rows found: ${Object.keys(summaryRows).length}`);
+            console.log(`  ðŸ“Š Total summary rows found: ${Object.keys(summaryRows).length}`);
             return summaryRows;
         }
 
@@ -2946,11 +2773,11 @@
 
             // Check date columns
             if (dateColumns.length === 0) {
-                errors.push('❌ Tidak ditemukan kolom tanggal (01-31). Pastikan baris header memiliki angka 1-31.');
+                errors.push('âŒ Tidak ditemukan kolom tanggal (01-31). Pastikan baris header memiliki angka 1-31.');
             }
 
             // Check summary rows
-            const required = ['wfo', 'dinas_luar', 'undangan', 'ijin', 'cuti', 'tidak_absen']; // ✅ WFO is REQUIRED
+            const required = ['wfo', 'dinas_luar', 'undangan', 'ijin', 'cuti', 'tidak_absen']; // âœ… WFO is REQUIRED
             const missing = [];
 
             for (const key of required) {
@@ -2960,7 +2787,7 @@
             }
 
             if (missing.length > 0) {
-                errors.push(`❌ Tidak ditemukan baris summary: ${missing.join(', ')}`);
+                errors.push(`âŒ Tidak ditemukan baris summary: ${missing.join(', ')}`);
                 errors.push(`   Pastikan Excel memiliki baris dengan label "JUMLAH WFO", "JUMLAH DINAS LUAR", dll.`);
             }
 
@@ -2974,7 +2801,7 @@
          */
         function detectExcelFormat(data) {
             if (data.length < 2) {
-                console.warn(`⚠️ Data too short: ${data.length} rows`);
+                console.warn(`âš ï¸ Data too short: ${data.length} rows`);
                 return {
                     format: 'UNKNOWN',
                     headerRowIndex: -1,
@@ -2982,7 +2809,7 @@
                 };
             }
 
-            console.log(`🔍 Detecting format from ${data.length} rows...`);
+            console.log(`ðŸ” Detecting format from ${data.length} rows...`);
 
             // Check first few rows for header patterns
             for (let rowIdx = 0; rowIdx < Math.min(5, data.length); rowIdx++) {
@@ -3006,7 +2833,7 @@
                 }
 
                 if ((hasNo || hasNama || hasNIP) && dateStartIndex > 0) {
-                    console.log(`📋 Detected STANDARD format at row ${rowIdx}`);
+                    console.log(`ðŸ“‹ Detected STANDARD format at row ${rowIdx}`);
                     console.log(`   Header keywords: No=${hasNo}, Nama=${hasNama}, NIP=${hasNIP}`);
                     console.log(`   Date columns start at index ${dateStartIndex}`);
 
@@ -3024,7 +2851,7 @@
                 for (let i = 0; i < row.length; i++) {
                     const num = parseInt(String(row[i]).trim());
                     if (!isNaN(num) && num === 1) {
-                        console.log(`📋 Detected CUSTOM format with dates starting at row ${rowIdx}, col ${i}`);
+                        console.log(`ðŸ“‹ Detected CUSTOM format with dates starting at row ${rowIdx}, col ${i}`);
                         return {
                             format: 'CUSTOM',
                             headerRowIndex: rowIdx,
@@ -3034,7 +2861,7 @@
                 }
             }
 
-            console.warn(`⚠️ Could not detect Excel format - no header row or date columns found`);
+            console.warn(`âš ï¸ Could not detect Excel format - no header row or date columns found`);
             console.warn(`   First 3 rows:`, data.slice(0, 3));
             return {
                 format: 'UNKNOWN',
@@ -3052,19 +2879,19 @@
          * @returns {Array} Transformed data ready for database
          */
         function smartExtractData(jsonData, bidang, tahun, bulan) {
-            console.log(`\n🔍 Smart parsing sheet: ${bidang}`);
+            console.log(`\nðŸ” Smart parsing sheet: ${bidang}`);
             console.log(`   Total rows in sheet: ${jsonData.length}`);
 
             // Step 1: Detect format
             const format = detectExcelFormat(jsonData);
             if (format.format === 'UNKNOWN') {
-                console.warn(`⚠️ Format unknown, trying fallback method...`);
+                console.warn(`âš ï¸ Format unknown, trying fallback method...`);
                 // Fallback: Try first 5 rows as potential header rows
                 for (let tryRow = 0; tryRow < Math.min(5, jsonData.length); tryRow++) {
                     console.log(`   Trying row ${tryRow} as header...`);
                     const dateColumns = detectDateColumns(jsonData[tryRow]);
                     if (dateColumns.length > 0) {
-                        console.log(`   ✅ Found ${dateColumns.length} date columns at row ${tryRow}!`);
+                        console.log(`   âœ… Found ${dateColumns.length} date columns at row ${tryRow}!`);
                         format.headerRowIndex = tryRow;
                         format.format = 'FALLBACK';
                         break;
@@ -3112,7 +2939,7 @@
                 const sakit = parseValue(summaryRows['sakit'], colIndex);
                 const ijin = parseValue(summaryRows['ijin'], colIndex);
                 const cuti = parseValue(summaryRows['cuti'], colIndex);
-                const isoman = parseValue(summaryRows['isoman'], colIndex); // ✅ ISOMAN support (optional)
+                const isoman = parseValue(summaryRows['isoman'], colIndex); // âœ… ISOMAN support (optional)
                 const tidakAbsen = parseValue(summaryRows['tidak_absen'], colIndex);
 
                 // Skip if no data (weekend/holiday)
@@ -3138,15 +2965,15 @@
                     sakit: sakit,
                     ijin: ijin,
                     cuti: cuti,
-                    isoman: isoman, // ✅ ISOMAN support
+                    isoman: isoman, // âœ… ISOMAN support
                     tidak_absen: tidakAbsen
                 });
             }
 
-            console.log(`  ✅ Extracted ${transformedData.length} rows from "${bidang}"`);
+            console.log(`  âœ… Extracted ${transformedData.length} rows from "${bidang}"`);
 
             if (transformedData.length === 0) {
-                console.warn(`  ⚠️ No data extracted! Possible reasons:`);
+                console.warn(`  âš ï¸ No data extracted! Possible reasons:`);
                 console.warn(`     - All date columns have 0 values`);
                 console.warn(`     - Summary rows don't have data at date column positions`);
                 console.warn(`     Sample summary row data:`, summaryRows['wfo']?.data?.slice(0, 15));
@@ -3164,7 +2991,7 @@
          * @returns {Array} Transformed data
          */
         function extractGabunganFallback(jsonData, bidang, tahun, bulan) {
-            console.log(`  🔄 GABUNGAN sheet has no summary rows - will calculate from bidang totals`);
+            console.log(`  ðŸ”„ GABUNGAN sheet has no summary rows - will calculate from bidang totals`);
 
             // Return empty array - GABUNGAN will be calculated from sum of all bidang
             return [];
@@ -3234,7 +3061,7 @@
         function handleFileSelect(file) {
             selectedFile = file;
             displayFileInfo(file);
-            // Preview dihapus dari flow — langsung upload tanpa preview
+            // Preview dihapus dari flow â€” langsung upload tanpa preview
             // previewExcelFile(file);
         }
 
@@ -3263,12 +3090,12 @@
                     container.innerHTML = `
                         <div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 16px 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">📄 Preview Excel</h3>
+                                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">ðŸ“„ Preview Excel</h3>
                                 <p style="margin: 4px 0 0 0; font-size: 0.85rem; opacity: 0.9;">Sheet: ${firstSheetName} | Total sheets: ${workbook.SheetNames.length}</p>
                             </div>
                             <button type="button" onclick="document.getElementById('excelPreviewContainer').style.display='none'" 
                                     style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">
-                                ✕ Tutup
+                                âœ• Tutup
                             </button>
                         </div>
                         <div id="excelPreviewContent" style="overflow: auto; max-height: 500px; padding: 0;"></div>
@@ -3355,7 +3182,7 @@
                         </div>
                     </div>
                     <div class="file-status">
-                        <span>✓ Ready</span>
+                        <span>âœ“ Ready</span>
                     </div>
                 </div>
             `;
@@ -3372,7 +3199,7 @@
             const btnUpload = document.getElementById('btnUpload');
 
             if (!fileInput.files[0]) {
-                showStatus('error', '❌ Mohon pilih file Excel!');
+                showStatus('error', 'âŒ Mohon pilih file Excel!');
                 return;
             }
 
@@ -3392,7 +3219,7 @@
                     <span>Sedang memproses...</span>
                 </span>
             `;
-            showStatus('info', '⏳ Sedang memproses file Excel...');
+            showStatus('info', 'â³ Sedang memproses file Excel...');
             showProgress(10, 'Membaca file...');
 
             try {
@@ -3402,8 +3229,8 @@
                 showProgress(20, 'Parsing Excel...');
                 const workbook = XLSX.read(data);
 
-                console.log('📊 Total sheets found:', workbook.SheetNames.length);
-                console.log('📋 Sheet names:', workbook.SheetNames);
+                console.log('ðŸ“Š Total sheets found:', workbook.SheetNames.length);
+                console.log('ðŸ“‹ Sheet names:', workbook.SheetNames);
                 showProgress(30, 'Memproses sheets...');
 
                 // ============================================
@@ -3411,7 +3238,7 @@
                 // ============================================
                 const rekapData = parseRekapitulasi(workbook, bulan, tahun);
                 if (!rekapData) {
-                    console.warn('⚠️ Failed to parse rekapitulasi data');
+                    console.warn('âš ï¸ Failed to parse rekapitulasi data');
                 }
 
                 // Process all sheets (each sheet = 1 bidang)
@@ -3446,22 +3273,22 @@
 
                     if (cleanSheet) {
                         gabunganSheetIndex = cleanSheet.index;
-                        console.log(`✅ Found GABUNGAN sheet (CLEAN priority): "${cleanSheet.name}" at index ${cleanSheet.index}`);
+                        console.log(`âœ… Found GABUNGAN sheet (CLEAN priority): "${cleanSheet.name}" at index ${cleanSheet.index}`);
                     } else {
                         // Priority 2: Use first match
                         gabunganSheetIndex = gabunganCandidates[0].index;
-                        console.log(`✅ Found GABUNGAN sheet: "${gabunganCandidates[0].name}" at index ${gabunganCandidates[0].index}`);
+                        console.log(`âœ… Found GABUNGAN sheet: "${gabunganCandidates[0].name}" at index ${gabunganCandidates[0].index}`);
                     }
 
                     // Log if multiple GABUNGAN sheets found
                     if (gabunganCandidates.length > 1) {
-                        console.log(`⚠️ Multiple GABUNGAN sheets found (${gabunganCandidates.length}):`, gabunganCandidates.map(s => s.name));
+                        console.log(`âš ï¸ Multiple GABUNGAN sheets found (${gabunganCandidates.length}):`, gabunganCandidates.map(s => s.name));
                         console.log(`   Using: "${workbook.SheetNames[gabunganSheetIndex]}" (CLEAN has priority)`);
                     }
                 } else {
                     // If no GABUNGAN sheet found by name, use first sheet as fallback
                     gabunganSheetIndex = 0;
-                    console.log(`⚠️ No GABUNGAN sheet found by name, using first sheet as GABUNGAN: "${workbook.SheetNames[0]}"`);
+                    console.log(`âš ï¸ No GABUNGAN sheet found by name, using first sheet as GABUNGAN: "${workbook.SheetNames[0]}"`);
                 }
 
                 for (let i = 0; i < workbook.SheetNames.length; i++) {
@@ -3471,18 +3298,18 @@
                     // Determine bidang name based on sheet
                     let bidangName;
                     if (i === gabunganSheetIndex) {
-                        console.log(`\n🔍 Processing sheet: ${sheetName} (GABUNGAN SHEET - detected by name or position)`);
+                        console.log(`\nðŸ” Processing sheet: ${sheetName} (GABUNGAN SHEET - detected by name or position)`);
                         bidangName = 'GABUNGAN';
                     } else {
                         // Check if sheet name contains any valid bidang keyword (partial match)
                         const matchedBidang = validBidang.find(bidang => sheetNameUpper.includes(bidang));
 
                         if (!matchedBidang) {
-                            console.log(`⏭️ Skipping sheet: ${sheetName} (not a valid bidang)`);
+                            console.log(`â­ï¸ Skipping sheet: ${sheetName} (not a valid bidang)`);
                             continue;
                         }
 
-                        console.log(`\n🔍 Processing sheet: ${sheetName} → Detected as: ${matchedBidang}`);
+                        console.log(`\nðŸ” Processing sheet: ${sheetName} â†’ Detected as: ${matchedBidang}`);
                         bidangName = matchedBidang; // Use the matched bidang name (without suffix)
                     }
 
@@ -3497,13 +3324,13 @@
                     console.log(`Sheet "${sheetName}" - Total rows:`, jsonData.length);
 
                     if (jsonData.length === 0) {
-                        console.log(`⚠️ Sheet "${sheetName}" is empty, skipping...`);
+                        console.log(`âš ï¸ Sheet "${sheetName}" is empty, skipping...`);
                         continue;
                     }
 
                     // Use bidangName instead of detecting from sheet name
                     const bidang = bidangName;
-                    console.log(`📌 Bidang detected: ${bidang}`);
+                    console.log(`ðŸ“Œ Bidang detected: ${bidang}`);
 
                     // ============================================
                     // USE SMART PARSER v3.1.1
@@ -3512,18 +3339,18 @@
                         const transformedData = smartExtractData(jsonData, bidang, tahun, bulan);
                         allTransformedData = allTransformedData.concat(transformedData);
                     } catch (error) {
-                        console.error(`❌ Error parsing sheet "${sheetName}":`, error.message);
+                        console.error(`âŒ Error parsing sheet "${sheetName}":`, error.message);
 
                         // If GABUNGAN sheet fails, try to use old parser as fallback
                         if (bidang === 'GABUNGAN') {
-                            console.warn(`⚠️ GABUNGAN sheet failed with smart parser, trying fallback method...`);
+                            console.warn(`âš ï¸ GABUNGAN sheet failed with smart parser, trying fallback method...`);
                             try {
                                 const fallbackData = extractGabunganFallback(jsonData, bidang, tahun, bulan);
                                 allTransformedData = allTransformedData.concat(fallbackData);
-                                console.log(`✅ GABUNGAN extracted using fallback method: ${fallbackData.length} rows`);
+                                console.log(`âœ… GABUNGAN extracted using fallback method: ${fallbackData.length} rows`);
                             } catch (fallbackError) {
-                                console.error(`❌ Fallback also failed:`, fallbackError.message);
-                                console.warn(`⚠️ Skipping GABUNGAN sheet`);
+                                console.error(`âŒ Fallback also failed:`, fallbackError.message);
+                                console.warn(`âš ï¸ Skipping GABUNGAN sheet`);
                             }
                         } else {
                             throw error; // Re-throw for non-GABUNGAN sheets
@@ -3532,7 +3359,7 @@
 
                 } // End of sheet loop
 
-                console.log(`\n📊 Total data from all sheets: ${allTransformedData.length} rows`);
+                console.log(`\nðŸ“Š Total data from all sheets: ${allTransformedData.length} rows`);
                 showProgress(50, 'Validasi data...');
 
                 if (allTransformedData.length === 0) {
@@ -3542,7 +3369,7 @@
                 // Calculate GABUNGAN from bidang totals if GABUNGAN is missing
                 const hasGabungan = allTransformedData.some(row => row.bidang === 'GABUNGAN');
                 if (!hasGabungan) {
-                    console.log('\n🔄 GABUNGAN not found, calculating from bidang totals...');
+                    console.log('\nðŸ”„ GABUNGAN not found, calculating from bidang totals...');
 
                     // Group by date and sum all bidang
                     const dateMap = {};
@@ -3561,7 +3388,7 @@
                                 sakit: 0,
                                 ijin: 0,
                                 cuti: 0,
-                                isoman: 0, // ✅ ISOMAN support
+                                isoman: 0, // âœ… ISOMAN support
                                 tidak_absen: 0
                             };
                         }
@@ -3571,16 +3398,16 @@
                         dateMap[key].sakit += row.sakit;
                         dateMap[key].ijin += row.ijin;
                         dateMap[key].cuti += row.cuti;
-                        dateMap[key].isoman += (row.isoman || 0); // ✅ ISOMAN support
+                        dateMap[key].isoman += (row.isoman || 0); // âœ… ISOMAN support
                         dateMap[key].tidak_absen += row.tidak_absen;
                     });
 
                     const gabunganData = Object.values(dateMap);
                     allTransformedData = allTransformedData.concat(gabunganData);
-                    console.log(`✅ Calculated GABUNGAN: ${gabunganData.length} dates`);
+                    console.log(`âœ… Calculated GABUNGAN: ${gabunganData.length} dates`);
                 }
 
-                console.log(`\n📊 Final total with GABUNGAN: ${allTransformedData.length} rows`);
+                console.log(`\nðŸ“Š Final total with GABUNGAN: ${allTransformedData.length} rows`);
 
                 // ============================================
                 // LANGSUNG UPLOAD TANPA PREVIEW
@@ -3598,8 +3425,8 @@
                 document.getElementById('progressContainer').style.display = 'none';
 
             } catch (error) {
-                console.error('❌ Error:', error);
-                showStatus('error', `❌ Error: ${error.message}`);
+                console.error('âŒ Error:', error);
+                showStatus('error', `âŒ Error: ${error.message}`);
                 showProgress(0, 'Error!');
 
                 addToHistory(bulan, tahun, uploadMode, 0, 'failed');
@@ -3791,7 +3618,7 @@
 
             if (error) throw error;
 
-            console.log(`✅ Excel file uploaded: ${filepath}`);
+            console.log(`âœ… Excel file uploaded: ${filepath}`);
             return data;
         }
 
@@ -3803,7 +3630,7 @@
 
             // Delete old data if replace mode
             if (uploadMode === 'replace') {
-                showStatus('info', '⏳ Menghapus data lama...');
+                showStatus('info', 'â³ Menghapus data lama...');
                 showProgress(70, 'Hapus data lama...');
                 const { error: deleteError } = await sbClient
                     .from('absensi')
@@ -3813,7 +3640,7 @@
 
                 if (deleteError) throw deleteError;
 
-                console.log(`   ✅ Deleted old data for ${bulan} ${tahun}`);
+                console.log(`   âœ… Deleted old data for ${bulan} ${tahun}`);
             }
 
             // Insert new data
@@ -3849,9 +3676,9 @@
             const totalDeleted = (deletedGabungan?.length || 0) + (deletedBidang?.length || 0);
 
             if (cleanupError1 || cleanupError2) {
-                console.warn('⚠️ Cleanup warning:', cleanupError1 || cleanupError2);
+                console.warn('âš ï¸ Cleanup warning:', cleanupError1 || cleanupError2);
             } else if (totalDeleted > 0) {
-                console.log(`✅ Cleaned up ${totalDeleted} TOTAL column rows`);
+                console.log(`âœ… Cleaned up ${totalDeleted} TOTAL column rows`);
             }
 
             // ============================================
@@ -3861,10 +3688,10 @@
                 showProgress(90, 'Menyimpan rekapitulasi...');
                 const rekapSuccess = await uploadRekapitulasi(sbClient, rekapData);
                 if (!rekapSuccess) {
-                    console.warn('⚠️ Failed to upload rekapitulasi data');
+                    console.warn('âš ï¸ Failed to upload rekapitulasi data');
                 }
             } else {
-                console.warn('⚠️ No rekapitulasi data to upload');
+                console.warn('âš ï¸ No rekapitulasi data to upload');
             }
 
             // ============================================
@@ -3873,9 +3700,9 @@
             try {
                 showProgress(95, 'Menyimpan file Excel...');
                 await uploadExcelToStorage(file, bulan, tahun);
-                console.log('✅ Excel file saved to storage');
+                console.log('âœ… Excel file saved to storage');
             } catch (storageError) {
-                console.warn('⚠️ Failed to save Excel file to storage:', storageError.message);
+                console.warn('âš ï¸ Failed to save Excel file to storage:', storageError.message);
                 console.warn('   Data is still saved to database successfully');
                 // Don't throw error - data upload is still successful
             }
@@ -3885,9 +3712,9 @@
             addToHistory(bulan, tahun, uploadMode, allTransformedData.length, 'success');
 
             if (totalDeleted > 0) {
-                showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data (${totalDeleted} kolom TOTAL dihapus) untuk ${bulan} ${tahun}!\n\n⚠️ CEK CONSOLE (F12) untuk validasi hasil!`);
+                showStatus('success', `âœ… Berhasil upload ${allTransformedData.length} data (${totalDeleted} kolom TOTAL dihapus) untuk ${bulan} ${tahun}!\n\nâš ï¸ CEK CONSOLE (F12) untuk validasi hasil!`);
             } else {
-                showStatus('success', `✅ Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!\n\n⚠️ CEK CONSOLE (F12) untuk validasi hasil!`);
+                showStatus('success', `âœ… Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!\n\nâš ï¸ CEK CONSOLE (F12) untuk validasi hasil!`);
             }
         }
 
@@ -3908,7 +3735,7 @@
 
             // Show loading state
             btnLoad.disabled = true;
-            btnLoad.textContent = '⏳ Memuat...';
+            btnLoad.textContent = 'â³ Memuat...';
 
             // Hide sections
             document.getElementById('emptyState').style.display = 'none';
@@ -3938,7 +3765,7 @@
                 if (!data || data.length === 0) {
                     // Show empty state
                     document.getElementById('emptyState').innerHTML = `
-                        <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">📭</div>
+                        <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">ðŸ“­</div>
                         <p style="font-size: 1.1rem; font-weight: 600; color: #6b7280; margin-bottom: 8px;">
                             Tidak ada data untuk ${displayBulan} ${tahun}
                         </p>
@@ -3965,7 +3792,7 @@
 
                     // Show data info
                     document.getElementById('dataInfo').innerHTML = `
-                        📊 <strong>${data.length} data</strong> untuk <strong>${displayBulan} ${tahun}</strong><br>
+                        ðŸ“Š <strong>${data.length} data</strong> untuk <strong>${displayBulan} ${tahun}</strong><br>
                         <span style="font-size: 0.85rem; opacity: 0.9;">${bidangSummary}</span>
                     `;
                     document.getElementById('dataInfoSection').style.display = 'block';
@@ -3986,7 +3813,7 @@
                 currentLoadedData = null;
             } finally {
                 btnLoad.disabled = false;
-                btnLoad.textContent = '🔍 Tampilkan Data';
+                btnLoad.textContent = 'ðŸ” Tampilkan Data';
             }
         });
 
@@ -4006,7 +3833,7 @@
                     .download(filepath);
 
                 if (error) {
-                    console.warn('⚠️ Excel file not found in storage, generating from database');
+                    console.warn('âš ï¸ Excel file not found in storage, generating from database');
                     // Fallback: generate from database
                     generateExcelPreview(currentLoadedData.data);
                     return;
@@ -4244,7 +4071,7 @@
             // Download file
             XLSX.writeFile(wb, filename);
 
-            console.log(`✅ Excel downloaded: ${filename}`);
+            console.log(`âœ… Excel downloaded: ${filename}`);
         });
 
         document.getElementById('btnDeleteData').addEventListener('click', async function () {
@@ -4258,7 +4085,7 @@
             const displayBulan = bulan === 'SEMUA' ? 'semua bulan' : bulan;
 
             const confirmation = confirm(
-                `⚠️ PERINGATAN!\n\n` +
+                `âš ï¸ PERINGATAN!\n\n` +
                 `Anda akan menghapus ${data.length} data untuk ${displayBulan} ${tahun}.\n\n` +
                 `Tindakan ini TIDAK DAPAT DIBATALKAN!\n\n` +
                 `Apakah Anda yakin ingin melanjutkan?`
@@ -4268,10 +4095,10 @@
 
             const btnDelete = document.getElementById('btnDeleteData');
             btnDelete.disabled = true;
-            btnDelete.textContent = '⏳ Menghapus...';
+            btnDelete.textContent = 'â³ Menghapus...';
 
             try {
-                console.log(`🗑️ Deleting data for tahun=${tahun}, bulan=${bulan}`);
+                console.log(`ðŸ—‘ï¸ Deleting data for tahun=${tahun}, bulan=${bulan}`);
 
                 // Delete from absensi table
                 let deleteAbsensiQuery = sbClient
@@ -4287,7 +4114,7 @@
                 const { error: absensiError } = await deleteAbsensiQuery;
 
                 if (absensiError) throw absensiError;
-                console.log('✅ Absensi data deleted successfully');
+                console.log('âœ… Absensi data deleted successfully');
 
                 // Delete from rekapitulasi table
                 let deleteRekapQuery = sbClient
@@ -4303,20 +4130,20 @@
                 const { error: rekapError, data: rekapData } = await deleteRekapQuery;
 
                 if (rekapError) {
-                    console.warn('⚠️ Warning: Failed to delete rekapitulasi data:', rekapError);
+                    console.warn('âš ï¸ Warning: Failed to delete rekapitulasi data:', rekapError);
                     // Don't throw error, just warn - rekapitulasi might not exist
                 } else {
-                    console.log('✅ Rekapitulasi data deleted successfully');
+                    console.log('âœ… Rekapitulasi data deleted successfully');
                 }
 
-                alert(`✅ Berhasil menghapus ${data.length} data absensi dan data rekapitulasi untuk ${displayBulan} ${tahun}!\n\nSilakan refresh dashboard untuk melihat perubahan.`);
+                alert(`âœ… Berhasil menghapus ${data.length} data absensi dan data rekapitulasi untuk ${displayBulan} ${tahun}!\n\nSilakan refresh dashboard untuk melihat perubahan.`);
 
                 // Reset state
                 currentLoadedData = null;
                 document.getElementById('dataInfoSection').style.display = 'none';
                 document.getElementById('excelPreviewSection').style.display = 'none';
                 document.getElementById('emptyState').innerHTML = `
-                    <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">✅</div>
+                    <div style="font-size: 64px; margin-bottom: 16px; opacity: 0.5;">âœ…</div>
                     <p style="font-size: 1.1rem; font-weight: 600; color: #16a34a; margin-bottom: 8px;">
                         Data berhasil dihapus
                     </p>
@@ -4328,10 +4155,10 @@
 
             } catch (error) {
                 console.error('Error deleting data:', error);
-                alert(`❌ Error: ${error.message}`);
+                alert(`âŒ Error: ${error.message}`);
             } finally {
                 btnDelete.disabled = false;
-                btnDelete.textContent = '🗑️ Hapus Data';
+                btnDelete.textContent = 'ðŸ—‘ï¸ Hapus Data';
             }
         });
     </script>
