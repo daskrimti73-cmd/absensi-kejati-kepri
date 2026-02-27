@@ -1769,17 +1769,18 @@
             let finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal;
             let pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha;
 
-            if (rekapData && rekapData.total > 0) {
+            if (rekapData && (rekapData.wfo > 0 || rekapData.dinas_luar > 0)) {
                 // Use rekapitulasi data from database
-                console.log('Using REKAPITULASI data for donut chart');
-                finalWfo = rekapData.wfo;
-                finalDinas = rekapData.dinas_luar;
-                finalUndangan = rekapData.undangan;
-                finalSakit = rekapData.sakit;
-                finalIjin = rekapData.ijin;
-                finalCuti = rekapData.cuti;
-                finalAlpha = rekapData.tidak_absen;
-                finalTotal = rekapData.total;
+                console.log('✅ Using REKAPITULASI data for donut chart');
+                finalWfo = rekapData.wfo || 0;
+                finalDinas = rekapData.dinas_luar || 0;
+                finalUndangan = rekapData.undangan || 0;
+                finalSakit = rekapData.sakit || 0;
+                finalIjin = rekapData.ijin || 0;
+                finalCuti = rekapData.cuti || 0;
+                finalAlpha = rekapData.tidak_absen || 0;
+                // Total tidak ada di DB, hitung dari penjumlahan
+                finalTotal = finalWfo + finalDinas + finalUndangan + finalSakit + finalIjin + finalCuti + finalAlpha;
 
                 // PRIORITAS: Gunakan persentase dari Excel jika ada
                 if (rekapData.wfo_pct !== null) {
