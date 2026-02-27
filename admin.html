@@ -2541,8 +2541,17 @@
                 </div>
             </div>
 
-            <!-- Excel Preview Section - HIDDEN -->
-            <div id="excelPreviewSection" style="display: none !important;"></div>
+            <!-- Excel Preview Section -->
+            <div id="excelPreviewSection" style="display: none; border-top: 1px solid #e5e7eb;">
+                <div
+                    style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); padding: 16px 20px; color: white; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700;">📄 Preview Data Excel</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; opacity: 0.9;">Data yang sudah terupload</p>
+                    </div>
+                </div>
+                <div id="excelPreviewContent" style="overflow: auto; max-height: 500px; padding: 0;"></div>
+            </div>
 
             <!-- Empty State - Enhanced -->
             <div id="emptyState" style="padding: clamp(40px, 8vw, 80px) clamp(20px, 4vw, 32px); text-align: center;">
