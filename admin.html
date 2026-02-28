@@ -1685,7 +1685,7 @@
 
         /* === GLOBAL TOP BAR (injected via ::before) === */
         body::before {
-            content: 'ï¸  Admin Panel  Kejaksaan Tinggi Kepulauan Riau';
+            content: '  Admin Panel  Kejaksaan Tinggi Kepulauan Riau';
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2823,7 +2823,7 @@
          */
         function detectExcelFormat(data) {
             if (data.length < 2) {
-                console.warn(`ï¸ Data too short: ${data.length} rows`);
+                console.warn(` Data too short: ${data.length} rows`);
                 return {
                     format: 'UNKNOWN',
                     headerRowIndex: -1,
@@ -2883,7 +2883,7 @@
                 }
             }
 
-            console.warn(`ï¸ Could not detect Excel format - no header row or date columns found`);
+            console.warn(` Could not detect Excel format - no header row or date columns found`);
             console.warn(`   First 3 rows:`, data.slice(0, 3));
             return {
                 format: 'UNKNOWN',
@@ -2907,7 +2907,7 @@
             // Step 1: Detect format
             const format = detectExcelFormat(jsonData);
             if (format.format === 'UNKNOWN') {
-                console.warn(`ï¸ Format unknown, trying fallback method...`);
+                console.warn(` Format unknown, trying fallback method...`);
                 // Fallback: Try first 5 rows as potential header rows
                 for (let tryRow = 0; tryRow < Math.min(5, jsonData.length); tryRow++) {
                     console.log(`   Trying row ${tryRow} as header...`);
@@ -2995,7 +2995,7 @@
             console.log(`   Extracted ${transformedData.length} rows from "${bidang}"`);
 
             if (transformedData.length === 0) {
-                console.warn(`  ï¸ No data extracted! Possible reasons:`);
+                console.warn(`   No data extracted! Possible reasons:`);
                 console.warn(`     - All date columns have 0 values`);
                 console.warn(`     - Summary rows don't have data at date column positions`);
                 console.warn(`     Sample summary row data:`, summaryRows['wfo']?.data?.slice(0, 15));
@@ -3260,7 +3260,7 @@
                 // ============================================
                 const rekapData = parseRekapitulasi(workbook, bulan, tahun);
                 if (!rekapData) {
-                    console.warn('ï¸ Failed to parse rekapitulasi data');
+                    console.warn(' Failed to parse rekapitulasi data');
                 }
 
                 // Process all sheets (each sheet = 1 bidang)
@@ -3304,13 +3304,13 @@
 
                     // Log if multiple GABUNGAN sheets found
                     if (gabunganCandidates.length > 1) {
-                        console.log(`ï¸ Multiple GABUNGAN sheets found (${gabunganCandidates.length}):`, gabunganCandidates.map(s => s.name));
+                        console.log(` Multiple GABUNGAN sheets found (${gabunganCandidates.length}):`, gabunganCandidates.map(s => s.name));
                         console.log(`   Using: "${workbook.SheetNames[gabunganSheetIndex]}" (CLEAN has priority)`);
                     }
                 } else {
                     // If no GABUNGAN sheet found by name, use first sheet as fallback
                     gabunganSheetIndex = 0;
-                    console.log(`ï¸ No GABUNGAN sheet found by name, using first sheet as GABUNGAN: "${workbook.SheetNames[0]}"`);
+                    console.log(` No GABUNGAN sheet found by name, using first sheet as GABUNGAN: "${workbook.SheetNames[0]}"`);
                 }
 
                 for (let i = 0; i < workbook.SheetNames.length; i++) {
@@ -3327,7 +3327,7 @@
                         const matchedBidang = validBidang.find(bidang => sheetNameUpper.includes(bidang));
 
                         if (!matchedBidang) {
-                            console.log(`ï¸ Skipping sheet: ${sheetName} (not a valid bidang)`);
+                            console.log(` Skipping sheet: ${sheetName} (not a valid bidang)`);
                             continue;
                         }
 
@@ -3346,7 +3346,7 @@
                     console.log(`Sheet "${sheetName}" - Total rows:`, jsonData.length);
 
                     if (jsonData.length === 0) {
-                        console.log(`ï¸ Sheet "${sheetName}" is empty, skipping...`);
+                        console.log(` Sheet "${sheetName}" is empty, skipping...`);
                         continue;
                     }
 
@@ -3365,14 +3365,14 @@
 
                         // If GABUNGAN sheet fails, try to use old parser as fallback
                         if (bidang === 'GABUNGAN') {
-                            console.warn(`ï¸ GABUNGAN sheet failed with smart parser, trying fallback method...`);
+                            console.warn(` GABUNGAN sheet failed with smart parser, trying fallback method...`);
                             try {
                                 const fallbackData = extractGabunganFallback(jsonData, bidang, tahun, bulan);
                                 allTransformedData = allTransformedData.concat(fallbackData);
                                 console.log(` GABUNGAN extracted using fallback method: ${fallbackData.length} rows`);
                             } catch (fallbackError) {
                                 console.error(` Fallback also failed:`, fallbackError.message);
-                                console.warn(`ï¸ Skipping GABUNGAN sheet`);
+                                console.warn(` Skipping GABUNGAN sheet`);
                             }
                         } else {
                             throw error; // Re-throw for non-GABUNGAN sheets
@@ -3698,7 +3698,7 @@
             const totalDeleted = (deletedGabungan?.length || 0) + (deletedBidang?.length || 0);
 
             if (cleanupError1 || cleanupError2) {
-                console.warn('ï¸ Cleanup warning:', cleanupError1 || cleanupError2);
+                console.warn(' Cleanup warning:', cleanupError1 || cleanupError2);
             } else if (totalDeleted > 0) {
                 console.log(` Cleaned up ${totalDeleted} TOTAL column rows`);
             }
@@ -3710,10 +3710,10 @@
                 showProgress(90, 'Menyimpan rekapitulasi...');
                 const rekapSuccess = await uploadRekapitulasi(sbClient, rekapData);
                 if (!rekapSuccess) {
-                    console.warn('ï¸ Failed to upload rekapitulasi data');
+                    console.warn(' Failed to upload rekapitulasi data');
                 }
             } else {
-                console.warn('ï¸ No rekapitulasi data to upload');
+                console.warn(' No rekapitulasi data to upload');
             }
 
             // ============================================
@@ -3724,7 +3724,7 @@
                 await uploadExcelToStorage(file, bulan, tahun);
                 console.log(' Excel file saved to storage');
             } catch (storageError) {
-                console.warn('ï¸ Failed to save Excel file to storage:', storageError.message);
+                console.warn(' Failed to save Excel file to storage:', storageError.message);
                 console.warn('   Data is still saved to database successfully');
                 // Don't throw error - data upload is still successful
             }
@@ -3734,9 +3734,9 @@
             addToHistory(bulan, tahun, uploadMode, allTransformedData.length, 'success');
 
             if (totalDeleted > 0) {
-                showStatus('success', ` Berhasil upload ${allTransformedData.length} data (${totalDeleted} kolom TOTAL dihapus) untuk ${bulan} ${tahun}!\n\nï¸ CEK CONSOLE (F12) untuk validasi hasil!`);
+                showStatus('success', ` Berhasil upload ${allTransformedData.length} data (${totalDeleted} kolom TOTAL dihapus) untuk ${bulan} ${tahun}!\n\n CEK CONSOLE (F12) untuk validasi hasil!`);
             } else {
-                showStatus('success', ` Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!\n\nï¸ CEK CONSOLE (F12) untuk validasi hasil!`);
+                showStatus('success', ` Berhasil upload ${allTransformedData.length} data untuk ${bulan} ${tahun}!\n\n CEK CONSOLE (F12) untuk validasi hasil!`);
             }
         }
 
@@ -3855,7 +3855,7 @@
                     .download(filepath);
 
                 if (error) {
-                    console.warn('ï¸ Excel file not found in storage, generating from database');
+                    console.warn(' Excel file not found in storage, generating from database');
                     // Fallback: generate from database
                     generateExcelPreview(currentLoadedData.data);
                     return;
@@ -4107,7 +4107,7 @@
             const displayBulan = bulan === 'SEMUA' ? 'semua bulan' : bulan;
 
             const confirmation = confirm(
-                `ï¸ PERINGATAN!\n\n` +
+                ` PERINGATAN!\n\n` +
                 `Anda akan menghapus ${data.length} data untuk ${displayBulan} ${tahun}.\n\n` +
                 `Tindakan ini TIDAK DAPAT DIBATALKAN!\n\n` +
                 `Apakah Anda yakin ingin melanjutkan?`
@@ -4120,7 +4120,7 @@
             btnDelete.textContent = ' Menghapus...';
 
             try {
-                console.log(`ï¸ Deleting data for tahun=${tahun}, bulan=${bulan}`);
+                console.log(` Deleting data for tahun=${tahun}, bulan=${bulan}`);
 
                 // Delete from absensi table
                 let deleteAbsensiQuery = sbClient
@@ -4152,7 +4152,7 @@
                 const { error: rekapError, data: rekapData } = await deleteRekapQuery;
 
                 if (rekapError) {
-                    console.warn('ï¸ Warning: Failed to delete rekapitulasi data:', rekapError);
+                    console.warn(' Warning: Failed to delete rekapitulasi data:', rekapError);
                     // Don't throw error, just warn - rekapitulasi might not exist
                 } else {
                     console.log(' Rekapitulasi data deleted successfully');
@@ -4180,7 +4180,7 @@
                 alert(` Error: ${error.message}`);
             } finally {
                 btnDelete.disabled = false;
-                btnDelete.textContent = 'ï¸ Hapus Data';
+                btnDelete.textContent = ' Hapus Data';
             }
         });
     </script>
