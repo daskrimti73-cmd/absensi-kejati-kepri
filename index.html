@@ -1769,9 +1769,43 @@
             let finalWfo, finalDinas, finalUndangan, finalSakit, finalIjin, finalCuti, finalAlpha, finalTotal;
             let pctWfo, pctDinas, pctUndangan, pctSakit, pctIjin, pctCuti, pctAlpha;
 
+            // VALIDASI REKAPITULASI: Pastikan data masuk akal sebelum menggunakannya
+            let useRekapData = false;
             if (rekapData && (rekapData.wfo > 0 || rekapData.dinas_luar > 0)) {
+                // Cek apakah data rekapitulasi valid
+                const rekapTotal = (rekapData.wfo || 0) + (rekapData.dinas_luar || 0) + (rekapData.undangan || 0) +
+                    (rekapData.sakit || 0) + (rekapData.ijin || 0) + (rekapData.cuti || 0) + (rekapData.tidak_absen || 0);
+
+                // Cek persentase: jika ada, total harus mendekati 100%
+                if (rekapData.wfo_pct !== null && rekapData.wfo_pct !== undefined) {
+                    const totalPct = (rekapData.wfo_pct || 0) + (rekapData.dinas_luar_pct || 0) +
+                        (rekapData.undangan_pct || 0) + (rekapData.sakit_pct || 0) +
+                        (rekapData.ijin_pct || 0) + (rekapData.cuti_pct || 0) +
+                        (rekapData.tidak_absen_pct || 0);
+                    console.log('Rekap total pct: ' + totalPct.toFixed(1) + '%');
+
+                    if (totalPct >= 50 && totalPct <= 150) {
+                        useRekapData = true;
+                    } else {
+                        console.log('WARNING: Rekap persentase abnormal (' + totalPct.toFixed(1) + '%), skip rekap data');
+                    }
+                }
+
+                // Jika WFO = 0 tapi data harian punya WFO > 0, rekapitulasi kemungkinan rusak
+                if (rekapData.wfo === 0 && totalWfoAll > 0) {
+                    console.log('WARNING: Rekap WFO=0 tapi data harian WFO=' + totalWfoAll + ', skip rekap data');
+                    useRekapData = false;
+                }
+
+                // Jika WFO > 0 dan total masuk akal, gunakan
+                if (rekapData.wfo > 0 && rekapTotal > 0) {
+                    useRekapData = true;
+                }
+            }
+
+            if (useRekapData) {
                 // Use rekapitulasi data from database
-                console.log('✅ Using REKAPITULASI data for donut chart');
+                console.log('Using REKAPITULASI data for donut chart');
                 finalWfo = rekapData.wfo || 0;
                 finalDinas = rekapData.dinas_luar || 0;
                 finalUndangan = rekapData.undangan || 0;
@@ -1779,22 +1813,35 @@
                 finalIjin = rekapData.ijin || 0;
                 finalCuti = rekapData.cuti || 0;
                 finalAlpha = rekapData.tidak_absen || 0;
-                // Total tidak ada di DB, hitung dari penjumlahan
                 finalTotal = finalWfo + finalDinas + finalUndangan + finalSakit + finalIjin + finalCuti + finalAlpha;
 
-                // PRIORITAS: Gunakan persentase dari Excel jika ada
-                if (rekapData.wfo_pct !== null) {
-                    console.log('Using PERCENTAGE from Excel (not calculated)');
-                    pctWfo = rekapData.wfo_pct.toFixed(1);
-                    pctDinas = (rekapData.dinas_luar_pct || 0).toFixed(1);
-                    pctUndangan = (rekapData.undangan_pct || 0).toFixed(1);
-                    pctSakit = (rekapData.sakit_pct || 0).toFixed(1);
-                    pctIjin = (rekapData.ijin_pct || 0).toFixed(1);
-                    pctCuti = (rekapData.cuti_pct || 0).toFixed(1);
-                    pctAlpha = (rekapData.tidak_absen_pct || 0).toFixed(1);
+                // Gunakan persentase dari Excel jika valid
+                if (rekapData.wfo_pct !== null && rekapData.wfo_pct !== undefined) {
+                    const totalPct = (rekapData.wfo_pct || 0) + (rekapData.dinas_luar_pct || 0) +
+                        (rekapData.undangan_pct || 0) + (rekapData.sakit_pct || 0) +
+                        (rekapData.ijin_pct || 0) + (rekapData.cuti_pct || 0) +
+                        (rekapData.tidak_absen_pct || 0);
+                    if (totalPct >= 80 && totalPct <= 120) {
+                        console.log('Using PERCENTAGE from Excel');
+                        pctWfo = rekapData.wfo_pct.toFixed(1);
+                        pctDinas = (rekapData.dinas_luar_pct || 0).toFixed(1);
+                        pctUndangan = (rekapData.undangan_pct || 0).toFixed(1);
+                        pctSakit = (rekapData.sakit_pct || 0).toFixed(1);
+                        pctIjin = (rekapData.ijin_pct || 0).toFixed(1);
+                        pctCuti = (rekapData.cuti_pct || 0).toFixed(1);
+                        pctAlpha = (rekapData.tidak_absen_pct || 0).toFixed(1);
+                    } else {
+                        console.log('Recalculating percentage from raw numbers');
+                        pctWfo = ((finalWfo / finalTotal) * 100).toFixed(1);
+                        pctDinas = ((finalDinas / finalTotal) * 100).toFixed(1);
+                        pctUndangan = ((finalUndangan / finalTotal) * 100).toFixed(1);
+                        pctSakit = ((finalSakit / finalTotal) * 100).toFixed(1);
+                        pctIjin = ((finalIjin / finalTotal) * 100).toFixed(1);
+                        pctCuti = ((finalCuti / finalTotal) * 100).toFixed(1);
+                        pctAlpha = ((finalAlpha / finalTotal) * 100).toFixed(1);
+                    }
                 } else {
-                    // Fallback: Hitung dari angka mentah
-                    console.log(' Calculating percentage from raw numbers');
+                    console.log('Calculating percentage from raw numbers');
                     pctWfo = ((finalWfo / finalTotal) * 100).toFixed(1);
                     pctDinas = ((finalDinas / finalTotal) * 100).toFixed(1);
                     pctUndangan = ((finalUndangan / finalTotal) * 100).toFixed(1);
@@ -1804,8 +1851,8 @@
                     pctAlpha = ((finalAlpha / finalTotal) * 100).toFixed(1);
                 }
             } else {
-                // Use calculated data from absensi table (existing logic)
-                console.log(' Using CALCULATED data for donut chart');
+                // Use calculated data from absensi table (GABUNGAN daily data)
+                console.log('Using CALCULATED data from daily attendance for donut chart');
                 finalWfo = totalWfoAll;
                 finalDinas = totalDinasAll;
                 finalUndangan = totalUndanganAll;
@@ -1816,13 +1863,17 @@
                 finalTotal = totalWfoAll + totalDinasAll + totalUndanganAll + totalSakitAll + totalIjinAll + totalCutiAll + totalAlphaAll;
 
                 // Hitung persentase
-                pctWfo = ((finalWfo / finalTotal) * 100).toFixed(1);
-                pctDinas = ((finalDinas / finalTotal) * 100).toFixed(1);
-                pctUndangan = ((finalUndangan / finalTotal) * 100).toFixed(1);
-                pctSakit = ((finalSakit / finalTotal) * 100).toFixed(1);
-                pctIjin = ((finalIjin / finalTotal) * 100).toFixed(1);
-                pctCuti = ((finalCuti / finalTotal) * 100).toFixed(1);
-                pctAlpha = ((finalAlpha / finalTotal) * 100).toFixed(1);
+                if (finalTotal > 0) {
+                    pctWfo = ((finalWfo / finalTotal) * 100).toFixed(1);
+                    pctDinas = ((finalDinas / finalTotal) * 100).toFixed(1);
+                    pctUndangan = ((finalUndangan / finalTotal) * 100).toFixed(1);
+                    pctSakit = ((finalSakit / finalTotal) * 100).toFixed(1);
+                    pctIjin = ((finalIjin / finalTotal) * 100).toFixed(1);
+                    pctCuti = ((finalCuti / finalTotal) * 100).toFixed(1);
+                    pctAlpha = ((finalAlpha / finalTotal) * 100).toFixed(1);
+                } else {
+                    pctWfo = pctDinas = pctUndangan = pctSakit = pctIjin = pctCuti = pctAlpha = '0.0';
+                }
             }
 
             // Generate Attendance Donut Chart (dengan persentase custom)
