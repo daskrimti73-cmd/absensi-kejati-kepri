@@ -133,6 +133,7 @@
             border: 1px solid var(--gray-200);
             width: 100%;
             overflow-x: hidden;
+            box-sizing: border-box;
         }
 
         /* ============================================
@@ -310,6 +311,9 @@
         .summary-chart-container {
             position: relative;
             height: 280px;
+            width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         /* Treemap Styling */
@@ -779,12 +783,18 @@
             .summary-chart-container {
                 height: 200px;
                 width: 100%;
+                overflow: hidden;
+            }
+
+            .summary-chart-container canvas {
+                width: 100% !important;
+                height: 100% !important;
+                max-width: 100%;
             }
 
             .treemap-container {
-                height: 200px;
-                gap: 16px;
-                width: 100%;
+                flex-wrap: wrap;
+                overflow: hidden;
             }
 
             .treemap-item-label {
