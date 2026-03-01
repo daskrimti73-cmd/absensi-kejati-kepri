@@ -1077,6 +1077,84 @@
                 font-size: 0.75rem;
             }
         }
+
+        /* ---- Comparison Dashboard Mobile Fix ---- */
+        @media (max-width: 768px) {
+            #comparisonStats {
+                grid-template-columns: 1fr !important;
+                gap: 0.75rem !important;
+                margin-bottom: 1rem !important;
+            }
+
+            #comparisonContent>div {
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+
+            #comparisonContent h2 {
+                font-size: 1rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+
+            #trendChartContainer>div:first-child {
+                padding: 1rem !important;
+                flex-direction: column !important;
+            }
+
+            #trendChartContainer>div:first-child h2 {
+                font-size: 1rem !important;
+            }
+
+            #trendChartContainer>div:first-child p {
+                font-size: 0.75rem !important;
+            }
+
+            #trendStatsRow {
+                grid-template-columns: repeat(2, 1fr) !important;
+                padding: 0.75rem 1rem !important;
+                gap: 0.5rem !important;
+            }
+
+            #trendChartContainer>div:nth-child(3) {
+                padding: 0.75rem !important;
+            }
+
+            #comparisonTrendChart {
+                max-height: 250px !important;
+            }
+
+            #comparisonOverallChart {
+                max-height: 280px !important;
+            }
+
+            #trendInsight>div {
+                padding: 0.5rem 0.75rem !important;
+                font-size: 0.75rem !important;
+            }
+
+            #trendInsight {
+                padding: 0.5rem 1rem 1rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #trendStatsRow {
+                grid-template-columns: 1fr 1fr !important;
+                padding: 0.5rem 0.75rem !important;
+            }
+
+            #comparisonTrendChart {
+                max-height: 200px !important;
+            }
+
+            #comparisonOverallChart {
+                max-height: 220px !important;
+            }
+
+            .bidang-chart-container canvas {
+                max-height: 180px;
+            }
+        }
     </style>
 
 </head>
