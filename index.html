@@ -1283,7 +1283,6 @@
                     <label for="tahunFilter">Pilih Tahun</label>
                     <select id="tahunFilter" onchange="updateBidangDashboard()">
                         <option value="2025" selected>2025</option>
-                        <option value="2026">2026</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -1340,11 +1339,6 @@
                             <select id="globalYearSelect"
                                 style="padding: 0.875rem 1.5rem; border: 2px solid var(--primary-300); border-radius: var(--radius-lg); font-weight: 700; font-size: 1rem; color: var(--primary-700); background: white; cursor: pointer; min-width: 120px; transition: all 0.3s;">
                                 <option value="2025" selected>2025</option>
-                                <option value="2026">2026</option>
-                                <option value="2027">2027</option>
-                                <option value="2028">2028</option>
-                                <option value="2029">2029</option>
-                                <option value="2030">2030</option>
                             </select>
                         </div>
 
@@ -1474,6 +1468,66 @@
         } else {
             console.log(' Supabase disabled or library not loaded');
         }
+
+        // ============================================
+        // POPULATE TAHUN DROPDOWNS DYNAMICALLY
+        // Query distinct tahun from absensi table
+        // ============================================
+        async function populateTahunDropdowns() {
+            if (!supabaseClient) {
+                console.log('Supabase not available, using default tahun');
+                return;
+            }
+
+            try {
+                // Query distinct tahun from absensi table
+                const { data, error } = await supabaseClient
+                    .from('absensi')
+                    .select('tahun')
+                    .order('tahun', { ascending: true });
+
+                if (error) {
+                    console.error('Error fetching tahun:', error);
+                    return;
+                }
+
+                // Extract unique years
+                const years = [...new Set(data.map(r => r.tahun))].sort((a, b) => a - b);
+                console.log('Available years from database:', years);
+
+                if (years.length === 0) {
+                    console.log('No years found, keeping default');
+                    return;
+                }
+
+                // Current year for default selection
+                const currentYear = new Date().getFullYear();
+                const defaultYear = years.includes(currentYear) ? currentYear : years[years.length - 1];
+
+                // Populate tahunFilter (dashboard per bidang)
+                const tahunFilter = document.getElementById('tahunFilter');
+                if (tahunFilter) {
+                    tahunFilter.innerHTML = years.map(y =>
+                        `<option value="${y}" ${y === defaultYear ? 'selected' : ''}>${y}</option>`
+                    ).join('');
+                }
+
+                // Populate globalYearSelect (analisis perbandingan)
+                const globalYear = document.getElementById('globalYearSelect');
+                if (globalYear) {
+                    globalYear.innerHTML = years.map(y =>
+                        `<option value="${y}" ${y === defaultYear ? 'selected' : ''}>${y}</option>`
+                    ).join('');
+                }
+
+                console.log('Tahun dropdowns populated with', years.length, 'years, default:', defaultYear);
+            } catch (err) {
+                console.error('populateTahunDropdowns error:', err);
+            }
+        }
+
+        // Auto-populate on load
+        populateTahunDropdowns();
 
         // Fetch data from Supabase
         async function fetchFromSupabase(tahun, bulan, bidang = null) {

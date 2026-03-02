@@ -2229,6 +2229,36 @@
 
         <div class="status" id="status"></div>
 
+        <!-- ============================================ -->
+        <!-- KELOLA TAHUN DASHBOARD -->
+        <!-- ============================================ -->
+        <div style="
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            margin-top: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid #e5e7eb;
+        ">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #1f2937;">Kelola Tahun Dashboard</h3>
+            </div>
+            <p style="color: #64748b; font-size: 0.82rem; margin-bottom: 16px; line-height: 1.5;">
+                Tahun yang tersedia di dropdown filter dashboard publik. Otomatis terupdate saat Anda upload data untuk
+                tahun baru.
+            </p>
+            <div id="tahunTagsContainer" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <span style="color: #94a3b8; font-size: 0.85rem;">Memuat...</span>
+            </div>
+        </div>
+
         <!-- Preview Data Section - DISABLED -->
         <div id="previewSection" style="display: none !important;">
             <!-- Preview section dihapus - langsung upload tanpa preview -->
@@ -4256,6 +4286,63 @@
                 btnDelete.textContent = ' Hapus Data';
             }
         });
+    </script>
+
+    <!-- KELOLA TAHUN DASHBOARD SCRIPT -->
+    <script>
+        async function loadTahunDashboard() {
+            try {
+                const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+                // Query distinct tahun from absensi table
+                const { data, error } = await sb
+                    .from('absensi')
+                    .select('tahun')
+                    .order('tahun', { ascending: true });
+
+                if (error) {
+                    console.error('Error loading tahun:', error);
+                    renderTahunTags([]);
+                    return;
+                }
+
+                // Extract unique years
+                const years = [...new Set(data.map(r => r.tahun))].sort((a, b) => a - b);
+                console.log('Available years:', years);
+                renderTahunTags(years);
+            } catch (err) {
+                console.error('loadTahunDashboard error:', err);
+                renderTahunTags([]);
+            }
+        }
+
+        function renderTahunTags(tahunList) {
+            const container = document.getElementById('tahunTagsContainer');
+            if (!container) return;
+
+            if (tahunList.length === 0) {
+                container.innerHTML = '<span style="color: #94a3b8; font-size: 0.85rem;">Belum ada data. Upload file Excel untuk menambahkan tahun.</span>';
+                return;
+            }
+
+            container.innerHTML = tahunList.map(t => `
+                <div style="
+                    display: inline-flex; align-items: center; gap: 6px;
+                    padding: 8px 14px; background: #eff6ff; border: 1px solid #bfdbfe;
+                    border-radius: 8px; font-size: 0.85rem; font-weight: 700; color: #1e40af;
+                    font-family: 'Inter', sans-serif;
+                ">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span>${t}</span>
+                </div>
+            `).join('');
+        }
+
+        // Auto-load on page ready
+        document.addEventListener('DOMContentLoaded', loadTahunDashboard);
     </script>
 </body>
 
