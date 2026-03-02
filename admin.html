@@ -182,11 +182,13 @@
 
                     console.log('  Label "' + cellText + '" (key=' + entry.key + ') di row ' + i + ', col ' + j);
 
-                    // Kumpulkan SEMUA angka di kanan label
+                    // Kumpulkan angka di kanan label (MAKS 6 kolom setelah label)
+                    // PENTING: Batasi agar tidak ambil angka dari kolom jauh (TOTAL dll)
                     var allNumbers = [];
                     var allPercentages = [];
+                    var maxScanCol = Math.min(j + 7, row.length); // scan maks 6 kolom setelah label
 
-                    for (var k = j + 1; k < row.length; k++) {
+                    for (var k = j + 1; k < maxScanCol; k++) {
                         var val = row[k];
                         if (val === '' || val === null || val === undefined) continue;
 
