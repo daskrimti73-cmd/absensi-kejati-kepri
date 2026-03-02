@@ -3366,9 +3366,17 @@
                         console.log(`   Using: "${workbook.SheetNames[gabunganSheetIndex]}" (CLEAN has priority)`);
                     }
                 } else {
-                    // If no GABUNGAN sheet found by name, use first sheet as fallback
-                    gabunganSheetIndex = 0;
-                    console.log(` No GABUNGAN sheet found by name, using first sheet as GABUNGAN: "${workbook.SheetNames[0]}"`);
+                    // If no GABUNGAN sheet found by name, check if first sheet is a valid bidang
+                    const firstSheetUpper = workbook.SheetNames[0].trim().toUpperCase();
+                    const firstSheetIsBidang = resolveBidangName(firstSheetUpper);
+                    if (firstSheetIsBidang) {
+                        // First sheet is a valid bidang — do NOT use it as GABUNGAN
+                        gabunganSheetIndex = -1;
+                        console.log(` No GABUNGAN sheet found. First sheet "${workbook.SheetNames[0]}" is bidang ${firstSheetIsBidang}, NOT using as GABUNGAN`);
+                    } else {
+                        gabunganSheetIndex = 0;
+                        console.log(` No GABUNGAN sheet found by name, using first sheet as GABUNGAN: "${workbook.SheetNames[0]}"`);
+                    }
                 }
 
                 for (let i = 0; i < workbook.SheetNames.length; i++) {
