@@ -1480,19 +1480,39 @@
             }
 
             try {
-                // Query distinct tahun from absensi table
-                const { data, error } = await supabaseClient
-                    .from('absensi')
-                    .select('tahun')
-                    .order('tahun', { ascending: true });
+                // Query tahun with pagination to bypass 1000 row Supabase limit
+                // Strategy: fetch in batches, each time filtering tahun > lastYear
+                let allYears = [];
+                let lastYear = 0;
+                let hasMore = true;
 
-                if (error) {
-                    console.error('Error fetching tahun:', error);
-                    return;
+                while (hasMore) {
+                    let query = supabaseClient
+                        .from('absensi')
+                        .select('tahun')
+                        .order('tahun', { ascending: true })
+                        .limit(1000);
+
+                    if (lastYear > 0) {
+                        query = query.gt('tahun', lastYear);
+                    }
+
+                    const { data, error } = await query;
+
+                    if (error || !data || data.length === 0) {
+                        hasMore = false;
+                    } else {
+                        const batchYears = [...new Set(data.map(r => r.tahun))];
+                        batchYears.forEach(y => {
+                            if (!allYears.includes(y)) allYears.push(y);
+                        });
+                        lastYear = Math.max(...batchYears);
+                        if (data.length < 1000) hasMore = false;
+                    }
                 }
 
-                // Extract unique years
-                const years = [...new Set(data.map(r => r.tahun))].sort((a, b) => a - b);
+                // Sort years
+                const years = allYears.sort((a, b) => a - b);
                 console.log('Available years from database:', years);
 
                 if (years.length === 0) {
