@@ -216,22 +216,25 @@
                     console.log('    Numbers: ' + JSON.stringify(allNumbers.map(function (n) { return n.value; })));
                     console.log('    Percentages: ' + JSON.stringify(allPercentages.map(function (p) { return p.value.toFixed(1) + '%'; })));
 
-                    // Pilih JUMLAH: angka integer terbesar (> 1) = jumlah mentah
+                    // Pilih JUMLAH: angka integer PERTAMA (> 1) setelah label = jumlah mentah
+                    // PENTING: Ambil yang PERTAMA, bukan terbesar! 
+                    // Karena kolom setelah label biasanya: [jumlah] [persentase] [total]
+                    // Jika ambil terbesar, bisa salah ambil kolom TOTAL
                     var bestCount = 0;
                     var integerNumbers = allNumbers.filter(function (n) {
                         return n.value > 1 && n.value === Math.floor(n.value);
                     });
 
                     if (integerNumbers.length > 0) {
-                        // Ambil integer terbesar
-                        integerNumbers.sort(function (a, b) { return b.value - a.value; });
+                        // Ambil integer PERTAMA (posisi kolom paling kiri/dekat label)
+                        integerNumbers.sort(function (a, b) { return a.col - b.col; });
                         bestCount = Math.round(integerNumbers[0].value);
-                        console.log('    -> Jumlah (integer terbesar): ' + bestCount);
+                        console.log('    -> Jumlah (integer pertama setelah label): ' + bestCount);
                     } else if (allNumbers.length > 0) {
-                        // Tidak ada integer > 1, ambil angka terbesar apapun
-                        var sorted = allNumbers.slice().sort(function (a, b) { return b.value - a.value; });
+                        // Tidak ada integer > 1, ambil angka pertama setelah label
+                        var sorted = allNumbers.slice().sort(function (a, b) { return a.col - b.col; });
                         bestCount = Math.round(sorted[0].value);
-                        console.log('    -> Jumlah (angka terbesar): ' + bestCount);
+                        console.log('    -> Jumlah (angka pertama): ' + bestCount);
                     }
 
                     // Pilih PERSENTASE
