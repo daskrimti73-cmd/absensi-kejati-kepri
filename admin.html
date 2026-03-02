@@ -3315,14 +3315,15 @@
 
                 // Helper: resolve sheet name to canonical bidang name
                 function resolveBidangName(nameUpper) {
-                    // 1. Direct/partial match with validBidang (existing logic)
-                    var direct = validBidang.find(b => nameUpper.includes(b));
-                    if (direct) return direct;
-                    // 2. Check aliases (longest alias first to avoid partial conflicts)
+                    // 1. Check aliases FIRST (longest alias first to avoid partial conflicts)
+                    //    e.g. "TATA USAHA NEGARA" must match DATUN, not "TATA USAHA"
                     var aliasKeys = Object.keys(bidangAliases).sort((a, b) => b.length - a.length);
                     for (var k = 0; k < aliasKeys.length; k++) {
                         if (nameUpper.includes(aliasKeys[k])) return bidangAliases[aliasKeys[k]];
                     }
+                    // 2. Fallback: Direct/partial match with validBidang
+                    var direct = validBidang.find(b => nameUpper.includes(b));
+                    if (direct) return direct;
                     return null;
                 }
 
