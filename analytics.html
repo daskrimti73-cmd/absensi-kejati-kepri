@@ -219,6 +219,14 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             border: 1px solid #e0e0e0;
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container canvas {
+            width: 100% !important;
+            max-width: 100%;
+            height: auto !important;
         }
 
         .chart-container:hover {
@@ -330,25 +338,294 @@
             font-weight: 500;
         }
 
-        @media (max-width: 768px) {
+        /* ============================================
+           RESPONSIVE BREAKPOINTS
+           ============================================ */
+
+        /* Tablet & small laptops */
+        @media (max-width: 1024px) {
             .container {
-                padding: 24px;
+                padding: 28px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Tablets portrait & large phones */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .container {
+                padding: 20px;
+                border-radius: 16px;
+            }
+
+            .header {
+                margin-bottom: 24px;
+                padding-bottom: 16px;
             }
 
             .header h1 {
-                font-size: 1.5rem;
+                font-size: 1.35rem;
+            }
+
+            .header p {
+                font-size: 0.875rem;
             }
 
             .controls {
                 flex-direction: column;
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .controls select,
+            .controls button {
+                width: 100%;
+                padding: 12px 16px;
+                font-size: 0.875rem;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr;
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+
+            .stat-card {
+                padding: 20px;
             }
 
             .stat-card .value {
                 font-size: 2rem;
+            }
+
+            .stat-card h3 {
+                font-size: 0.8125rem;
+            }
+
+            .chart-container {
+                padding: 16px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+            }
+
+            .chart-container h2 {
+                font-size: 1.125rem;
+                margin-bottom: 16px;
+            }
+
+            .top-bidang {
+                padding: 20px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+            }
+
+            .top-bidang h2 {
+                font-size: 1.125rem;
+                margin-bottom: 16px;
+            }
+
+            .bidang-item {
+                padding: 14px 16px;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .bidang-rank {
+                font-size: 1.5rem;
+                width: 40px;
+            }
+
+            .bidang-name {
+                font-size: 0.9375rem;
+            }
+
+            .bidang-value {
+                font-size: 1.375rem;
+            }
+
+            .alert-box {
+                padding: 18px 20px;
+                border-radius: 10px;
+            }
+
+            .alert-box h3 {
+                font-size: 1.0625rem;
+                margin-bottom: 12px;
+            }
+
+            .alert-item {
+                font-size: 0.875rem;
+                padding: 10px 0;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+            }
+
+            .container {
+                padding: 14px;
+                border-radius: 12px;
+            }
+
+            .header {
+                margin-bottom: 16px;
+                padding-bottom: 12px;
+            }
+
+            .header h1 {
+                font-size: 1.15rem;
+                word-break: break-word;
+            }
+
+            .header p {
+                font-size: 0.8125rem;
+            }
+
+            .controls {
+                padding: 12px;
+                gap: 10px;
+                border-radius: 12px;
+                margin-bottom: 20px;
+            }
+
+            .controls select,
+            .controls button {
+                padding: 11px 14px;
+                font-size: 0.8125rem;
+                border-radius: 10px;
+            }
+
+            .stats-grid {
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .stat-card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .stat-card .value {
+                font-size: 1.625rem;
+            }
+
+            .stat-card h3 {
+                font-size: 0.75rem;
+                margin-bottom: 8px;
+            }
+
+            .stat-card .trend {
+                font-size: 0.8125rem;
+            }
+
+            .chart-container {
+                padding: 12px;
+                border-radius: 10px;
+                margin-bottom: 16px;
+            }
+
+            .chart-container h2 {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+
+            .top-bidang {
+                padding: 14px;
+                border-radius: 10px;
+                margin-bottom: 16px;
+            }
+
+            .top-bidang h2 {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+
+            .bidang-item {
+                padding: 12px;
+                border-radius: 10px;
+                margin-bottom: 8px;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .bidang-rank {
+                font-size: 1.25rem;
+                width: 32px;
+                min-width: 32px;
+            }
+
+            .bidang-name {
+                font-size: 0.8125rem;
+                flex: 1;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .bidang-value {
+                font-size: 1.125rem;
+            }
+
+            .alert-box {
+                padding: 14px 16px;
+                border-radius: 8px;
+                margin-bottom: 16px;
+            }
+
+            .alert-box h3 {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+
+            .alert-item {
+                font-size: 0.8125rem;
+                padding: 8px 0;
+                word-break: break-word;
+            }
+
+            .loading {
+                padding: 40px 16px;
+                font-size: 0.9375rem;
+            }
+        }
+
+        /* Very small phones (320px) */
+        @media (max-width: 360px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 1.05rem;
+            }
+
+            .stat-card .value {
+                font-size: 1.4rem;
+            }
+
+            .bidang-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+
+            .bidang-rank {
+                font-size: 1rem;
+                width: auto;
+            }
+
+            .bidang-value {
+                font-size: 1rem;
+                align-self: flex-end;
             }
         }
     </style>
