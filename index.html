@@ -2056,13 +2056,12 @@
                 return;
             }
 
-            // Helper: render one treemap cell — name + value at bottom-left
+            // Helper: render one treemap cell — "Name, Value" at bottom-left, wraps if needed
             function cell(item, flex) {
                 const name = bidangShortName[item.name] || item.name;
                 const color = bidangColorMap[item.name] || '#999';
                 return `<div class="treemap-item" style="flex:${flex};background:${color};border-radius:4px;margin:1px;min-height:0;min-width:0;padding:6px 8px;">
-                    <div style="font-size:0.6rem;font-weight:600;opacity:0.9;line-height:1.2;word-break:break-word;">${name}</div>
-                    <div style="font-size:0.85rem;font-weight:800;line-height:1.1;font-family:'Poppins',sans-serif;">${item.value}</div>
+                    <div style="font-size:0.65rem;font-weight:700;opacity:0.95;line-height:1.3;word-break:break-word;">${name}, ${item.value}</div>
                 </div>`;
             }
 
@@ -2103,8 +2102,7 @@
             const lgName = bidangShortName[largest.name] || largest.name;
             const lgColor = bidangColorMap[largest.name] || '#999';
             html += `<div class="treemap-item" style="flex:${leftFlex};background:${lgColor};border-radius:4px;margin:1px;min-height:0;min-width:0;padding:8px 10px;">
-                <div style="font-size:0.75rem;font-weight:600;opacity:0.9;line-height:1.2;">${lgName}</div>
-                <div style="font-size:1.3rem;font-weight:800;line-height:1.1;font-family:'Poppins',sans-serif;">${largest.value}</div>
+                <div style="font-size:0.85rem;font-weight:700;opacity:0.95;line-height:1.3;">${lgName}, ${largest.value}</div>
             </div>`;
 
             // RIGHT: 2 rows
