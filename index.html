@@ -287,6 +287,7 @@
             box-shadow: var(--shadow-md);
             transition: var(--transition);
             min-width: 0;
+            overflow: hidden;
             width: 100%;
         }
 
@@ -312,7 +313,7 @@
             position: relative;
             height: 280px;
             width: 100%;
-            overflow: visible;
+            overflow: hidden;
             box-sizing: border-box;
         }
 
@@ -320,8 +321,10 @@
         .treemap-container {
             display: flex;
             gap: 0;
-            height: 280px;
+            height: 100%;
             width: 100%;
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         .treemap-item {
@@ -783,7 +786,7 @@
             .summary-chart-container {
                 height: 250px;
                 width: 100%;
-                overflow: visible;
+                overflow: hidden;
             }
 
             .summary-chart-container canvas {
@@ -793,8 +796,8 @@
             }
 
             .treemap-container {
-                overflow: visible;
-                height: 250px;
+                overflow: hidden;
+                height: 100%;
             }
 
             .treemap-item-label {
@@ -983,7 +986,7 @@
             }
 
             .treemap-container {
-                height: 220px;
+                height: 100%;
                 gap: 0;
             }
 
@@ -1075,8 +1078,8 @@
             }
 
             .treemap-container {
-                height: 160px;
-                gap: 12px;
+                height: 100%;
+                gap: 0;
             }
 
             .treemap-item-label {
@@ -2115,7 +2118,7 @@
             function cell(item, fontSize, valSize) {
                 const name = bidangShortName[item.name] || item.name;
                 const color = bidangColorMap[item.name] || '#999';
-                return `<div class="treemap-item" style="flex:1;background:${color};display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:8px;margin:1.5px;">
+                return `<div class="treemap-item" style="flex:1;background:${color};display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:8px;margin:1px;min-height:0;">
                     <div style="font-size:${fontSize};opacity:0.95;font-weight:600;margin-bottom:4px;line-height:1.2;">${name}</div>
                     <div style="font-size:${valSize};font-weight:800;font-family:'Poppins',sans-serif;">${item.value}</div>
                 </div>`;
@@ -2162,30 +2165,30 @@
                 row2Small = row2.slice(2);
             }
 
-            let html = `<div style="display:flex;height:100%;width:100%;">`;
+            let html = `<div style="display:flex;height:100%;width:100%;overflow:hidden;">`;
 
             // LEFT: largest item
-            html += `<div class="treemap-item" style="flex:0 0 ${leftPct}%;background:${bidangColorMap[largest.name] || '#999'};display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:8px;margin:1.5px;">
+            html += `<div class="treemap-item" style="flex:0 0 ${leftPct}%;background:${bidangColorMap[largest.name] || '#999'};display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:8px;margin:1px;min-height:0;">
                 <div style="font-size:0.8rem;opacity:0.95;font-weight:600;margin-bottom:6px;">${bidangShortName[largest.name] || largest.name}</div>
                 <div style="font-size:2rem;font-weight:800;font-family:'Poppins',sans-serif;">${largest.value}</div>
             </div>`;
 
             // RIGHT: 2 rows
-            html += `<div style="flex:1;display:flex;flex-direction:column;">`;
+            html += `<div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;">`;
 
             // Row 1
-            html += `<div style="flex:0 0 ${row1Hpct}%;display:flex;">`;
+            html += `<div style="flex:${row1Total};display:flex;min-height:0;overflow:hidden;">`;
             row1.forEach(item => { html += cell(item, '0.7rem', '1.4rem'); });
             html += `</div>`;
 
             // Row 2
-            html += `<div style="flex:0 0 ${row2Hpct}%;display:flex;">`;
+            html += `<div style="flex:${row2Total};display:flex;min-height:0;overflow:hidden;">`;
             row2Main.forEach(item => { html += cell(item, '0.65rem', '1.3rem'); });
             if (row2Small.length > 0) {
                 const smallTotal = row2Small.reduce((s, i) => s + i.value, 0);
                 const row2MainTotal = row2Main.reduce((s, i) => s + i.value, 0);
                 const smallPct = row2Total > 0 ? (smallTotal / row2Total * 100) : 30;
-                html += `<div style="flex:0 0 ${smallPct}%;display:flex;flex-direction:column;">`;
+                html += `<div style="flex:0 0 ${smallPct}%;display:flex;flex-direction:column;min-height:0;overflow:hidden;">`;
                 row2Small.forEach(item => { html += cell(item, '0.55rem', '1.1rem'); });
                 html += `</div>`;
             }
