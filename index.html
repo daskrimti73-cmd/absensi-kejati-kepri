@@ -330,43 +330,27 @@
         .treemap-item {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            align-items: flex-start;
+            justify-content: flex-end;
             color: white;
             font-weight: 700;
             font-size: 0.75rem;
-            text-align: center;
-            padding: 1rem;
+            text-align: left;
+            padding: 6px 8px;
             position: relative;
             overflow: hidden;
             line-height: 1.3;
-            border-radius: var(--radius-md);
+            border-radius: 4px;
             transition: var(--transition);
-            box-shadow: var(--shadow-sm);
             min-width: 0;
             word-break: break-word;
         }
 
         .treemap-item:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-lg);
+            filter: brightness(1.1);
             z-index: 10;
         }
 
-        .treemap-item-label {
-            font-size: 0.625rem;
-            margin-bottom: 0.5rem;
-            opacity: 0.95;
-            word-wrap: break-word;
-            max-width: 100%;
-            font-weight: 600;
-        }
-
-        .treemap-item-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            font-family: 'Poppins', sans-serif;
-        }
 
         /* ============================================
            FILTER SECTION
@@ -800,19 +784,6 @@
                 height: 100%;
             }
 
-            .treemap-item-label {
-                font-size: 0.5rem;
-                margin-bottom: 0.25rem;
-            }
-
-            .treemap-item-value {
-                font-size: 1rem;
-            }
-
-            .treemap-item:hover {
-                transform: none;
-            }
-
             .filter-section {
                 margin-bottom: 1.5rem;
             }
@@ -990,15 +961,6 @@
                 gap: 0;
             }
 
-            .treemap-item-label {
-                font-size: 0.4375rem;
-                margin-bottom: 0.125rem;
-            }
-
-            .treemap-item-value {
-                font-size: 0.875rem;
-            }
-
             .filter-section {
                 margin-bottom: 1rem;
             }
@@ -1080,14 +1042,6 @@
             .treemap-container {
                 height: 100%;
                 gap: 0;
-            }
-
-            .treemap-item-label {
-                font-size: 0.375rem;
-            }
-
-            .treemap-item-value {
-                font-size: 0.75rem;
             }
         }
 
@@ -2080,33 +2034,21 @@
                 return;
             }
 
-            // Short names for treemap labels (like reference design)
             const bidangShortName = {
-                'PEMBINAAN': 'Pembinaan',
-                'INTELIJEN': 'Intelijen',
-                'PIDUM': 'Pidum',
-                'PIDSUS': 'Pidsus',
-                'DATUN': 'Datun',
-                'PENGAWASAN': 'Pengawasan',
-                'TATA USAHA': 'Tata Usaha',
-                'KOORDINATOR': 'Koordinator',
-                'PEMULIHAN ASET': 'Pemulihan Aset'
+                'PEMBINAAN': 'Pembinaan', 'INTELIJEN': 'Intelijen',
+                'PIDUM': 'Pidum', 'PIDSUS': 'Pidsus', 'DATUN': 'Datun',
+                'PENGAWASAN': 'Pengawasan', 'TATA USAHA': 'Tata Usaha',
+                'KOORDINATOR': 'Koordinator', 'PEMULIHAN ASET': 'Pemulihan Aset'
             };
 
-            // Fixed color per bidang name (consistent regardless of sort order)
             const bidangColorMap = {
-                'PEMBINAAN': '#073B4C',
-                'TATA USAHA': '#F78C6B',
-                'PIDSUS': '#7B68A6',
-                'PIDUM': '#E85D75',
-                'PENGAWASAN': '#FF6B6B',
-                'INTELIJEN': '#0CB0A9',
-                'DATUN': '#FF9F40',
-                'PEMULIHAN ASET': '#FFD166',
+                'PEMBINAAN': '#073B4C', 'TATA USAHA': '#F78C6B',
+                'PIDSUS': '#7B68A6', 'PIDUM': '#E85D75',
+                'PENGAWASAN': '#FF6B6B', 'INTELIJEN': '#0CB0A9',
+                'DATUN': '#FF9F40', 'PEMULIHAN ASET': '#FFD166',
                 'KOORDINATOR': '#FFA500'
             };
 
-            // Sort descending by value
             const sorted = [...bidangData].sort((a, b) => b.value - a.value);
             const total = sorted.reduce((s, i) => s + i.value, 0);
             if (total === 0) {
@@ -2114,82 +2056,70 @@
                 return;
             }
 
-            // Helper: render one treemap cell
-            function cell(item, fontSize, valSize) {
+            // Helper: render one treemap cell — text at bottom-left, "Name, Value"
+            function cell(item, flex) {
                 const name = bidangShortName[item.name] || item.name;
                 const color = bidangColorMap[item.name] || '#999';
-                return `<div class="treemap-item" style="flex:1;background:${color};display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:8px;margin:1px;min-height:0;">
-                    <div style="font-size:${fontSize};opacity:0.95;font-weight:600;margin-bottom:4px;line-height:1.2;">${name}</div>
-                    <div style="font-size:${valSize};font-weight:800;font-family:'Poppins',sans-serif;">${item.value}</div>
+                return `<div class="treemap-item" style="flex:${flex};background:${color};border-radius:4px;margin:1px;min-height:0;min-width:0;padding:6px 8px;">
+                    <span style="font-size:0.7rem;font-weight:600;opacity:0.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">${name}, ${item.value}</span>
                 </div>`;
             }
 
-            // Squarified treemap layout algorithm (slice-and-dice)
-            // Strategy: split sorted items into rows, each row has items whose
-            // combined area is proportional. We use a simple greedy approach.
-
-            // Take the largest item as the left column
+            // Largest item = left column (full height)
             const largest = sorted[0];
             const rest = sorted.slice(1);
             const restTotal = total - largest.value;
+            const leftFlex = largest.value;
 
-            // Left column width proportional to largest value
-            const leftPct = (largest.value / total * 100);
-
-            // Split rest into 2 rows, trying to balance area
-            // Row 1 gets items until its sum exceeds ~half of restTotal
-            let row1 = [], row2 = [];
-            let row1Sum = 0;
-            const halfRest = restTotal / 2;
+            // Balanced partition: split rest into 2 rows with closest sums
+            // Greedy: assign each item to the row with smaller current sum
+            let row1 = [], row2 = [], sum1 = 0, sum2 = 0;
             for (const item of rest) {
-                if (row1Sum < halfRest && row1.length < 3) {
+                if (sum1 <= sum2) {
                     row1.push(item);
-                    row1Sum += item.value;
+                    sum1 += item.value;
                 } else {
                     row2.push(item);
+                    sum2 += item.value;
                 }
             }
+            // Sort each row descending for consistent layout
+            row1.sort((a, b) => b.value - a.value);
+            row2.sort((a, b) => b.value - a.value);
             const row1Total = row1.reduce((s, i) => s + i.value, 0);
             const row2Total = row2.reduce((s, i) => s + i.value, 0);
 
-            // Row heights proportional to their totals
-            const row1Hpct = restTotal > 0 ? (row1Total / restTotal * 100) : 50;
-            const row2Hpct = 100 - row1Hpct;
-
-            // Check if row2 has small items that should be stacked
-            // If row2 has more than 3 items, split last few into a sub-column
-            let row2Main = row2;
-            let row2Small = [];
+            // Split row2 if it has many small items: main items + stacked small column
+            let row2Main = row2, row2Small = [];
             if (row2.length > 3) {
                 row2Main = row2.slice(0, 2);
                 row2Small = row2.slice(2);
             }
 
-            let html = `<div style="display:flex;height:100%;width:100%;overflow:hidden;">`;
+            let html = `<div style="display:flex;height:100%;width:100%;overflow:hidden;gap:1px;">`;
 
-            // LEFT: largest item
-            html += `<div class="treemap-item" style="flex:0 0 ${leftPct}%;background:${bidangColorMap[largest.name] || '#999'};display:flex;flex-direction:column;justify-content:center;align-items:center;border-radius:8px;margin:1px;min-height:0;">
-                <div style="font-size:0.8rem;opacity:0.95;font-weight:600;margin-bottom:6px;">${bidangShortName[largest.name] || largest.name}</div>
-                <div style="font-size:2rem;font-weight:800;font-family:'Poppins',sans-serif;">${largest.value}</div>
+            // LEFT: largest item — text at bottom-left
+            const lgName = bidangShortName[largest.name] || largest.name;
+            const lgColor = bidangColorMap[largest.name] || '#999';
+            html += `<div class="treemap-item" style="flex:${leftFlex};background:${lgColor};border-radius:4px;margin:1px;min-height:0;min-width:0;padding:8px 10px;">
+                <span style="font-size:0.8rem;font-weight:600;opacity:0.95;">${lgName}, ${largest.value}</span>
             </div>`;
 
             // RIGHT: 2 rows
-            html += `<div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;">`;
+            html += `<div style="flex:${restTotal};display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden;gap:1px;">`;
 
             // Row 1
-            html += `<div style="flex:${row1Total};display:flex;min-height:0;overflow:hidden;">`;
-            row1.forEach(item => { html += cell(item, '0.7rem', '1.4rem'); });
+            html += `<div style="flex:${row1Total || 1};display:flex;min-height:0;overflow:hidden;gap:1px;">`;
+            row1.forEach(item => { html += cell(item, item.value); });
             html += `</div>`;
 
             // Row 2
-            html += `<div style="flex:${row2Total};display:flex;min-height:0;overflow:hidden;">`;
-            row2Main.forEach(item => { html += cell(item, '0.65rem', '1.3rem'); });
+            html += `<div style="flex:${row2Total || 1};display:flex;min-height:0;overflow:hidden;gap:1px;">`;
+            row2Main.forEach(item => { html += cell(item, item.value); });
             if (row2Small.length > 0) {
                 const smallTotal = row2Small.reduce((s, i) => s + i.value, 0);
-                const row2MainTotal = row2Main.reduce((s, i) => s + i.value, 0);
-                const smallPct = row2Total > 0 ? (smallTotal / row2Total * 100) : 30;
-                html += `<div style="flex:0 0 ${smallPct}%;display:flex;flex-direction:column;min-height:0;overflow:hidden;">`;
-                row2Small.forEach(item => { html += cell(item, '0.55rem', '1.1rem'); });
+                html += `<div style="flex:${smallTotal};display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;gap:1px;">`;
+                row2Small.forEach(item => { html += cell(item, item.value); });
                 html += `</div>`;
             }
             html += `</div>`;
