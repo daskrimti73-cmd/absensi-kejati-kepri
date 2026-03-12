@@ -331,7 +331,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            justify-content: flex-end;
+            justify-content: flex-start;
             color: white;
             font-weight: 700;
             font-size: 0.75rem;
@@ -2056,12 +2056,14 @@
                 return;
             }
 
-            // Helper: render one treemap cell — "Name, Value" at bottom-left, wraps if needed
-            function cell(item, flex) {
+            // Helper: render one treemap cell — "Name, Value" at top-left, wraps if needed
+            function cell(item, flex, small) {
                 const name = bidangShortName[item.name] || item.name;
                 const color = bidangColorMap[item.name] || '#999';
-                return `<div class="treemap-item" style="flex:${flex};background:${color};border-radius:4px;margin:1px;min-height:0;min-width:0;padding:6px 8px;">
-                    <div style="font-size:0.65rem;font-weight:700;opacity:0.95;line-height:1.3;word-break:break-word;">${name}, ${item.value}</div>
+                const fs = small ? '0.48rem' : '0.65rem';
+                const pad = small ? '3px 4px' : '6px 8px';
+                return `<div class="treemap-item" style="flex:${flex};background:${color};border-radius:4px;margin:1px;min-height:0;min-width:0;padding:${pad};justify-content:flex-start;">
+                    <div style="font-size:${fs};font-weight:700;opacity:0.95;line-height:1.3;word-break:break-word;">${name}, ${item.value}</div>
                 </div>`;
             }
 
@@ -2098,10 +2100,10 @@
 
             let html = `<div style="display:flex;height:100%;width:100%;overflow:hidden;gap:1px;">`;
 
-            // LEFT: largest item — text at bottom-left
+            // LEFT: largest item — text at top-left
             const lgName = bidangShortName[largest.name] || largest.name;
             const lgColor = bidangColorMap[largest.name] || '#999';
-            html += `<div class="treemap-item" style="flex:${leftFlex};background:${lgColor};border-radius:4px;margin:1px;min-height:0;min-width:0;padding:8px 10px;">
+            html += `<div class="treemap-item" style="flex:${leftFlex};background:${lgColor};border-radius:4px;margin:1px;min-height:0;min-width:0;padding:8px 10px;justify-content:flex-start;">
                 <div style="font-size:0.85rem;font-weight:700;opacity:0.95;line-height:1.3;">${lgName}, ${largest.value}</div>
             </div>`;
 
@@ -2119,7 +2121,7 @@
             if (row2Small.length > 0) {
                 const smallTotal = row2Small.reduce((s, i) => s + i.value, 0);
                 html += `<div style="flex:${smallTotal};display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;gap:1px;">`;
-                row2Small.forEach(item => { html += cell(item, item.value); });
+                row2Small.forEach(item => { html += cell(item, item.value, true); });
                 html += `</div>`;
             }
             html += `</div>`;
